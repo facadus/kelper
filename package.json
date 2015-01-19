@@ -1,4 +1,7 @@
 {
   "name": "builder",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "dependencies": {
+    "grunt-contrib-requirejs": "latest"
+  }
 }

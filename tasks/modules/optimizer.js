@@ -13,18 +13,50 @@ exports.init = function(grunt){
             process.chdir(cwd);
             // Loading -> End
 
-            if(typeof config.minify == "object"){
-                // Object
-                grunt.config.set("uglify", config.minify);
-            }else{
-                // Set configuration from config file
-                grunt.config.set("uglify", {
-                    options: grunt.file.readJSON(config.minify)
-                });
+            var configuration = {
+                options: {},
+                merge: function(){
+                    if(!arguments.length)
+                        return this.options;
+                    for(var i = 0; i < arguments.length; i++){
+                        for(var key in arguments[i]){
+                            this.options[key] = arguments[i][key];
+                        }
+                    }
+                }
+            };
+
+            if(grunt.util.kindOf(config.minify.prefabs) == "array" && config.minify.prefabs.length){
+                if(config.minify.prefabs.indexOf("requirejs") > -1){
+                    var libraries = grunt.config.get("builder").requirejs;
+                    switch(grunt.util.kindOf(libraries)){
+                        case "string":
+                            // File
+                            libraries = grunt.file.readJSON(libraries);
+                            break;
+                        case "object":
+                            // Plain
+                            libraries = libraries.compile.options;
+                            break;
+                    }
+                    config.minify.prefabs.splice[config.minify.prefabs.indexOf("requirejs"), 1];
+                    configuration.options.reqjs = {files: [{ src: libraries.out, dest: libraries.out }]};
+                }
             }
 
-            // Run RequireJS
+            if(typeof config.minify == "object"){
+                // Object
+                configuration.merge(config.minify);
+            }else{
+                // Set configuration from config file
+                configuration.merge(grunt.file.readJSON(config.minify));
+            }
+            grunt.config.set("uglify", configuration.options);
+
+            // Run Uglify
             grunt.task.run("uglify");
         }
-    }
+    };
+
+    return exports;
 };

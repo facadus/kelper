@@ -31,11 +31,32 @@ module.exports = function(grunt){
                 grunt.log.writeln("RequireJS -> Finished");
 
             }
-
         }
 
         if(typeof config.optiomization != "undefined"){
+            if(typeof config.optiomization.minify != "undefined"){
 
+                grunt.log.writeln("Minify -> Start");
+
+                // Loading Uglify if needed -> Start
+                process.chdir(__dirname + "/../");
+                grunt.loadNpmTasks("grunt-contrib-uglify");
+                process.chdir(cwd);
+                // Loading -> End
+
+                // Set configuration from config file
+                grunt.config.set("uglify", {
+                    compile: {
+                        options: grunt.file.readJSON(config.builder.requirejs)
+                    }
+                });
+
+                // Run RequireJS
+                grunt.task.run("uglify");
+
+                grunt.log.writeln("Minify -> End");
+
+            }
         }
 
 

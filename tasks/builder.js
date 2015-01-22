@@ -10,15 +10,26 @@ module.exports = function(grunt){
         if(typeof config.builder != "undefined"){
             if(typeof config.builder.requirejs != "undefined"){
 
+                grunt.log.writeln("RequireJS -> Start");
+
                 // Loading RequireJS if needed -> Start
                 process.chdir(__dirname + "/../");
                 grunt.loadNpmTasks("grunt-contrib-requirejs");
                 process.chdir(cwd);
                 // Loading -> End
 
-                // requirejs.config = grunt.file.readJSON(config.builder.requirejs);
+                // Set configuration from config file
+                grunt.config.set("requirejs", {
+                    compile: {
+                        options: grunt.file.readJSON(config.builder.requirejs)
+                    }
+                });
 
-                grunt.task.run(["requirejs"]);
+                // Run RequireJS
+                grunt.task.run("requirejs");
+
+                grunt.log.writeln("RequireJS -> Finished");
+
             }
 
         }

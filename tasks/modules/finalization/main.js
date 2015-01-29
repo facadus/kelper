@@ -30,16 +30,21 @@ exports.init = function(grunt){
             }
 
             // Step 1 = Uglify
-            if(this.envelopment.uglify != "undefined"){
+            if(typeof this.envelopment.uglify != "undefined" && grunt.util.kindOf(this.envelopment.libraries) == "array"){
+                var fileList = {};
+                this.envelopment.libraries.forEach(function(library){
+                    fileList[process.cwd() + path.sep + path.normalize(config.target) + path.sep + library.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(config.source) + path.sep + library.name + path.sep + "main.js";
+                });
+
                 configuration.uglify = {
-                    options: this.envelopment.uglify
+                    options: this.envelopment.uglify,
+                    target: {
+                        files: fileList
+                    }
                 }
 
-
-                console.log(config);
-                return;
                 // Set uglify configuration
-                grunt.config.set("uglify", configuration);
+                grunt.config.set("uglify", configuration.uglify);
 
                 // Run uglify
                 this.loadPlugin("grunt-contrib-uglify");
@@ -47,8 +52,30 @@ exports.init = function(grunt){
             }
 
             // Step 2 = Resources
-            if(this.envelopment.resources != "undefined"){
-                // Copy forEach resources
+            if(grunt.util.kindOf(this.envelopment.resources) == "array" && typeof config.resourcePath != "undefined"){
+
+                // Empty files
+                configuration.copy = {
+                    resources: {
+                        files: []
+                    }
+                };
+
+                // Adding files if needed
+                this.envelopment.resources.forEach(function(resource){
+                    configuration.copy.resources.files.push({
+                        expand: true,
+                        cwd: process.cwd() + path.sep + path.normalize(config.resourcePath) + path.sep + resource + path.sep,
+                        src: ["*.*", "**/*.*"],
+                        dest: process.cwd() + path.sep + path.normalize(config.target),
+                    });
+                });
+
+                grunt.config.set("copy", configuration.copy);
+
+                // Run Task
+                this.loadPlugin("grunt-contrib-copy");
+                grunt.task.run("copy");
             }
 
 
@@ -56,20 +83,8 @@ exports.init = function(grunt){
         parse: function(configuration){
             // Parsing
             if(configuration.hasOwnProperty("source") && configuration.hasOwnProperty("target")){
-                configuration.uglify = {
-                    base: {
-                        options: {},
-                        files: {
-                            expand: true,
-                            src: process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.js",
-                            dest: process.cwd() + path.sep + path.normalize(configuration.target)
-                        }
-                    }
-                }
-                delete configuration.source;
-                delete configuration.target;
+
             }
-            console.log(configuration);
 
             return configuration;
         }

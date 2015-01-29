@@ -28,13 +28,8 @@ exports.init = function(grunt){
             return destination[0] || {};
         },
         makeClear: function(target){
-            if(grunt.file.exists(target)){
-                if(grunt.file.isDir(target) || grunt.file.isFile(target)){
-                    grunt.file.delete(target, {force: true});
-                    grunt.log.debug(target + " folder is deleted");
-                }else{
-                    grunt.log.error("[ERROR] Unknown file type '" + target + "'");
-                }
+            if(grunt.file.isDir(target) || grunt.file.isFile(target)){
+                grunt.file.delete(target, {force: true});
             }
         }
     }

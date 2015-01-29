@@ -43,6 +43,8 @@ exports.init = function(grunt){
             grunt.config.set("typescript", configuration);
             this.loadPlugin("grunt-typescript");
 
+            this.generateLibraries(configuration.base.dest);
+
             grunt.task.run("typescript");
         },
         parse: function(configuration){
@@ -68,6 +70,24 @@ exports.init = function(grunt){
             return {
                 base: configuration
             };
+        },
+        generateLibraries: function(dest){
+            if(grunt.util.kindOf(this.envelopment.libraries) == "array"){
+
+                this.envelopment.libraries.forEach(function(library){
+                    var fileText = 'define("' + library.name + '"';
+                    if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
+                        var packages = [];
+                        library.packages.forEach(function(package){
+                            packages.push(package.name);
+                        });
+                        fileText += ', ["' + packages.join('","') + '"]';
+                    }
+                    fileText += ", function(){});";
+                    grunt.file.write(dest + path.sep + library.name + path.sep + "main.js", fileText);
+                });
+                
+            }
         }
     });
 

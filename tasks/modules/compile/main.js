@@ -29,13 +29,16 @@ exports.init = function(grunt){
                 grunt.log.writeln(this.name + " user configuration not found, continue");
             }
 
+            // For Debug ->
+            grunt.log.debug(configuration);
+
+            // Setting configuration
             grunt.config.set("typescript", configuration);
             this.loadPlugin("grunt-typescript");
 
             grunt.task.run("typescript");
         },
         loadPlugin: function(pluginName){
-            console.log(this.modulePath);
             var cwd = process.cwd();
             process.chdir(this.modulePath);
             grunt.loadNpmTasks(pluginName);

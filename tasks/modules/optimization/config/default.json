@@ -1,0 +1,10 @@
+{
+  "compile": {
+    "options": {
+      "remoteBaseUrl": "src",
+      "baseUrl": "target/compiled",
+      "dir": "target/optimized",
+      "optimize": "none"
+    }
+  }
+}

@@ -26,8 +26,14 @@ exports.init = function(grunt){
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, this.parse(config));
 
-                console.log(configuration);
+                // For Debug ->
+                grunt.log.debug(configuration);
 
+                // Setting configuration
+                grunt.config.set("requirejs", configuration);
+
+                this.loadPlugin("grunt-contrib-requirejs");
+                grunt.task.run("requirejs");
             }else{
                 grunt.log.writeln(this.name + " user configuration not found, continue");
             }
@@ -41,22 +47,20 @@ exports.init = function(grunt){
         parse: function(configuration){
             // Parsing
             if(configuration.hasOwnProperty("source")){
-                configuration.src = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.ts";
+                configuration.baseUrl = process.cwd() + path.sep + path.normalize(configuration.source);
                 delete configuration.source;
             }
             if(configuration.hasOwnProperty("target")){
-                configuration.dest = process.cwd() + path.sep + path.normalize(configuration.target);
+                configuration.dir = process.cwd() + path.sep + path.normalize(configuration.target);
                 delete configuration.target;
             }
-            if(configuration.hasOwnProperty("version")){
-                if(configuration.hasOwnProperty("options")){
-                    configuration.options.target = configuration.version;
-                }else{
-                    configuration.options = {target: configuration.version};
+
+            // Fix for RequireJS
+            return {
+                compile: {
+                    options: configuration
                 }
-                delete configuration.version;
-            }
-            return configuration;
+            };
         },
         mergeObjects: function(){
             if(arguments.length > 1){

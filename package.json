@@ -1,10 +1,12 @@
 {
   "name": "builder",
   "version": "0.0.1",
+  "description": "Project Builder",
   "dependencies": {
     "grunt-contrib-requirejs": "latest",
     "grunt-contrib-uglify": "latest",
-    "grunt-typescript": "^0.6.1",
-    "typescript": "^1.4.1"
+    "grunt-contrib-copy": "latest",
+    "grunt-typescript": "latest",
+    "typescript": "latest"
   }
 }

@@ -29,6 +29,11 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
+            if(typeof this.envelopment != "undefined" && typeof this.envelopment.libraries != "undefined"){
+                configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseLibraries(this.envelopment.libraries));
+                console.log(configuration);
+            }
+
             // For Debug ->
             grunt.log.debug(configuration);
 
@@ -67,11 +72,11 @@ exports.init = function(grunt){
                 var destination = arguments[0];
                 for(var i = 1; i < arguments.length; i++){
                     var source = arguments[i];
-                    for (var property in source){
-                        if(grunt.util.kindOf(destination[property]) == "object" && grunt.util.kindOf(source[property]) == "object") {
+                    for(var property in source){
+                        if(grunt.util.kindOf(destination[property]) == "object" && grunt.util.kindOf(source[property]) == "object"){
                             destination[property] = destination[property] || {};
                             arguments.callee(destination[property], source[property]);
-                        } else {
+                        }else{
                             destination[property] = source[property];
                         }
                     }
@@ -79,6 +84,27 @@ exports.init = function(grunt){
                 }
             }
             return destination[0] || {};
+        },
+        parseLibraries: function(source){
+            var parsed = {
+                modules: [],
+                packages: []
+            };
+
+            source.forEach(function(library){
+                // Push Modules
+                parsed.packages.push(library.name);
+                parsed.modules.push({
+                    name: library.name
+                });
+
+                // Push packages
+                library.packages.forEach(function(package){
+                    parsed.packages.push(package.name);
+                });
+            });
+
+            return parsed;
         }
     }
 };

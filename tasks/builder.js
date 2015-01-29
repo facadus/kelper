@@ -12,15 +12,15 @@ module.exports = function(grunt){
         ]
     };
 
-    // Loading Envelopment file
+    // Loading Environment file
     var env_file = grunt.option('target') || 'local';
     try{
-        var envelopment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "envelopment" + path.sep + env_file + ".json");
+        var environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "environment" + path.sep + env_file + ".json");
     }catch(ex){
         if(ex.origError.code == "ENOENT"){
-            grunt.log.error("[ERROR] There is no '" + env_file + ".json' envelopment file!");
+            grunt.log.error("[ERROR] There is no '" + env_file + ".json' environment file!");
         }else{
-            grunt.log.error("[ERROR] Unable to parse '" + env_file + ".json' envelopment file!");
+            grunt.log.error("[ERROR] Unable to parse '" + env_file + ".json' environment file!");
         }
         return 1;
     }
@@ -31,7 +31,7 @@ module.exports = function(grunt){
         configuration.modules.forEach(function(module){
             module = require(configuration.modulePath + path.sep + module + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(configuration.builderPath);
-            module.envelopment = envelopment;
+            module.environment = environment;
             module.run();
         });
 

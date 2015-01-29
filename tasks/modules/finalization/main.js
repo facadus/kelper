@@ -30,14 +30,14 @@ exports.init = function(grunt){
             }
 
             // Step 1 = Uglify
-            if(typeof this.envelopment.uglify != "undefined" && grunt.util.kindOf(this.envelopment.libraries) == "array"){
+            if(typeof this.environment.uglify != "undefined" && grunt.util.kindOf(this.environment.libraries) == "array"){
                 var fileList = {};
-                this.envelopment.libraries.forEach(function(library){
+                this.environment.libraries.forEach(function(library){
                     fileList[process.cwd() + path.sep + path.normalize(config.target) + path.sep + library.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(config.source) + path.sep + library.name + path.sep + "main.js";
                 });
 
                 configuration.uglify = {
-                    options: this.envelopment.uglify,
+                    options: this.environment.uglify,
                     target: {
                         files: fileList
                     }
@@ -52,7 +52,7 @@ exports.init = function(grunt){
             }
 
             // Step 2 = Resources
-            if(grunt.util.kindOf(this.envelopment.resources) == "array" && typeof config.resourcePath != "undefined"){
+            if(grunt.util.kindOf(this.environment.resources) == "array" && typeof config.resourcePath != "undefined"){
 
                 // Empty files
                 configuration.copy = {
@@ -62,7 +62,7 @@ exports.init = function(grunt){
                 };
 
                 // Adding files if needed
-                this.envelopment.resources.forEach(function(resource){
+                this.environment.resources.forEach(function(resource){
                     configuration.copy.resources.files.push({
                         expand: true,
                         cwd: process.cwd() + path.sep + path.normalize(config.resourcePath) + path.sep + resource + path.sep,
@@ -78,15 +78,27 @@ exports.init = function(grunt){
                 grunt.task.run("copy");
             }
 
+            // Step 3 = Libs
+            if(grunt.util.kindOf(config.base) == "array"){
 
-        },
-        parse: function(configuration){
-            // Parsing
-            if(configuration.hasOwnProperty("source") && configuration.hasOwnProperty("target")){
+                var libs = {}
+                libs[process.cwd() + path.sep + path.normalize(config.target) + path.sep + "base" + path.sep + "main.js"] = config.base;
 
+                configuration.uglify = {
+                    options: this.environment.uglify,
+                    target: {
+                        files: libs
+                    }
+                }
+
+                // Set uglify configuration
+                grunt.config.set("uglify", configuration.uglify);
+
+                // Run uglify
+                this.loadPlugin("grunt-contrib-uglify");
+                grunt.task.run("uglify");
             }
 
-            return configuration;
         }
     });
 

@@ -32,8 +32,8 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
-            if(typeof this.envelopment != "undefined" && typeof this.envelopment.libraries != "undefined"){
-                configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseLibraries(this.envelopment.libraries));
+            if(typeof this.environment != "undefined" && typeof this.environment.libraries != "undefined"){
+                configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseLibraries(this.environment.libraries));
             }
 
             if(typeof  configuration.compile != "undefined" && typeof configuration.compile.options.dir != "undefined"){
@@ -41,7 +41,7 @@ exports.init = function(grunt){
             }
 
             // For Debug ->
-            grunt.log.debug(configuration);
+            grunt.log.debug(JSON.stringify(configuration));
 
             // Setting configuration
             grunt.config.set("requirejs", configuration);

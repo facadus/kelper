@@ -37,7 +37,7 @@ exports.init = function(grunt){
             }
 
             // For Debug ->
-            grunt.log.debug(configuration);
+            grunt.log.debug(JSON.stringify(configuration));
 
             // Setting configuration
             grunt.config.set("typescript", configuration);
@@ -72,9 +72,9 @@ exports.init = function(grunt){
             };
         },
         generateLibraries: function(dest){
-            if(grunt.util.kindOf(this.envelopment.libraries) == "array"){
+            if(grunt.util.kindOf(this.environment.libraries) == "array"){
 
-                this.envelopment.libraries.forEach(function(library){
+                this.environment.libraries.forEach(function(library){
                     var fileText = 'define("' + library.name + '"';
                     if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
                         var packages = [];

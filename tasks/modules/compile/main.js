@@ -29,6 +29,10 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
+            if(typeof configuration.base != "undefined" && configuration.base.dest != "undefined"){
+                this.makeClear(configuration.base.dest);
+            }
+
             // For Debug ->
             grunt.log.debug(configuration);
 
@@ -85,6 +89,11 @@ exports.init = function(grunt){
                 }
             }
             return destination[0] || {};
+        },
+        makeClear: function(target){
+            if(grunt.file.isDir(target) || grunt.file.isFile(target)){
+                grunt.file.delete(target, {force:true});
+            }
         }
     }
 };

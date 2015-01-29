@@ -22,15 +22,33 @@ exports.init = function(grunt){
             // Load user created configuration
             if(grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")){
                 var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
-
-                //Parsing configuration
-                configuration = this.mergeObjects(configuration, this.parse(config));
-
-                console.log(configuration);
-
             }else{
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
+
+            // Step 1 = Uglify
+            if(this.envelopment.uglify != "undefined"){
+                configuration.uglify = {
+                    options: this.envelopment.uglify
+                }
+
+
+                console.log(config);
+                return;
+                // Set uglify configuration
+                grunt.config.set("uglify", configuration);
+
+                // Run uglify
+                this.loadPlugin("grunt-contrib-uglify");
+                grunt.task.run("uglify");
+            }
+
+            // Step 2 = Resources
+            if(this.envelopment.resources != "undefined"){
+                // Copy forEach resources
+            }
+
+
         },
         loadPlugin: function(pluginName){
             var cwd = process.cwd();
@@ -40,22 +58,22 @@ exports.init = function(grunt){
         },
         parse: function(configuration){
             // Parsing
-            if(configuration.hasOwnProperty("source")){
-                configuration.src = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.ts";
+            if(configuration.hasOwnProperty("source") && configuration.hasOwnProperty("target")){
+                configuration.uglify = {
+                    base: {
+                        options: {},
+                        files: {
+                            expand: true,
+                            src: process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.js",
+                            dest: process.cwd() + path.sep + path.normalize(configuration.target)
+                        }
+                    }
+                }
                 delete configuration.source;
-            }
-            if(configuration.hasOwnProperty("target")){
-                configuration.dest = process.cwd() + path.sep + path.normalize(configuration.target);
                 delete configuration.target;
             }
-            if(configuration.hasOwnProperty("version")){
-                if(configuration.hasOwnProperty("options")){
-                    configuration.options.target = configuration.version;
-                }else{
-                    configuration.options = {target: configuration.version};
-                }
-                delete configuration.version;
-            }
+            console.log(configuration);
+
             return configuration;
         },
         mergeObjects: function(){
@@ -75,6 +93,11 @@ exports.init = function(grunt){
                 }
             }
             return destination[0] || {};
+        },
+        makeClear: function(target){
+            if(grunt.file.isDir(target) || grunt.file.isFile(target)){
+                grunt.file.delete(target, {force:true});
+            }
         }
     }
 };

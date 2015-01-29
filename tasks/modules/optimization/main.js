@@ -31,7 +31,10 @@ exports.init = function(grunt){
 
             if(typeof this.envelopment != "undefined" && typeof this.envelopment.libraries != "undefined"){
                 configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseLibraries(this.envelopment.libraries));
-                console.log(configuration);
+            }
+
+            if(typeof  configuration.compile != "undefined" && typeof configuration.compile.options.dir != "undefined"){
+                this.makeClear(configuration.compile.options.dir);
             }
 
             // For Debug ->
@@ -105,6 +108,11 @@ exports.init = function(grunt){
             });
 
             return parsed;
+        },
+        makeClear: function(target){
+            if(grunt.file.isDir(target) || grunt.file.isFile(target)){
+                grunt.file.delete(target, {force:true});
+            }
         }
     }
 };

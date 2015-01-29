@@ -1,9 +1,12 @@
 //External modules
 var path = require('path');
+var util = require("util");
 
 // Module Compile
 exports.init = function(grunt){
-    return {
+    module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
+
+    util._extend(module, {
         name: path.basename(__dirname),
         run: function(){
             var configuration = {};
@@ -46,12 +49,6 @@ exports.init = function(grunt){
             this.loadPlugin("grunt-contrib-requirejs");
             grunt.task.run("requirejs");
         },
-        loadPlugin: function(pluginName){
-            var cwd = process.cwd();
-            process.chdir(this.modulePath);
-            grunt.loadNpmTasks(pluginName);
-            process.chdir(cwd);
-        },
         parse: function(configuration){
             // Parsing
             if(configuration.hasOwnProperty("source")){
@@ -69,24 +66,6 @@ exports.init = function(grunt){
                     options: configuration
                 }
             };
-        },
-        mergeObjects: function(){
-            if(arguments.length > 1){
-                var destination = arguments[0];
-                for(var i = 1; i < arguments.length; i++){
-                    var source = arguments[i];
-                    for(var property in source){
-                        if(grunt.util.kindOf(destination[property]) == "object" && grunt.util.kindOf(source[property]) == "object"){
-                            destination[property] = destination[property] || {};
-                            arguments.callee(destination[property], source[property]);
-                        }else{
-                            destination[property] = source[property];
-                        }
-                    }
-                    return destination;
-                }
-            }
-            return destination[0] || {};
         },
         parseLibraries: function(source){
             var parsed = {
@@ -108,11 +87,8 @@ exports.init = function(grunt){
             });
 
             return parsed;
-        },
-        makeClear: function(target){
-            if(grunt.file.isDir(target) || grunt.file.isFile(target)){
-                grunt.file.delete(target, {force:true});
-            }
         }
-    }
+    });
+
+    return module;
 };

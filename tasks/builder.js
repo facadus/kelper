@@ -1,6 +1,7 @@
 module.exports = function(grunt){
 
     var path = require('path');
+
     var configuration = {
         builderPath: path.normalize(__dirname),
         modulePath: path.normalize(__dirname) + path.sep + "modules",

@@ -1,0 +1,12 @@
+{
+  "base": {
+    "src": "src/**/*.ts",
+    "dest": "target/compiled",
+    "options": {
+      "module": "amd",
+      "sourceMap": true,
+      "basePath": "src",
+      "target": "es5"
+    }
+  }
+}

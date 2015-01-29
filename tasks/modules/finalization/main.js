@@ -12,9 +12,9 @@ exports.init = function(grunt){
             if(grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")){
                 try{
                     configuration = grunt.file.readJSON(__dirname + path.sep + "config" + path.sep + "default.json");
-                    grunt.log.writeln(this.name + " plugin default configuration is loaded!");
+                    grunt.log.debug(this.name + " plugin default configuration is loaded!");
                 }catch(ex){
-                    grunt.log.writeln("[ERROR] " + this.name + " plugin default configuration has error!");
+                    grunt.log.error("[ERROR] " + this.name + " plugin default configuration has error!");
                     configuration = {};
                 }
             }
@@ -29,7 +29,7 @@ exports.init = function(grunt){
                 console.log(configuration);
 
             }else{
-                grunt.log.writeln(this.name + " user configuration not found, continue");
+                grunt.log.debug(this.name + " user configuration not found, continue");
             }
         },
         loadPlugin: function(pluginName){

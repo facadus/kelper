@@ -40,8 +40,8 @@ exports.init = function(grunt){
             grunt.log.debug(JSON.stringify(configuration));
 
             // Setting configuration
-            grunt.config.set("typescript", configuration);
             this.loadPlugin("grunt-typescript");
+            grunt.config.set("typescript", configuration);
 
             this.generateLibraries(configuration.base.dest);
             this.generateAppNoCache(configuration.base.dest);

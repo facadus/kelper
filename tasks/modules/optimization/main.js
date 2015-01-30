@@ -47,13 +47,19 @@ exports.init = function(grunt){
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 
+            var callbackObject = this;
+            configuration.compile.options.done = function(done, output){
+                // RequireJS callback
+
+                callbackObject.compileConfig(configuration.compile.options.baseUrl, configuration.compile.options.dir);
+                done();
+            }
+
             // Setting configuration
             grunt.config.set("requirejs", configuration);
 
             this.loadPlugin("grunt-contrib-requirejs");
             grunt.task.run("requirejs");
-
-            this.compileConfig(configuration.compile.options.baseUrl, configuration.compile.options.dir);
         },
         parse: function(configuration){
             // Parsing
@@ -97,7 +103,7 @@ exports.init = function(grunt){
         parseBaseLibs: function(libs){
             var paths = {};
             for(var lib in libs){
-                paths[lib] = process.cwd() + path.sep + path.normalize(libs[lib]);
+                paths[lib] = "empty:";
             }
             return {paths: paths};
         },
@@ -106,7 +112,7 @@ exports.init = function(grunt){
             var configJs = path.sep + "config.js";
             if(grunt.file.exists(fromPath + configJs)){
                 grunt.file.delete(toPath + configJs);
-                grunt.file.write(toPath + appJs, grunt.file.read(fromPath + configJs) + grunt.file.read(fromPath + appJs));
+                grunt.file.write(toPath + appJs, grunt.file.read(fromPath + appJs) + grunt.file.read(fromPath + configJs));
             }
         }
     });

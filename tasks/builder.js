@@ -8,7 +8,8 @@ module.exports = function(grunt){
         modules: [
             "compile",
             "optimization",
-            "finalization"
+            "finalization",
+            "hashconstruction"
         ]
     };
 

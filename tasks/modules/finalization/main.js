@@ -29,6 +29,14 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
+            // ToDo:
+            // Configuration SUCKS in this module -> Rebuild
+            this.makeClear(config.target);
+
+            configuration.uglify = {
+                options: this.environment.uglify
+            }
+
             // Step 1 = Uglify
             if(typeof this.environment.uglify != "undefined" && grunt.util.kindOf(this.environment.libraries) == "array"){
                 var fileList = {};
@@ -36,19 +44,9 @@ exports.init = function(grunt){
                     fileList[process.cwd() + path.sep + path.normalize(config.target) + path.sep + library.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(config.source) + path.sep + library.name + path.sep + "main.js";
                 });
 
-                configuration.uglify = {
-                    options: this.environment.uglify,
-                    target: {
-                        files: fileList
-                    }
-                }
-
-                // Set uglify configuration
-                grunt.config.set("uglify", configuration.uglify);
-
-                // Run uglify
-                this.loadPlugin("grunt-contrib-uglify");
-                grunt.task.run("uglify");
+                configuration.uglify.minimize = {
+                    files: fileList
+                };
             }
 
             // Step 2 = Resources
@@ -79,26 +77,25 @@ exports.init = function(grunt){
             }
 
             // Step 3 = Libs
-            if(grunt.util.kindOf(config.base) == "array"){
+            if(grunt.util.kindOf(this.environment.base) == "object"){
 
                 var libs = {}
-                libs[process.cwd() + path.sep + path.normalize(config.target) + path.sep + "base" + path.sep + "main.js"] = config.base;
-
-                configuration.uglify = {
-                    options: this.environment.uglify,
-                    target: {
-                        files: libs
-                    }
+                libs[process.cwd() + path.sep + path.normalize(config.target) + path.sep + "base" + path.sep + "main.js"] = [];
+                for(var lib in this.environment.base){
+                    libs[process.cwd() + path.sep + path.normalize(config.target) + path.sep + "base" + path.sep + "main.js"].push(process.cwd() + path.sep + path.normalize(this.environment.base[lib]) + ".js");
                 }
 
-                // Set uglify configuration
-                grunt.config.set("uglify", configuration.uglify);
-
-                // Run uglify
-                this.loadPlugin("grunt-contrib-uglify");
-                grunt.task.run("uglify");
+                configuration.uglify.libs = {
+                    files: libs
+                };
             }
 
+            // Set uglify configuration
+            grunt.config.set("uglify", configuration.uglify);
+
+            // Run uglify
+            this.loadPlugin("grunt-contrib-uglify");
+            grunt.task.run("uglify");
         }
     });
 

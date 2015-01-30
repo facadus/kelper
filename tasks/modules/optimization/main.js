@@ -47,14 +47,6 @@ exports.init = function(grunt){
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 
-            var callbackObject = this;
-            configuration.compile.options.done = function(done, output){
-                // RequireJS callback
-
-                callbackObject.compileConfig(configuration.compile.options.baseUrl, configuration.compile.options.dir);
-                done();
-            }
-
             // Setting configuration
             grunt.config.set("requirejs", configuration);
 
@@ -106,14 +98,6 @@ exports.init = function(grunt){
                 paths[lib] = "empty:";
             }
             return {paths: paths};
-        },
-        compileConfig: function(fromPath, toPath){
-            var appJs = path.sep + "app.nocache.js";
-            var configJs = path.sep + "config.js";
-            if(grunt.file.exists(fromPath + configJs)){
-                grunt.file.delete(toPath + configJs);
-                grunt.file.write(toPath + appJs, grunt.file.read(fromPath + appJs) + grunt.file.read(fromPath + configJs));
-            }
         }
     });
 

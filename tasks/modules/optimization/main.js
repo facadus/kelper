@@ -32,11 +32,15 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
-            if(typeof this.environment != "undefined" && typeof this.environment.libraries != "undefined"){
+            if(typeof this.environment.libraries != "undefined"){
                 configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseLibraries(this.environment.libraries));
             }
 
-            if(typeof  configuration.compile != "undefined" && typeof configuration.compile.options.dir != "undefined"){
+            if(typeof this.environment.base != "undefined"){
+                configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseBaseLibs(this.environment.base));
+            }
+
+            if(typeof configuration.compile != "undefined" && typeof configuration.compile.options.dir != "undefined"){
                 this.makeClear(configuration.compile.options.dir);
             }
 
@@ -48,6 +52,8 @@ exports.init = function(grunt){
 
             this.loadPlugin("grunt-contrib-requirejs");
             grunt.task.run("requirejs");
+
+            this.compileConfig(configuration.compile.options.baseUrl, configuration.compile.options.dir);
         },
         parse: function(configuration){
             // Parsing
@@ -67,7 +73,7 @@ exports.init = function(grunt){
                 }
             };
         },
-        parseLibraries: function(source){
+        parseLibraries: function(source, base){
             var parsed = {
                 modules: [],
                 packages: []
@@ -87,6 +93,21 @@ exports.init = function(grunt){
             });
 
             return parsed;
+        },
+        parseBaseLibs: function(libs){
+            var paths = {};
+            for(var lib in libs){
+                paths[lib] = process.cwd() + path.sep + path.normalize(libs[lib]);
+            }
+            return {paths: paths};
+        },
+        compileConfig: function(fromPath, toPath){
+            var appJs = path.sep + "app.nocache.js";
+            var configJs = path.sep + "config.js";
+            if(grunt.file.exists(fromPath + configJs)){
+                grunt.file.delete(toPath + configJs);
+                grunt.file.write(toPath + appJs, grunt.file.read(fromPath + configJs) + grunt.file.read(fromPath + appJs));
+            }
         }
     });
 

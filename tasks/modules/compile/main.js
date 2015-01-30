@@ -5,11 +5,11 @@ var util = require("util");
 // Module Compile
 exports.init = function(grunt){
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
+    var configuration = {};
 
     util._extend(module, {
         name: path.basename(__dirname),
         run: function(){
-            var configuration = {};
 
             // Load default configuration
             if(grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")){
@@ -44,6 +44,7 @@ exports.init = function(grunt){
             this.loadPlugin("grunt-typescript");
 
             this.generateLibraries(configuration.base.dest);
+            this.generateAppNoCache(configuration.base.dest);
             this.generateConfigFile(configuration.base.dest);
 
             grunt.task.run("typescript");
@@ -91,12 +92,18 @@ exports.init = function(grunt){
             }
         },
         generateConfigFile: function(destPath){
-            var fileText = "";
+
             var configFile = destPath + path.sep + "config.js";
+            var pathRel = path.relative(process.cwd(), configuration.base.dest).replace(/\\/g, "/");
+
+            // ToDo:
+            //   Need to test this function (SelfMaded) - WebStorm - ok
+            var fileText = "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return document.currentScript.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
+            fileText += "window.require = window.require || {};\n";
+            fileText += "window.require.baseUrl = rootDir + '" + pathRel + "';\n";
 
             if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
-                fileText += "window.require = window.require || {};\r\n";
-                fileText += "window.require.config = window.require.config || {};\r\n";
+                fileText += "window.require.config = window.require.config || {};\n";
 
                 var libraries = [];
                 var packages = [];
@@ -114,15 +121,30 @@ exports.init = function(grunt){
                     }
                 });
 
-                fileText += 'window.require.deps = ["' + libraries.join('","') + '"];\r\n';
-                fileText += 'window.require.packages = ["' + libraries.concat(packages).join('","') + '"];\r\n';
+                if(libraries.length > 0){
+                    fileText += 'window.require.deps = (window.require.deps || []).concat(["' + libraries.join('","') + '"]);\n';
+                    fileText += 'window.require.packages = (window.require.packages || []).concat(["' + libraries.concat(packages).join('","') + '"]);\n';
+                }
 
                 for(var index in packageConfig){
-                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]);
+                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
+                }
+            }
+
+            if(grunt.util.kindOf(this.environment.base) == "object"){
+                fileText += "window.require.paths = window.require.paths || {};\n";
+                for(var lib in this.environment.base){
+                    fileText += 'window.require.paths["' + lib + '"] = rootDir + "' + path.normalize(this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
                 }
             }
 
             grunt.file.write(configFile, fileText);
+        },
+        generateAppNoCache: function(destPath){
+            var appJs = destPath + path.sep + "app.nocache.js";
+            if(!grunt.file.exists(appJs)){
+                grunt.file.write(appJs, "__bootstrap();");
+            }
         }
     });
 

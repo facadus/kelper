@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "description": "Project Builder",
   "dependencies": {
+    "grunt-contrib-copy": "latest",
     "grunt-contrib-requirejs": "latest",
     "grunt-contrib-uglify": "latest",
-    "grunt-contrib-copy": "latest",
     "grunt-typescript": "latest",
     "typescript": "latest"
   }

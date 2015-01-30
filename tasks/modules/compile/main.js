@@ -44,6 +44,7 @@ exports.init = function(grunt){
             this.loadPlugin("grunt-typescript");
 
             this.generateLibraries(configuration.base.dest);
+            this.generateConfigFile(configuration.base.dest);
 
             grunt.task.run("typescript");
         },
@@ -86,8 +87,42 @@ exports.init = function(grunt){
                     fileText += ", function(){});";
                     grunt.file.write(dest + path.sep + library.name + path.sep + "main.js", fileText);
                 });
-                
+
             }
+        },
+        generateConfigFile: function(destPath){
+            var fileText = "";
+            var configFile = destPath + path.sep + "config.js";
+
+            if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
+                fileText += "window.require = window.require || {};\r\n";
+                fileText += "window.require.config = window.require.config || {};\r\n";
+
+                var libraries = [];
+                var packages = [];
+                var packageConfig = {};
+
+                this.environment.libraries.forEach(function(library){
+                    libraries.push(library.name);
+                    if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
+                        library.packages.forEach(function(package){
+                            packages.push(package.name);
+                            if(package.hasOwnProperty("config")){
+                                packageConfig[package.name + "/main"] = package.config;
+                            }
+                        });
+                    }
+                });
+
+                fileText += 'window.require.deps = ["' + libraries.join('","') + '"];\r\n';
+                fileText += 'window.require.packages = ["' + libraries.concat(packages).join('","') + '"];\r\n';
+
+                for(var index in packageConfig){
+                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]);
+                }
+            }
+
+            grunt.file.write(configFile, fileText);
         }
     });
 

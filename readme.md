@@ -125,6 +125,7 @@ Environment configuration should contain **JSON** format data and all data is op
 By adding additional configuration Kelper will make additional functions like minifying, building libraries and packages, copying resources.
 
 There can be these configuration parameters:
+
 * **uglify** - is used in finalization process to minify files
 * **base** - is used in optimization and finalization process to define static libraries like jQuery, Backbone and others.
 * **libraries** - is used in optimization and finalization process to define libraries that should be exported.
@@ -152,12 +153,53 @@ For more information [follow this link](https://github.com/gruntjs/grunt-contrib
 
 #### Base configuration parameter
 
+Base is used in optimization and finalization process to define static libraries like jQuery, Backbone and others.
+
+*Example of usage:*
+```
+{
+    "base": {
+        "require": "lib/require/require",
+        "jquery": "lib/jquery/jquery"
+    }
+}
+```
 
 #### Libraries configuration parameter
 
+Libraries is used in optimization and finalization process to define libraries that should be exported.
+This function automatically generates library files and compile them. All configurations that are set in packages are copied to configuration (config.js or app.nocache.js) files for usage.
+
+
+*Example of usage:*
+
+```
+{
+    "libraries": [
+        {
+            "name": "sample",
+            "packages": [
+                {
+                    "name": "common"
+                },
+                {
+                    "name": "application",
+                    "config": {
+                        "title": "My Application"
+                    }
+                }
+            ]
+        }
+    ]
+}
+```
 
 #### Packages configuration parameter
 
+Packages is used in optimization process to define RequireJS static packages.
+
+In ToDo:
+xxx
 
 
 #### HASH configuration parameter
@@ -165,6 +207,12 @@ For more information [follow this link](https://github.com/gruntjs/grunt-contrib
 Hash parameter is used in finalization process to define hash method. After all finalization process this function renames all files by it's content to it's HASH.
 
 Default method is **"MD5"**.
+
+To view all available methods:
+
+- Open console (CMD or Terminal)
+- Start Node.JS
+- Write "Crypto.getHashes();"
 
 #### Resources configuration parameter
 

@@ -8,5 +8,9 @@
     "grunt-contrib-uglify": "latest",
     "grunt-typescript": "latest",
     "typescript": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://git.ctco.lv/r/~alexander.domotenko/training/builder.git"
   }
 }

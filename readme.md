@@ -14,7 +14,7 @@ To start working with Kelper, you should add kelper dependency to package.json f
 ```
 
 Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
-```js
+```
 grunt.loadNpmTasks('kelper');
 ```
 
@@ -46,7 +46,7 @@ There are available these commands:
 * **f** or **finalization** - will run all 3 tasks
 
 *Example of usage:*
-```shell
+```
 grunt -process optimization
 ```
 
@@ -60,7 +60,7 @@ There are 3 main parameters:
 * **version** - compiled javascript standart
 
 *Example*:
-```js
+```
 module.exports = function(grunt){
         return {
             source: 'src',
@@ -80,7 +80,7 @@ There are 3 main parameters:
 * **target** - path of folder from base directory that collects optimized files
 
 *Optimization file example*:
-```js
+```
 module.exports = function(grunt){
         return {
             remoteBaseUrl: 'src',
@@ -100,7 +100,7 @@ There are 3 main parameters:
 * **target** - path of folder from base directory that collects finalized files
 
 *Finalization file example*:
-```js
+```
 module.exports = function(grunt){
         return {
             resourcePath: 'resources',
@@ -139,7 +139,7 @@ Without this parameter finalization process will continue it's work without mini
 For more information [follow this link](https://github.com/gruntjs/grunt-contrib-uglify).
 
 *Example of configuration:*
-```json
+```
 {
   "uglify": {
     "mangle": false,
@@ -173,7 +173,7 @@ Resource parameter is used in finalization process to define static resources fo
 If parameter is not exist or is empty, finalization process continue it's work without copying these files.
 
 *Example of usage:*
-```json
+```
 {
     "resources": [
         "main",

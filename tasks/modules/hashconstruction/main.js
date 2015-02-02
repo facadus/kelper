@@ -73,9 +73,7 @@ exports.init = function(grunt){
 
             // Gettings path
             var filePath = process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "app.nocache.js";
-
-            var fileText = grunt.file.read(process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "app.nocache.js");
-            fileText += "window.require = window.require || {};\n";
+            var fileText = "window.require = window.require || {};\n";
 
             if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
                 fileText += "window.require.config = window.require.config || {};\n";
@@ -112,55 +110,14 @@ exports.init = function(grunt){
                 }
             }
 
+            fileText += "function __bootstrap(){\n";
+            fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
+            fileText += "}\n";
+            fileText += grunt.file.read(process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "app.nocache.js");
+
             grunt.file.write(filePath, fileText);
 
             return true;
-        },
-        generateConfigFile: function(destPath){
-
-            var configFile = destPath + path.sep + "config.js";
-
-
-            // ToDo:
-            //   Need to test this function (SelfMaded) - WebStorm - ok
-
-            if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
-                fileText += "window.require.config = window.require.config || {};\n";
-
-                var libraries = [];
-                var packages = [];
-                var packageConfig = {};
-
-                this.environment.libraries.forEach(function(library){
-                    libraries.push(library.name);
-                    if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
-                        library.packages.forEach(function(package){
-                            packages.push(package.name);
-                            if(package.hasOwnProperty("config")){
-                                packageConfig[package.name + "/main"] = package.config;
-                            }
-                        });
-                    }
-                });
-
-                if(libraries.length > 0){
-                    fileText += 'window.require.deps = (window.require.deps || []).concat(["' + libraries.join('","') + '"]);\n';
-                    fileText += 'window.require.packages = (window.require.packages || []).concat(["' + libraries.concat(packages).join('","') + '"]);\n';
-                }
-
-                for(var index in packageConfig){
-                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
-                }
-            }
-
-            if(grunt.util.kindOf(this.environment.base) == "object"){
-                fileText += "window.require.paths = window.require.paths || {};\n";
-                for(var lib in this.environment.base){
-                    fileText += 'window.require.paths["' + lib + '"] = rootDir + "' + path.normalize(this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
-                }
-            }
-
-            grunt.file.write(configFile, fileText);
         }
     });
 

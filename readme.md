@@ -1,4 +1,4 @@
-#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.svg) Kelper 0.1.0
+#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png) Kelper 0.1.0
 
 Kelper is a project builder 
 

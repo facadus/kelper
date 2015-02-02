@@ -1,7 +1,7 @@
 {
-  "name": "builder",
-  "version": "0.0.1",
-  "description": "Project Builder",
+  "name": "Kelper",
+  "version": "0.1.0",
+  "description": "Kelper is a project builder/compiler",
   "dependencies": {
     "grunt-contrib-copy": "latest",
     "grunt-contrib-requirejs": "latest",

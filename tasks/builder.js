@@ -10,7 +10,15 @@ module.exports = function(grunt){
             "optimization",
             "finalization",
             "hashconstruction"
-        ]
+        ],
+        phase: {
+            "c": ["compile"],
+            "compile": ["compile"],
+            "o": ["compile", "optimization"],
+            "optimization": ["compile", "optimization"],
+            "f": ["compile", "optimization", "finalization", "hashconstruction"],
+            "finalization": ["compile", "optimization", "finalization", "hashconstruction"]
+        }
     };
 
     // Loading Environment file
@@ -26,10 +34,17 @@ module.exports = function(grunt){
         return 1;
     }
 
+    var phase = grunt.option("process") || grunt.option("p") || "finalization";
+    var modules = configuration.phase[phase];
+    if(!modules){
+        grunt.log.error("[ERROR] There is no '" + phase + "' phase");
+        return 1;
+    }
+
     grunt.registerTask('builder', 'Build task', function(){
 
         // Running all modules
-        configuration.modules.forEach(function(module){
+        modules.forEach(function(module){
             module = require(configuration.modulePath + path.sep + module + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(configuration.builderPath);
             module.environment = environment;

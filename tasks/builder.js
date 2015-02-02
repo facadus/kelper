@@ -16,7 +16,7 @@ module.exports = function(grunt){
     // Loading Environment file
     var env_file = grunt.option('target') || 'local';
     try{
-        var environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "environment" + path.sep + env_file + ".json");
+        var environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "target" + path.sep + env_file + ".json");
     }catch(ex){
         if(ex.origError.code == "ENOENT"){
             grunt.log.error("[ERROR] There is no '" + env_file + ".json' environment file!");

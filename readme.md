@@ -133,7 +133,7 @@ Environment configuration is used for builder to get project build information. 
 *Example:*
 
 ```
-    grunt -target dev
+grunt -target dev
 ```
 
 Environment configuration should contain **JSON** format data and all data is optional.

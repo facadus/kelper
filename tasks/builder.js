@@ -41,7 +41,7 @@ module.exports = function(grunt){
         return 1;
     }
 
-    grunt.registerTask('builder', 'Build task', function(){
+    grunt.registerTask('kelper', 'Build task', function(){
 
         // Running all modules
         modules.forEach(function(module){
@@ -53,5 +53,5 @@ module.exports = function(grunt){
 
     });
 
-    grunt.registerTask("default", ["builder"]);
+    grunt.registerTask("default", ["kelper"]);
 };

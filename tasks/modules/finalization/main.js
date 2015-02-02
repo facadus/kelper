@@ -25,13 +25,14 @@ exports.init = function(grunt){
             // Load user created configuration
             if(grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")){
                 var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
+
+                //Parsing configuration
+                configuration = this.mergeObjects(configuration, config);
             }else{
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
-            // ToDo:
-            // Configuration SUCKS in this module -> Rebuild
-            this.makeClear(config.target);
+            this.makeClear(configuration.target);
 
             configuration.uglify = {
                 options: this.environment.uglify
@@ -80,9 +81,9 @@ exports.init = function(grunt){
             if(grunt.util.kindOf(this.environment.base) == "object"){
 
                 var libs = {}
-                libs[process.cwd() + path.sep + path.normalize(config.target) + path.sep + "base" + path.sep + "main.js"] = [];
+                libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"] = [];
                 for(var lib in this.environment.base){
-                    libs[process.cwd() + path.sep + path.normalize(config.target) + path.sep + "base" + path.sep + "main.js"].push(process.cwd() + path.sep + path.normalize(this.environment.base[lib]) + ".js");
+                    libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"].push(process.cwd() + path.sep + path.normalize(this.environment.base[lib]) + ".js");
                 }
 
                 configuration.uglify.libs = {

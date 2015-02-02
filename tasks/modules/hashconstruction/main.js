@@ -104,7 +104,7 @@ exports.init = function(grunt){
                     });
 
                     fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
-                    fileText += 'window.require.packages = (window.require.packages || []).concat(["' + JSON.stringify(packages) + '"]);\n';
+                    fileText += 'window.require.packages = (window.require.packages || []).concat(' + JSON.stringify(packages) + ');\n';
                 }
 
                 for(var index in packageConfig){

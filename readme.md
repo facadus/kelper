@@ -15,6 +15,7 @@ npm install git+https://git.ctco.lv/r/~alexander.domotenko/training/builder.git 
 ```
 
 or add as dependency to package.json file.
+
 ```
 module.exports = function (grunt) {
     grunt.loadNpmTasks('kelper');
@@ -22,6 +23,7 @@ module.exports = function (grunt) {
 ```
 
 Once the plugin has been installed, your Gruntfile should look like this:
+
 ```
 grunt.loadNpmTasks('kelper');
 ```
@@ -55,6 +57,7 @@ There are available these commands:
 * **f** or **finalization** - will run all 3 tasks
 
 *Example of usage:*
+
 ```
 grunt -process optimization
 ```
@@ -69,6 +72,7 @@ There are 3 main parameters:
 * **version** - compiled javascript standart
 
 *Example*:
+
 ```
 module.exports = function(grunt){
         return {
@@ -89,6 +93,7 @@ There are 3 main parameters:
 * **target** - path of folder from base directory that collects optimized files
 
 *Optimization file example*:
+
 ```
 module.exports = function(grunt){
         return {
@@ -109,6 +114,7 @@ There are 3 main parameters:
 * **target** - path of folder from base directory that collects finalized files
 
 *Finalization file example*:
+
 ```
 module.exports = function(grunt){
         return {
@@ -125,6 +131,7 @@ module.exports = function(grunt){
 Environment configuration is used for builder to get project build information. All information should be in **JSON** format. Default file is **"local.json"**, but if you need use another one, Kelper should be runned with additional parameter **"-target"** or **"-t"**.
 
 *Example:*
+
 ```
     grunt -target dev
 ```
@@ -149,6 +156,7 @@ Without this parameter finalization process will continue it's work without mini
 For more information [follow this link](https://github.com/gruntjs/grunt-contrib-uglify).
 
 *Example of configuration:*
+
 ```
 {
   "uglify": {
@@ -165,6 +173,7 @@ For more information [follow this link](https://github.com/gruntjs/grunt-contrib
 Base is used in optimization and finalization process to define static libraries like jQuery, Backbone and others.
 
 *Example of usage:*
+
 ```
 {
     "base": {
@@ -230,6 +239,7 @@ Resource parameter is used in finalization process to define static resources fo
 If parameter is not exist or is empty, finalization process continue it's work without copying these files.
 
 *Example of usage:*
+
 ```
 {
     "resources": [

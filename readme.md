@@ -75,12 +75,12 @@ There are 3 main parameters:
 
 ```
 module.exports = function(grunt){
-        return {
-            source: 'src',
-            target: 'target/compiled',
-            version: 'es5'
-        };
-   };
+    return {
+        source: 'src',
+        target: 'target/compiled',
+        version: 'es5'
+    };
+};
 ```
 
 #### Optimization
@@ -96,12 +96,12 @@ There are 3 main parameters:
 
 ```
 module.exports = function(grunt){
-        return {
-            remoteBaseUrl: 'src',
-            source: 'target/compiled',
-            target: 'target/optimized'
-        };
-   };
+    return {
+        remoteBaseUrl: 'src',
+        source: 'target/compiled',
+        target: 'target/optimized'
+    };
+};
 ```
 
 #### Finalization
@@ -117,12 +117,12 @@ There are 3 main parameters:
 
 ```
 module.exports = function(grunt){
-        return {
-            resourcePath: 'resources',
-            source: 'target/optimized',
-            target: 'target/finalized'
-        };
-   };
+    return {
+        resourcePath: 'resources',
+        source: 'target/optimized',
+        target: 'target/finalized'
+    };
+};
 ```
 
 
@@ -159,12 +159,12 @@ For more information [follow this link](https://github.com/gruntjs/grunt-contrib
 
 ```
 {
-  "uglify": {
-    "mangle": false,
-    "compress": false,
-    "beautify": true,
-    "preserveComments": "some"
-  }
+    "uglify": {
+        "mangle": false,
+        "compress": false,
+        "beautify": true,
+        "preserveComments": "some"
+    }
 }
 ```
 

@@ -49,6 +49,7 @@ Processes:
 By default all 3 tasks will be runned. To change this parameter **-process** or **-p** parameter should be used.
 
 There are available these commands:
+
 * **c** or **compile** - only compile process will be run
 * **o** or **optimization** - will run compile and optimization task
 * **f** or **finalization** - will run all 3 tasks

@@ -1,4 +1,4 @@
-#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png) Kelper 0.1.0
+#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.svg) Kelper 0.1.0
 
 Kelper is a project builder 
 
@@ -8,12 +8,20 @@ This plugin requires Grunt 0.4.5 or newer.
 
 If you haven't used Grunt before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a Gruntfile as well as install and use Grunt plugins. 
 
-To start working with Kelper, you should add kelper dependency to package.json file.
+Kelper can be installed with these methods:
+
 ```
-"kelper": "git+https://git.ctco.lv/r/~alexander.domotenko/training/builder.git"
+npm install git+https://git.ctco.lv/r/~alexander.domotenko/training/builder.git --save
 ```
 
-Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
+or add as dependency to package.json file.
+```
+module.exports = function (grunt) {
+    grunt.loadNpmTasks('kelper');
+};
+```
+
+Once the plugin has been installed, your Gruntfile should look like this:
 ```
 grunt.loadNpmTasks('kelper');
 ```

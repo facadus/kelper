@@ -100,12 +100,13 @@ exports.init = function(grunt){
             fileText += "window.require = window.require || {};\n";
             fileText += "window.require.baseUrl = rootDir + '" + pathRel + "';\n";
 
+            var libraries = [];
+            var packages = [];
+            var packageConfig = {};
+
+            // Parse Libraries
             if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
                 fileText += "window.require.config = window.require.config || {};\n";
-
-                var libraries = [];
-                var packages = [];
-                var packageConfig = {};
 
                 this.environment.libraries.forEach(function(library){
                     libraries.push(library.name);
@@ -121,12 +122,27 @@ exports.init = function(grunt){
 
                 if(libraries.length > 0){
                     fileText += 'window.require.deps = (window.require.deps || []).concat(["' + libraries.join('","') + '"]);\n';
-                    fileText += 'window.require.packages = (window.require.packages || []).concat(["' + libraries.concat(packages).join('","') + '"]);\n';
                 }
+            }
 
-                for(var index in packageConfig){
-                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
-                }
+            // Parse packages for configs
+            if(grunt.util.kindOf(this.environment.packages) == "array" && this.environment.packages.length > 0){
+                this.environment.packages.forEach(function(pkg){
+                    if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
+                        packages.push(pkg.name);
+                        if(pkg.hasOwnProperty("config")){
+                            packageConfig[pkg.name + "/main"] = pkg.config;
+                        }
+                    }else{
+                        grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+                    }
+                });
+            }
+
+            fileText += 'window.require.packages = (window.require.packages || []).concat(["' + libraries.concat(packages).join('","') + '"]);\n';
+
+            for(var index in packageConfig){
+                fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
             }
 
             if(grunt.util.kindOf(this.environment.base) == "object"){

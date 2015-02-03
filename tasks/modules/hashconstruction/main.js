@@ -96,14 +96,15 @@ exports.init = function(grunt){
             var filePath = process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "app.nocache.js";
             var fileText = "window.require = window.require || {};\n";
 
+            var libPackages = [];
+            var staticPackages = [];
+            var packageConfig = [];
+            var deps = [];
+
+            // Parse Libraries
             if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
-                fileText += "window.require.config = window.require.config || {};\n";
-
-                var packages = [];
-                var packageConfig = {};
-
                 this.environment.libraries.forEach(function(library){
-                    packages.push({
+                    libPackages.push({
                         name: library.name,
                         main: libraries[library.name]
                     });
@@ -111,24 +112,51 @@ exports.init = function(grunt){
                     if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
                         library.packages.forEach(function(pkg){
                             if(pkg.hasOwnProperty("config")){
-                                packageConfig[pkg.name + "/main"] = pkg.config;
+                                packageConfig.push({
+                                    name: pkg.name + "/main",
+                                    config: pkg.config
+                                });
                             }
                         });
                     }
                 });
+            }
 
-                if(packages.length > 0){
-                    var deps = packages.map(function(pkg){
-                        return pkg.name;
+            // Parse packages
+            if(grunt.util.kindOf(this.environment.packages) == "array" && this.environment.packages.length > 0){
+                this.environment.packages.forEach(function(pkg){
+                    staticPackages.push({
+                        name: pkg.name,
+                        main: libraries[pkg.name]
                     });
 
-                    fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
-                    fileText += 'window.require.packages = (window.require.packages || []).concat(' + JSON.stringify(packages) + ');\n';
-                }
+                    if(pkg.hasOwnProperty("config")){
+                        packageConfig.push({
+                            name: pkg.name + "/main",
+                            config: pkg.config
+                        });
+                    }
+                });
+            }
 
-                for(var index in packageConfig){
-                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
-                }
+            if(libPackages.length > 0){
+                var deps = libPackages.map(function(pkg){
+                    return pkg.name;
+                });
+
+                fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
+            }
+
+            var packages = libPackages.concat(staticPackages);
+            if(packages.length > 0){
+                fileText += 'window.require.packages = (window.require.packages || []).concat(' + JSON.stringify(packages) + ');\n';
+            }
+
+            if(packageConfig.length > 0){
+                fileText += "window.require.config = window.require.config || {};\n";
+                packageConfig.forEach(function(config){
+                    fileText += 'window.require.config["' + config.name + '"] = ' + JSON.stringify(config.config) + ";\n";
+                });
             }
 
             fileText += "function __bootstrap(){\n";

@@ -50,27 +50,27 @@ exports.init = function(grunt){
             grunt.task.run("typescript");
         },
         parse: function(configuration){
+
+            var parsed = {};
+
             // Parsing
             if(configuration.hasOwnProperty("source")){
-                configuration.src = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.ts";
-                delete configuration.source;
+                parsed.src = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.ts";
             }
             if(configuration.hasOwnProperty("target")){
-                configuration.dest = process.cwd() + path.sep + path.normalize(configuration.target);
-                delete configuration.target;
+                parsed.dest = process.cwd() + path.sep + path.normalize(configuration.target);
             }
             if(configuration.hasOwnProperty("version")){
-                if(configuration.hasOwnProperty("options")){
-                    configuration.options.target = configuration.version;
+                if(parsed.hasOwnProperty("options")){
+                    parsed.options.target = configuration.version;
                 }else{
-                    configuration.options = {target: configuration.version};
+                    parsed.options = {target: configuration.version};
                 }
-                delete configuration.version;
             }
 
             // Fix for TypeScript
             return {
-                base: configuration
+                base: parsed
             };
         },
         generateLibraries: function(dest){
@@ -80,8 +80,8 @@ exports.init = function(grunt){
                     var fileText = 'define("' + library.name + '"';
                     if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
                         var packages = [];
-                        library.packages.forEach(function(package){
-                            packages.push(package.name);
+                        library.packages.forEach(function(pkg){
+                            packages.push(pkg.name);
                         });
                         fileText += ', ["' + packages.join('","') + '"]';
                     }
@@ -96,8 +96,6 @@ exports.init = function(grunt){
             var configFile = destPath + path.sep + "config.js";
             var pathRel = path.relative(process.cwd(), configuration.base.dest).replace(/\\/g, "/");
 
-            // ToDo:
-            //   Need to test this function (SelfMaded) - WebStorm - ok
             var fileText = "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return document.currentScript.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
             fileText += "window.require = window.require || {};\n";
             fileText += "window.require.baseUrl = rootDir + '" + pathRel + "';\n";
@@ -112,10 +110,10 @@ exports.init = function(grunt){
                 this.environment.libraries.forEach(function(library){
                     libraries.push(library.name);
                     if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
-                        library.packages.forEach(function(package){
-                            packages.push(package.name);
-                            if(package.hasOwnProperty("config")){
-                                packageConfig[package.name + "/main"] = package.config;
+                        library.packages.forEach(function(pkg){
+                            packages.push(pkg.name);
+                            if(pkg.hasOwnProperty("config")){
+                                packageConfig[pkg.name + "/main"] = pkg.config;
                             }
                         });
                     }

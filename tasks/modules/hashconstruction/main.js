@@ -51,12 +51,33 @@ exports.init = function(grunt){
         makeLibraries: function(){
             var libraries = {};
 
-            this.environment.libraries.forEach(function(library){
-                var hash = crypt.createHash(configuration.hash);
-                hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + "/main.js"));
-                libraries[library.name] = hash.digest("hex");
-                fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + libraries[library.name] + ".js")
-            });
+            // Make Libraries
+            if(grunt.util.kindOf(this.environment.libraries) == "array"){
+                this.environment.libraries.forEach(function(library){
+                    if(typeof library == "object" && library.hasOwnProperty("name")){
+                        var hash = crypt.createHash(configuration.hash);
+                        hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + "/main.js"));
+                        libraries[library.name] = hash.digest("hex");
+                        fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + libraries[library.name] + ".js")
+                    }else{
+                        grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
+                    }
+                });
+            }
+
+            // Make Packages
+            if(grunt.util.kindOf(this.environment.packages) == "array"){
+                this.environment.packages.forEach(function(pkg){
+                    if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
+                        var hash = crypt.createHash(configuration.hash);
+                        hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + pkg.name + path.sep + "/main.js"));
+                        libraries[pkg.name] = hash.digest("hex");
+                        fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + pkg.name + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + pkg.name + path.sep + libraries[pkg.name] + ".js")
+                    }else{
+                        grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+                    }
+                });
+            }
 
             return libraries;
         },
@@ -64,7 +85,7 @@ exports.init = function(grunt){
             var hash = crypt.createHash(configuration.hash);
             hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "/main.js"));
             hash = hash.digest("hex");
-            fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + hash + ".js")
+            fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + hash + ".js");
             return hash;
         },
         generateAppNoCache: function(){
@@ -88,9 +109,9 @@ exports.init = function(grunt){
                     });
 
                     if(grunt.util.kindOf(library.packages) == "array" && library.packages.length > 0){
-                        library.packages.forEach(function(package){
-                            if(package.hasOwnProperty("config")){
-                                packageConfig[package.name + "/main"] = package.config;
+                        library.packages.forEach(function(pkg){
+                            if(pkg.hasOwnProperty("config")){
+                                packageConfig[pkg.name + "/main"] = pkg.config;
                             }
                         });
                     }

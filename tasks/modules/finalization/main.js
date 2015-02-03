@@ -26,6 +26,7 @@ exports.init = function(grunt){
             if(grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")){
                 var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
 
+
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, config);
             }else{
@@ -36,14 +37,34 @@ exports.init = function(grunt){
 
             configuration.uglify = {
                 options: this.environment.uglify
-            }
+            };
 
             // Step 1 = Uglify
-            if(typeof this.environment.uglify != "undefined" && grunt.util.kindOf(this.environment.libraries) == "array"){
+            if(typeof this.environment.uglify != "undefined"){
+
                 var fileList = {};
-                this.environment.libraries.forEach(function(library){
-                    fileList[process.cwd() + path.sep + path.normalize(config.target) + path.sep + library.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(config.source) + path.sep + library.name + path.sep + "main.js";
-                });
+
+                // Parse libraries
+                if(grunt.util.kindOf(this.environment.libraries) == "array"){
+                    this.environment.libraries.forEach(function(library){
+                        if(typeof library == "object" && library.hasOwnProperty("name")){
+                            fileList[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + library.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + library.name + path.sep + "main.js";
+                        }
+                    });
+                }else{
+                    grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
+                }
+
+                // Parse packages
+                if(grunt.util.kindOf(this.environment.packages) == "array"){
+                    this.environment.packages.forEach(function(pkg){
+                        if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
+                            fileList[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + pkg.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + pkg.name + path.sep + "main.js";
+                        }
+                    });
+                }else{
+                    grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+                }
 
                 configuration.uglify.minimize = {
                     files: fileList
@@ -51,7 +72,7 @@ exports.init = function(grunt){
             }
 
             // Step 2 = Resources
-            if(grunt.util.kindOf(this.environment.resources) == "array" && typeof config.resourcePath != "undefined"){
+            if(grunt.util.kindOf(this.environment.resources) == "array" && typeof configuration.resourcePath != "undefined"){
 
                 // Empty files
                 configuration.copy = {
@@ -64,9 +85,9 @@ exports.init = function(grunt){
                 this.environment.resources.forEach(function(resource){
                     configuration.copy.resources.files.push({
                         expand: true,
-                        cwd: process.cwd() + path.sep + path.normalize(config.resourcePath) + path.sep + resource + path.sep,
+                        cwd: process.cwd() + path.sep + path.normalize(configuration.resourcePath) + path.sep + resource + path.sep,
                         src: ["*.*", "**/*.*"],
-                        dest: process.cwd() + path.sep + path.normalize(config.target),
+                        dest: process.cwd() + path.sep + path.normalize(configuration.target)
                     });
                 });
 
@@ -80,7 +101,7 @@ exports.init = function(grunt){
             // Step 3 = Libs
             if(grunt.util.kindOf(this.environment.base) == "object"){
 
-                var libs = {}
+                var libs = {};
                 libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"] = [];
                 for(var lib in this.environment.base){
                     libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"].push(process.cwd() + path.sep + path.normalize(this.environment.base[lib]) + ".js");

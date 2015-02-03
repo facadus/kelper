@@ -36,6 +36,10 @@ exports.init = function(grunt){
                 configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseLibraries(this.environment.libraries));
             }
 
+            if(typeof this.environment.packages != "undefined"){
+                this.parsePackages(this.environment.packages, configuration.compile.options.packages);
+            }
+
             if(typeof this.environment.base != "undefined"){
                 configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseBaseLibs(this.environment.base));
             }
@@ -54,24 +58,25 @@ exports.init = function(grunt){
             grunt.task.run("requirejs");
         },
         parse: function(configuration){
+
+            var parsed = {};
+
             // Parsing
             if(configuration.hasOwnProperty("source")){
-                configuration.baseUrl = process.cwd() + path.sep + path.normalize(configuration.source);
-                delete configuration.source;
+                parsed.baseUrl = process.cwd() + path.sep + path.normalize(configuration.source);
             }
             if(configuration.hasOwnProperty("target")){
-                configuration.dir = process.cwd() + path.sep + path.normalize(configuration.target);
-                delete configuration.target;
+                parsed.dir = process.cwd() + path.sep + path.normalize(configuration.target);
             }
 
             // Fix for RequireJS
             return {
                 compile: {
-                    options: configuration
+                    options: parsed
                 }
             };
         },
-        parseLibraries: function(source, base){
+        parseLibraries: function(source){
             var parsed = {
                 modules: [],
                 packages: []
@@ -85,8 +90,8 @@ exports.init = function(grunt){
                 });
 
                 // Push packages
-                library.packages.forEach(function(package){
-                    parsed.packages.push(package.name);
+                library.packages.forEach(function(pkg){
+                    parsed.packages.push(pkg.name);
                 });
             });
 
@@ -98,6 +103,17 @@ exports.init = function(grunt){
                 paths[lib] = "empty:";
             }
             return {paths: paths};
+        },
+        parsePackages: function(packages, confPackages){
+            var parsed = confPackages || [];
+            if(grunt.util.kindOf(packages) == "array"){
+                packages.forEach(function(pkg){
+                    if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
+                        parsed.push(pkg.name);
+                    }
+                });
+            }
+            confPackages = parsed;
         }
     });
 

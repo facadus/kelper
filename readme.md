@@ -1,6 +1,6 @@
 #![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png) Kelper 0.1.0
 
-Kelper is a project builder 
+Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source.
 
 ##Installation
 
@@ -145,7 +145,7 @@ There can be these configuration parameters:
 * **uglify** - is used in finalization process to minify files
 * **base** - is used in optimization and finalization process to define static libraries like jQuery, Backbone and others.
 * **libraries** - is used in optimization and finalization process to define libraries that should be exported.
-* **packages** - is used in optimization process to define RequireJS static packages.
+* **packages** - is used in optimization and finalization process to define RequireJS static packages.
 * **hash** - is used in finalization process to define hash method.
 * **resources** -  is used in finalization process to define static resources for copy process.
 
@@ -188,6 +188,8 @@ Base is used in optimization and finalization process to define static libraries
 Libraries is used in optimization and finalization process to define libraries that should be exported.
 This function automatically generates library files and compile them. All configurations that are set in packages are copied to configuration (config.js or app.nocache.js) files for usage.
 
+Each library has 2 parameters - **"name"** *(string)* and **"packages"** *(array)*, other parameters will be ignored. Library will be automatically generated from inner packages it they exist otherwise library will be ignored.
+Each packages has it's own configuration. For more information, look at next paragraph (Packages configuration parameter).
 
 *Example of usage:*
 
@@ -214,10 +216,28 @@ This function automatically generates library files and compile them. All config
 
 #### Packages configuration parameter
 
-Packages is used in optimization process to define RequireJS static packages.
+Packages is used in optimization and finalization process to define RequireJS static packages.
 
-In ToDo:
-xxx
+Packages can be used in libraries and separate configuration. Packages configuration looks as array of objects.
+
+Each package contain 1 mandatory field **"name"** *(string)* and 1 optional field **"config"** *(object)*.
+
+Configuration of package will be transferred like in libraries to config.js file in compile/optimization process and app.nocache file in finalization process.
+
+*Example of usage:*
+
+```
+{
+    "packages": [
+        {
+            "name": "application1",
+            "config": {
+                "title": "My package"
+            }
+        }
+    ]
+}
+```
 
 
 #### HASH configuration parameter

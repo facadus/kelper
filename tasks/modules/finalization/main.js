@@ -94,7 +94,7 @@ exports.init = function(grunt){
 
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
-                grunt.task.run("copy");
+                grunt.tasks(["copy"]);
             }
 
             // Step 3 = Libs
@@ -116,7 +116,7 @@ exports.init = function(grunt){
 
             // Run uglify
             this.loadPlugin("grunt-contrib-uglify");
-            grunt.task.run("uglify");
+            grunt.tasks(["uglify"]);
         }
     });
 

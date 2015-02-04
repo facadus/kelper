@@ -56,7 +56,7 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
-            grunt.task.run("hashconstruction");
+            grunt.tasks(["hashconstruction"]);
         },
         makeLibraries: function(){
             var libraries = {};

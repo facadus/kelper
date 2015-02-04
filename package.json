@@ -17,7 +17,7 @@
     "mocha": "latest"
   },
   "scripts": {
-    "test": "mocha test/**/*.test.js"
+    "test": "mocha test/kelper.test.js"
   },
   "repository": {
     "type": "git",

@@ -26,7 +26,6 @@ exports.init = function(grunt){
             if(grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")){
                 var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
 
-
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, config);
             }else{

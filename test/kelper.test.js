@@ -58,8 +58,12 @@ describe("Kelper", function(){
             var module = require(plugin.configuration.modulePath + path.sep + "compile" + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(plugin.configuration.builderPath);
             module.environment = plugin.environment;
-            it("Run", function(){
+            it("Run", function(done){
                 module.run();
+                process.nextTick(function () {
+                    expect(true).to.equal(true);
+                    done();
+                });
             });
             it("Checking for files", function(){
                 glob(path.normalize(__dirname + "/expected/target/compiled/**/*.js"), function(err, files){
@@ -75,8 +79,12 @@ describe("Kelper", function(){
             var module = require(plugin.configuration.modulePath + path.sep + "optimization" + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(plugin.configuration.builderPath);
             module.environment = plugin.environment;
-            it("Run", function(){
+            it("Run", function(done){
                 module.run();
+                process.nextTick(function () {
+                    expect(true).to.equal(true);
+                    done();
+                });
             });
             it("Checking for files", function(){
                 glob(path.normalize(__dirname + "/expected/target/optimization/**/*.js"), function(err, files){
@@ -89,11 +97,15 @@ describe("Kelper", function(){
         });
 
         describe("Finalization module", function(){
-            var module3 = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
-            module3.modulePath = path.dirname(plugin.configuration.builderPath);
-            module3.environment = plugin.environment;
-            it("Run", function(){
-                module3.run();
+            var module = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
+            module.modulePath = path.dirname(plugin.configuration.builderPath);
+            module.environment = plugin.environment;
+            it("Run", function(done){
+                module.run();
+                process.nextTick(function () {
+                    expect(true).to.equal(true);
+                    done();
+                });
             });
         });
     });

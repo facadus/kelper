@@ -15,7 +15,9 @@ describe("Kelper", function(){
     var lastPhase = "finalization";
 
     // Setting up Test options
-    grunt.file.setBase(process.cwd() + path.sep + "test");
+    grunt.file.setBase(__dirname);
+    grunt.file.delete("target", {force: true});
+    grunt.test = true;
 
     // Run base setup
     describe("Task setup", function(){
@@ -76,14 +78,22 @@ describe("Kelper", function(){
             it("Run", function(){
                 module.run();
             });
+            it("Checking for files", function(){
+                glob(path.normalize(__dirname + "/expected/target/optimization/**/*.js"), function(err, files){
+                    should.not.exist(err, "There is error in files");
+                    files.forEach(function(file){
+                        should.equal(grunt.file.read(file), grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.basename(file))), "Files are not same (target and expected)");
+                    });
+                });
+            });
         });
 
         describe("Finalization module", function(){
-            var module = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
-            module.modulePath = path.dirname(plugin.configuration.builderPath);
-            module.environment = plugin.environment;
+            var module3 = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
+            module3.modulePath = path.dirname(plugin.configuration.builderPath);
+            module3.environment = plugin.environment;
             it("Run", function(){
-                module.run();
+                module3.run();
             });
         });
     });

@@ -3,7 +3,7 @@
  */
 module.exports = function(grunt){
     return {
-        source: "src",
-        target: "target/compiled"
+        source: "target/compiled",
+        target: "target/optimization"
     }
 };

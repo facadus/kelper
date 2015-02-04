@@ -47,7 +47,7 @@ exports.init = function(grunt){
             this.generateAppNoCache(configuration.base.dest);
             this.generateConfigFile(configuration.base.dest);
 
-            grunt.task.run("typescript");
+            grunt.tasks(["typescript"]);
         },
         parse: function(configuration){
 
@@ -56,7 +56,19 @@ exports.init = function(grunt){
             // Parsing
             if(configuration.hasOwnProperty("source")){
                 parsed.src = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.ts";
+                if(parsed.hasOwnProperty("options")){
+                    parsed.options.basePath = path.normalize(configuration.source);
+                }else{
+                    parsed.options = {
+                        basePath: path.normalize(configuration.source)
+                    }
+                }
+
+                if(grunt.hasOwnProperty("test") && grunt.test){
+                    parsed.options.basePath = 'test/' + parsed.options.basePath;
+                }
             }
+
             if(configuration.hasOwnProperty("target")){
                 parsed.dest = process.cwd() + path.sep + path.normalize(configuration.target);
             }

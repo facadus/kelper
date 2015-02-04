@@ -44,13 +44,15 @@ module.exports = function(grunt){
 
     grunt.registerTask('kelper', 'Build task', function(){
 
-        // Running all modules
-        modules.forEach(function(module){
-            module = require(plugin.configuration.modulePath + path.sep + module + path.sep + "main").init(grunt);
-            module.modulePath = path.dirname(plugin.configuration.builderPath);
-            module.environment = plugin.environment;
-            module.run();
-        });
+        if(!grunt.hasOwnProperty("test") || !grunt.test){
+            // Running all modules
+            modules.forEach(function(module){
+                module = require(plugin.configuration.modulePath + path.sep + module + path.sep + "main").init(grunt);
+                module.modulePath = path.dirname(plugin.configuration.builderPath);
+                module.environment = plugin.environment;
+                module.run();
+            });
+        }
 
     });
 

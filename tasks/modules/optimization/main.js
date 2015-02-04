@@ -55,7 +55,7 @@ exports.init = function(grunt){
             grunt.config.set("requirejs", configuration);
 
             this.loadPlugin("grunt-contrib-requirejs");
-            grunt.task.run("requirejs");
+            grunt.tasks(["requirejs"]);
         },
         parse: function(configuration){
 

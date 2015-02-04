@@ -32,7 +32,7 @@ exports.init = function(grunt){
         },
         makeClear: function(target){
             if(grunt.file.isDir(target) || grunt.file.isFile(target)){
-                grunt.log.ok(path.relative(process.cwd(), target) + " has been deleted");
+                grunt.verbose.ok(path.relative(process.cwd(), target) + " has been deleted");
                 grunt.file.delete(target, {force: true});
             }
         }

@@ -2,7 +2,8 @@ module.exports = function(grunt){
 
     var path = require('path');
 
-    this.configuration = {
+    var plugin = {};
+    plugin.configuration = {
         builderPath: path.normalize(__dirname),
         modulePath: path.normalize(__dirname) + path.sep + "modules",
         modules: [
@@ -24,7 +25,7 @@ module.exports = function(grunt){
     // Loading Environment file
     var env_file = grunt.option('target') || 'local';
     try{
-        this.environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "target" + path.sep + env_file + ".json");
+        plugin.environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "target" + path.sep + env_file + ".json");
     }catch(ex){
         if(ex.origError.code == "ENOENT"){
             grunt.log.error("[ERROR] There is no '" + env_file + ".json' environment file!");
@@ -35,7 +36,7 @@ module.exports = function(grunt){
     }
 
     var phase = grunt.option("process") || grunt.option("p") || "finalization";
-    var modules = this.configuration.phase[phase];
+    var modules = plugin.configuration.phase[phase];
     if(!modules){
         grunt.log.error("[ERROR] There is no '" + phase + "' phase");
         return 1;
@@ -45,9 +46,9 @@ module.exports = function(grunt){
 
         // Running all modules
         modules.forEach(function(module){
-            module = require(this.configuration.modulePath + path.sep + module + path.sep + "main").init(grunt);
-            module.modulePath = path.dirname(this.configuration.builderPath);
-            module.environment = this.environment;
+            module = require(plugin.configuration.modulePath + path.sep + module + path.sep + "main").init(grunt);
+            module.modulePath = path.dirname(plugin.configuration.builderPath);
+            module.environment = plugin.environment;
             module.run();
         });
 
@@ -55,5 +56,5 @@ module.exports = function(grunt){
 
     grunt.registerTask("default", ["kelper"]);
 
-    return this;
+    return plugin;
 };

@@ -47,8 +47,6 @@ exports.init = function(grunt){
             this.generateAppNoCache(configuration.base.dest);
             this.generateConfigFile(configuration.base.dest);
 
-            console.log(configuration);
-
             grunt.task.run("typescript");
         },
         parse: function(configuration){

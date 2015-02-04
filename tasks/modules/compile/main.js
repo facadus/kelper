@@ -47,6 +47,8 @@ exports.init = function(grunt){
             this.generateAppNoCache(configuration.base.dest);
             this.generateConfigFile(configuration.base.dest);
 
+            console.log(configuration);
+
             grunt.task.run("typescript");
         },
         parse: function(configuration){
@@ -74,7 +76,7 @@ exports.init = function(grunt){
             };
         },
         generateLibraries: function(dest){
-            if(grunt.util.kindOf(this.environment.libraries) == "array"){
+            if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
 
                 this.environment.libraries.forEach(function(library){
                     var fileText = 'define("' + library.name + '"';
@@ -139,7 +141,9 @@ exports.init = function(grunt){
                 });
             }
 
-            fileText += 'window.require.packages = (window.require.packages || []).concat(["' + libraries.concat(packages).join('","') + '"]);\n';
+            if(libraries.concat(packages).length > 0){
+                fileText += 'window.require.packages = (window.require.packages || []).concat(["' + libraries.concat(packages).join('","') + '"]);\n';
+            }
 
             for(var index in packageConfig){
                 fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";

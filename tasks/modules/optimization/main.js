@@ -11,8 +11,6 @@ exports.init = function(grunt){
         run: function(){
             var configuration = {};
 
-            this.checkTest();
-
             // Load default configuration
             if(grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")){
                 try{

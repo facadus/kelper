@@ -19,10 +19,18 @@ describe("Kelper", function(){
     grunt.file.delete("target", {force: true});
     grunt.test = true;
 
+    beforeEach(function(){
+        grunt.file.setBase(__dirname);
+    });
+
+    afterEach(function(){
+        return true;
+    });
+
     // Run base setup
     describe("Task setup", function(){
-
         var plugin = {};
+
         it('Run plugin base', function(){
             plugin = kelper(grunt);
         });
@@ -35,9 +43,7 @@ describe("Kelper", function(){
             var modules = plugin.configuration.phase[lastPhase];
             assert.deepEqual(modules, plugin.configuration.modules, "Finalization phase doesn't include all phases");
         });
-
     });
-
     // Checking modules for errors
 
     var plugin = kelper(grunt);
@@ -47,7 +53,7 @@ describe("Kelper", function(){
         modules.forEach(function(module){
             it(module, function(){
                 module = require(plugin.configuration.modulePath + path.sep + module + path.sep + "main").init(grunt);
-                assert.ok(module, " works fine");
+                assert.ok(module, "Works fine");
             });
         });
     });
@@ -58,19 +64,18 @@ describe("Kelper", function(){
             var module = require(plugin.configuration.modulePath + path.sep + "compile" + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(plugin.configuration.builderPath);
             module.environment = plugin.environment;
-            it("Run", function(done){
+            it("Run and check compiled files", function(done){
                 module.run();
-                process.nextTick(function () {
+                process.nextTick(function(){
                     expect(true).to.equal(true);
-                    done();
-                });
-            });
-            it("Checking for files", function(){
-                glob(path.normalize(__dirname + "/expected/target/compiled/**/*.js"), function(err, files){
-                    should.not.exist(err, "There is error in files");
-                    files.forEach(function(file){
-                        should.equal(grunt.file.read(file), grunt.file.read(path.resolve(__dirname + "/target/compiled/", path.basename(file))), "Files are not same (target and expected)");
+                    glob(path.normalize(__dirname + "/expected/target/compiled/**/*.js"), function(err, files){
+                        should.not.exist(err, "There is error in files");
+                        files.forEach(function(file){
+                            var pathFromDir = path.relative(__dirname + "/expected/target/compiled", file);
+                            should.equal(grunt.file.read(file), grunt.file.read(path.resolve(__dirname + "/target/compiled/", pathFromDir)), "Files are not same (target and expected)");
+                        });
                     });
+                    done();
                 });
             });
         });
@@ -79,19 +84,17 @@ describe("Kelper", function(){
             var module = require(plugin.configuration.modulePath + path.sep + "optimization" + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(plugin.configuration.builderPath);
             module.environment = plugin.environment;
-            it("Run", function(done){
+            it("Run and check optimized files", function(done){
                 module.run();
-                process.nextTick(function () {
-                    expect(true).to.equal(true);
-                    done();
-                });
-            });
-            it("Checking for files", function(){
-                glob(path.normalize(__dirname + "/expected/target/optimization/**/*.js"), function(err, files){
-                    should.not.exist(err, "There is error in files");
-                    files.forEach(function(file){
-                        should.equal(grunt.file.read(file), grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.basename(file))), "Files are not same (target and expected)");
+                process.nextTick(function(){
+                    glob(path.normalize(__dirname + "/expected/target/optimization/**/*.js"), function(err, files){
+                        should.not.exist(err, "There is error in files");
+                        files.forEach(function(file){
+                            var pathFromDir = path.relative(__dirname + "/expected/target/optimization", file);
+                            should.equal(grunt.file.read(file), grunt.file.read(path.resolve(__dirname + "/target/optimization/", pathFromDir)), "Files are not same (target and expected)");
+                        });
                     });
+                    done();
                 });
             });
         });
@@ -102,7 +105,7 @@ describe("Kelper", function(){
             module.environment = plugin.environment;
             it("Run", function(done){
                 module.run();
-                process.nextTick(function () {
+                process.nextTick(function(){
                     expect(true).to.equal(true);
                     done();
                 });

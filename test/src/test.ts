@@ -1,12 +1,5 @@
-class Test {
-    greeting: string;
-    constructor(message: string) {
-        this.greeting = message;
-    }
-    greet() {
-        return "Hello, " + this.greeting;
-    }
-}
+import app = require("application/main");
 
-var greeter = new Test("world");
-alert(greeter.greet());
+export
+var greeter = new app.Application("world");
+greeter.greet();

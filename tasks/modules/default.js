@@ -35,14 +35,6 @@ exports.init = function(grunt){
                 grunt.verbose.ok(path.relative(process.cwd(), target) + " has been deleted");
                 grunt.file.delete(target, {force: true});
             }
-        },
-        checkTest: function(){
-            // For test only
-            if(grunt.hasOwnProperty("test") && grunt.test){
-                if(!/\/test$/.test(process.cwd())){
-                    grunt.file.setBase(process.cwd() + path.sep + "test");
-                }
-            }
         }
     }
 };

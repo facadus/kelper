@@ -15,10 +15,10 @@ exports.init = function(grunt){
             if(crypt.getHashes().indexOf(configuration.hash) < 0){
                 grunt.fail.fatal("[ERROR] There is no '" + configuration.hash + "' method");
             }
+        }
 
-            if(module.generateAppNoCache()){
-                grunt.log.ok("Files are hashed");
-            }
+        if(module.generateAppNoCache()){
+            grunt.log.ok("Files are hashed");
         }
     });
 

@@ -39,30 +39,34 @@ exports.init = function(grunt){
             };
 
             // Step 1 = Uglify
-            if(typeof this.environment.uglify != "undefined"){
+            if(typeof this.environment.uglify != "undefined" || grunt.test){
 
                 var fileList = {};
 
                 // Parse libraries
-                if(grunt.util.kindOf(this.environment.libraries) == "array"){
-                    this.environment.libraries.forEach(function(library){
-                        if(typeof library == "object" && library.hasOwnProperty("name")){
-                            fileList[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + library.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + library.name + path.sep + "main.js";
-                        }
-                    });
-                }else{
-                    grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
+                if(typeof this.environment.libraries != "undefined"){
+                    if(grunt.util.kindOf(this.environment.libraries) == "array"){
+                        this.environment.libraries.forEach(function(library){
+                            if(typeof library == "object" && library.hasOwnProperty("name")){
+                                fileList[path.resolve(process.cwd(), configuration.target, library.name, "main.js")] = path.resolve(process.cwd(), configuration.source, library.name, "main.js");
+                            }
+                        });
+                    }else{
+                        grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
+                    }
                 }
 
                 // Parse packages
-                if(grunt.util.kindOf(this.environment.packages) == "array"){
-                    this.environment.packages.forEach(function(pkg){
-                        if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
-                            fileList[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + pkg.name + path.sep + "main.js"] = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + pkg.name + path.sep + "main.js";
-                        }
-                    });
-                }else{
-                    grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+                if(typeof this.environment.packages != "undefined"){
+                    if(grunt.util.kindOf(this.environment.packages) == "array"){
+                        this.environment.packages.forEach(function(pkg){
+                            if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
+                                fileList[path.resolve(process.cwd(), configuration.target, pkg.name, "main.js")] = path.resolve(process.cwd(), configuration.source, pkg.name, "main.js");
+                            }
+                        });
+                    }else{
+                        grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+                    }
                 }
 
                 configuration.uglify.minimize = {
@@ -70,7 +74,21 @@ exports.init = function(grunt){
                 };
             }
 
-            // Step 2 = Resources
+            // Step 2 = Libs
+            if(grunt.util.kindOf(this.environment.base) == "object"){
+
+                var libs = {};
+                libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"] = [];
+                for(var lib in this.environment.base){
+                    libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"].push(process.cwd() + path.sep + path.normalize(this.environment.base[lib]) + ".js");
+                }
+
+                configuration.uglify.libs = {
+                    files: libs
+                };
+            }
+
+            // Step 3 = Resources
             if(grunt.util.kindOf(this.environment.resources) == "array" && typeof configuration.resourcePath != "undefined"){
 
                 // Empty files
@@ -95,20 +113,6 @@ exports.init = function(grunt){
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
                 grunt.tasks(["copy"]);
-            }
-
-            // Step 3 = Libs
-            if(grunt.util.kindOf(this.environment.base) == "object"){
-
-                var libs = {};
-                libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"] = [];
-                for(var lib in this.environment.base){
-                    libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"].push(process.cwd() + path.sep + path.normalize(this.environment.base[lib]) + ".js");
-                }
-
-                configuration.uglify.libs = {
-                    files: libs
-                };
             }
 
             // Set uglify configuration

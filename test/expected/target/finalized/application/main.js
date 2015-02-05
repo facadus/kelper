@@ -1,0 +1,1 @@
+define(["require","exports"],function(a,b){var c=function(){function a(a){this.greeting=a}return a.prototype.greet=function(){return"Hello, "+this.greeting},a}();b.Application=c});

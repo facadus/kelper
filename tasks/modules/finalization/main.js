@@ -27,7 +27,7 @@ exports.init = function(grunt){
                 var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
 
                 //Parsing configuration
-                configuration = this.mergeObjects(configuration, config);
+                configuration = this.mergeObjects(configuration, this.parse(config));
             }else{
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
@@ -35,7 +35,7 @@ exports.init = function(grunt){
             this.makeClear(configuration.target);
 
             configuration.uglify = {
-                options: this.environment.uglify
+                options: this.environment.uglify || {}
             };
 
             // Step 1 = Uglify
@@ -117,6 +117,23 @@ exports.init = function(grunt){
             // Run uglify
             this.loadPlugin("grunt-contrib-uglify");
             grunt.tasks(["uglify"]);
+        },
+        parse: function(configuration){
+            var parsed = {};
+
+            // Parsing
+            if(configuration.hasOwnProperty("source")){
+                parsed.source = process.cwd() + path.sep + path.normalize(configuration.source);
+            }
+            if(configuration.hasOwnProperty("resourcePath")){
+                parsed.resourcePath = process.cwd() + path.sep + path.normalize(configuration.resourcePath);
+            }
+            if(configuration.hasOwnProperty("target")){
+                parsed.target = process.cwd() + path.sep + path.normalize(configuration.target);
+            }
+
+            // Fix for RequireJS
+            return parsed;
         }
     });
 

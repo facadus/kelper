@@ -57,16 +57,10 @@ module.exports = function(grunt){
     });
 
     grunt.registerTask("test", "Build task test", function(){
-        var exec = require('child_process').exec;
-        childProcess = cp.exec("mocha " + path.resolve(__dirname + "/../test/kelper.test.js"));
-
-        // Bind output
-        childProcess.stdout.on('data', function (d) {
-            log.write(d);
-        });
-
-        childProcess.stderr.on('data', function (d) {
-            log.error(d);
+        var done = this.async();
+        require('child_process').exec("mocha " + path.resolve(__dirname + "/../test/kelper.test.js"), function(err, stdout){
+            grunt.log.write(stdout);
+            done(err);
         });
     });
 

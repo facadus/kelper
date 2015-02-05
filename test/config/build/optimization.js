@@ -4,6 +4,6 @@
 module.exports = function(grunt){
     return {
         source: "target/compiled",
-        target: "target/optimization"
+        target: "target/optimized"
     }
 };

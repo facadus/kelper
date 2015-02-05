@@ -103,10 +103,16 @@ describe("Kelper", function(){
             var module = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(plugin.configuration.builderPath);
             module.environment = plugin.environment;
-            it("Run", function(done){
+            it("Run and check optimized files", function(done){
                 module.run();
                 process.nextTick(function(){
-                    expect(true).to.equal(true);
+                    glob(path.normalize(__dirname + "/expected/target/finalized/**/*.js"), function(err, files){
+                        should.not.exist(err, "There is error in files");
+                        files.forEach(function(file){
+                            var pathFromDir = path.relative(__dirname + "/expected/target/finalized", file);
+                            should.equal(grunt.file.read(file), grunt.file.read(path.resolve(__dirname + "/target/finalized/", pathFromDir)), "Files are not same (target and expected)");
+                        });
+                    });
                     done();
                 });
             });

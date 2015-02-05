@@ -4,17 +4,17 @@
   "description": "Kelper is a project builder/compiler",
   "author": "Pavel Kotov <pavel.kotov@ctco.lv>",
   "dependencies": {
-    "grunt-contrib-copy": "latest",
-    "grunt-contrib-requirejs": "latest",
-    "grunt-contrib-uglify": "latest",
-    "grunt-typescript": "latest",
-    "typescript": "latest"
+    "chai": "^1.10.0",
+    "glob": "^4.3.5",
+    "grunt-contrib-copy": "^0.7.0",
+    "grunt-contrib-requirejs": "^0.4.4",
+    "grunt-contrib-uglify": "^0.7.0",
+    "grunt-typescript": "^0.6.1",
+    "mocha": "^2.1.0",
+    "typescript": "^1.4.1"
   },
   "devDependencies": {
-    "chai": "latest",
-    "glob": "^4.3.5",
-    "grunt": "latest",
-    "mocha": "latest"
+    "grunt": "latest"
   },
   "scripts": {
     "test": "mocha test/kelper.test.js"

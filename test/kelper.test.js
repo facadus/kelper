@@ -5,7 +5,6 @@
 var grunt = require("grunt");
 var path = require("path");
 var glob = require("glob");
-var runTask = require("grunt-run-task");
 var kelper = require(path.resolve(__dirname, "../tasks/kelper"));
 var assert = require('chai').assert;
 var expect = require('chai').expect;
@@ -66,20 +65,21 @@ describe("Kelper", function(){
             module.modulePath = path.dirname(plugin.configuration.builderPath);
             module.environment = plugin.environment;
             it("Run and check compiled files", function(done){
-                runTask.task()
-                module.run();
-                console.log(grunt.task._queue[0].task);
-                process.nextTick(function(){
-                    expect(true).to.equal(true);
-                    glob(path.normalize(__dirname + "/expected/target/compiled/**/*.js"), function(err, files){
-                        should.not.exist(err, "There is error in files");
-                        files.forEach(function(file){
-                            var fromFile = grunt.file.read(file);
-                            var toFile = grunt.file.read(path.resolve(__dirname + "/target/compiled/", path.relative(__dirname + "/expected/target/compiled", file)));
-                            should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
+                var task = module.run();
+                task.run(function(err){
+                    if(err){
+                        done(err);
+                    }else{
+                        glob(path.normalize(__dirname + "/expected/target/compiled/**/*.js"), function(err, files){
+                            should.not.exist(err, "There is error in files");
+                            files.forEach(function(file){
+                                var fromFile = grunt.file.read(file);
+                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/compiled/", path.relative(__dirname + "/expected/target/compiled", file)));
+                                should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
+                            });
                         });
-                    });
-                    done();
+                        done();
+                    }
                 });
             });
         });
@@ -122,17 +122,17 @@ describe("Kelper", function(){
                     done();
                 });
             });
-        });
 
-        describe("asd", function(){
-
+            /*
             var module = require(plugin.configuration.modulePath + path.sep + "hashconstruction" + path.sep + "main").init(grunt);
             module.modulePath = path.dirname(plugin.configuration.builderPath);
             module.environment = plugin.environment;
             it("Hash finalized files", function(done){
                 module.run();
                 process.nextTick(function(){
-                    glob(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"), function(err, files){
+            */
+            //      glob(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"), function(err, files){
+            /*
                         should.not.exist(err, "There is error in files");
                         files.forEach(function(file){
                             var fromFile = grunt.file.read(file);
@@ -143,6 +143,7 @@ describe("Kelper", function(){
                     done();
                 });
             });
+            */
         });
     });
 });

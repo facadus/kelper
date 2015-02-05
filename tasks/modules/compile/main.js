@@ -32,22 +32,21 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
-            if(typeof configuration.base != "undefined" && configuration.base.dest != "undefined"){
-                this.makeClear(configuration.base.dest);
+            if(typeof configuration.default != "undefined" && configuration.default.dest != "undefined"){
+                this.makeClear(configuration.default.dest);
             }
 
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 
+            // Generating files
+            this.generateLibraries(configuration.default.dest);
+            this.generateAppNoCache(configuration.default.dest);
+            this.generateConfigFile(configuration.default.dest);
+
             // Setting configuration
             this.loadPlugin("grunt-typescript");
-            grunt.config.set("typescript", configuration);
-
-            this.generateLibraries(configuration.base.dest);
-            this.generateAppNoCache(configuration.base.dest);
-            this.generateConfigFile(configuration.base.dest);
-
-            grunt.tasks(["typescript"]);
+            return this.runTask("typescript", configuration);
         },
         parse: function(configuration){
 
@@ -62,10 +61,6 @@ exports.init = function(grunt){
                     parsed.options = {
                         basePath: path.normalize(configuration.source)
                     }
-                }
-
-                if(grunt.hasOwnProperty("test") && grunt.test){
-                    parsed.options.basePath = 'test/' + parsed.options.basePath;
                 }
             }
 
@@ -82,7 +77,7 @@ exports.init = function(grunt){
 
             // Fix for TypeScript
             return {
-                base: parsed
+                default: parsed
             };
         },
         generateLibraries: function(dest){
@@ -106,7 +101,7 @@ exports.init = function(grunt){
         generateConfigFile: function(destPath){
 
             var configFile = destPath + path.sep + "config.js";
-            var pathRel = path.relative(process.cwd(), configuration.base.dest).replace(/\\/g, "/");
+            var pathRel = path.relative(process.cwd(), configuration.default.dest).replace(/\\/g, "/");
 
             var fileText = "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return document.currentScript.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
             fileText += "window.require = window.require || {};\n";

@@ -2,15 +2,28 @@
  * Created by pkotov on 29.01.2015.
  */
 
-var path = require('path');
+var path = require("path");
+var runTask = require("grunt-run-task");
 
 exports.init = function(grunt){
     return {
         loadPlugin: function(pluginName){
             var cwd = process.cwd();
             process.chdir(this.modulePath);
-            grunt.loadNpmTasks(pluginName);
+            if(grunt.hasOwnProperty("test") && grunt.test){
+                runTask.loadNpmTasks(pluginName);
+            }else{
+                grunt.loadNpmTasks(pluginName);
+            }
             process.chdir(cwd);
+        },
+        runTask: function(pluginName, conf){
+            if(grunt.hasOwnProperty("test") && grunt.test){
+                return runTask.task(pluginName, conf);
+            }else{
+                grunt.config.set(pluginName, conf);
+                grunt.task.run(pluginName);
+            }
         },
         mergeObjects: function(){
             if(arguments.length > 1){

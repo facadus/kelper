@@ -108,19 +108,14 @@ exports.init = function(grunt){
                     });
                 });
 
-                grunt.config.set("copy", configuration.copy);
-
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
-                grunt.tasks(["copy"]);
+                this.runTask("copy", configuration.copy);
             }
-
-            // Set uglify configuration
-            grunt.config.set("uglify", configuration.uglify);
 
             // Run uglify
             this.loadPlugin("grunt-contrib-uglify");
-            grunt.tasks(["uglify"]);
+            return this.runTask("uglify", configuration.uglify);
         },
         parse: function(configuration){
             var parsed = {};

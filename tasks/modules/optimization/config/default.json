@@ -1,5 +1,5 @@
 {
-  "compile": {
+  "default": {
     "options": {
       "remoteBaseUrl": "src",
       "baseUrl": "target/compiled",

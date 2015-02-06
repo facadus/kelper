@@ -33,19 +33,19 @@ exports.init = function(grunt){
             }
 
             if(typeof this.environment.libraries != "undefined"){
-                configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseLibraries(this.environment.libraries));
+                configuration.default.options = this.mergeObjects(configuration.default.options, this.parseLibraries(this.environment.libraries));
             }
 
             if(typeof this.environment.packages != "undefined"){
-                this.parsePackages(this.environment.packages, configuration.compile.options.packages);
+                this.parsePackages(this.environment.packages, configuration.default.options.packages);
             }
 
             if(typeof this.environment.base != "undefined"){
-                configuration.compile.options = this.mergeObjects(configuration.compile.options, this.parseBaseLibs(this.environment.base));
+                configuration.default.options = this.mergeObjects(configuration.default.options, this.parseBaseLibs(this.environment.base));
             }
 
-            if(typeof configuration.compile != "undefined" && typeof configuration.compile.options.dir != "undefined"){
-                this.makeClear(configuration.compile.options.dir);
+            if(typeof configuration.default != "undefined" && typeof configuration.default.options.dir != "undefined"){
+                this.makeClear(configuration.default.options.dir);
             }
 
             // For Debug ->
@@ -69,7 +69,7 @@ exports.init = function(grunt){
 
             // Fix for RequireJS
             return {
-                compile: {
+                default: {
                     options: parsed
                 }
             };

@@ -17,9 +17,41 @@ exports.init = function(grunt){
             }
             process.chdir(cwd);
         },
-        runTask: function(pluginName, conf){
+        runTask: function(pluginName, conf, subtask){
             if(grunt.hasOwnProperty("test") && grunt.test){
-                return runTask.task(pluginName, conf);
+                if(grunt.util.kindOf(subtask) == "array"){
+                    var returned = {
+                        tasks: [],
+                        run: function(err){
+                            if(typeof err == "function"){
+                                try{
+                                    this.tasks.forEach(function(task){
+                                        task.run(function(localErr){
+                                            if(localErr){
+                                                throw new Error(localErr);
+                                            }
+                                        });
+                                    });
+                                }catch(ex){
+                                    err.call(this, ex);
+                                    return;
+                                }
+                                err.call();
+                            }
+                        }
+                    };
+
+                    var obj = this;
+                    subtask.forEach(function(task){
+                        if(conf.hasOwnProperty(task) && conf[task]){
+                            returned.tasks.push(runTask.task(pluginName + ":" + task, conf));
+                        }
+                    });
+
+                    return returned;
+                }else{
+                    return runTask.task(pluginName + ":" + (subtask ? subtask : "default"), conf);
+                }
             }else{
                 grunt.config.set(pluginName, conf);
                 grunt.task.run(pluginName);

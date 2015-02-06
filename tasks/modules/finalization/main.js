@@ -110,12 +110,12 @@ exports.init = function(grunt){
 
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
-                this.runTask("copy", configuration.copy);
+                this.runTask("copy", configuration.copy, "resources");
             }
 
             // Run uglify
             this.loadPlugin("grunt-contrib-uglify");
-            return this.runTask("uglify", configuration.uglify);
+            return this.runTask("uglify", configuration.uglify, ["minimize", "libs"]);
         },
         parse: function(configuration){
             var parsed = {};

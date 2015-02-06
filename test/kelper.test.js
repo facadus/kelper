@@ -61,10 +61,11 @@ describe("Kelper", function(){
     // Run modules and watch for results
     describe("Run modules and watch for results", function(){
         describe("Compile module", function(){
-            var module = require(plugin.configuration.modulePath + path.sep + "compile" + path.sep + "main").init(grunt);
-            module.modulePath = path.dirname(plugin.configuration.builderPath);
-            module.environment = plugin.environment;
             it("Run and check compiled files", function(done){
+                var module = require(plugin.configuration.modulePath + path.sep + "compile" + path.sep + "main").init(grunt);
+                module.modulePath = path.dirname(plugin.configuration.builderPath);
+                module.environment = plugin.environment;
+
                 var task = module.run();
                 task.run(function(err){
                     if(err){
@@ -85,10 +86,11 @@ describe("Kelper", function(){
         });
 
         describe("Optimization module", function(){
-            var module = require(plugin.configuration.modulePath + path.sep + "optimization" + path.sep + "main").init(grunt);
-            module.modulePath = path.dirname(plugin.configuration.builderPath);
-            module.environment = plugin.environment;
             it("Run and check optimized files", function(done){
+                var module = require(plugin.configuration.modulePath + path.sep + "optimization" + path.sep + "main").init(grunt);
+                module.modulePath = path.dirname(plugin.configuration.builderPath);
+                module.environment = plugin.environment;
+
                 var task = module.run();
                 task.run(function(err){
                     if(err){
@@ -109,10 +111,11 @@ describe("Kelper", function(){
         });
 
         describe("Finalization module", function(){
-            var module = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
-            module.modulePath = path.dirname(plugin.configuration.builderPath);
-            module.environment = plugin.environment;
             it("Run and check optimized files", function(done){
+                var module = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
+                module.modulePath = path.dirname(plugin.configuration.builderPath);
+                module.environment = plugin.environment;
+
                 var task = module.run();
                 task.run(function(err){
                     if(err){
@@ -131,27 +134,31 @@ describe("Kelper", function(){
                 });
             });
 
-            /*
-            var module = require(plugin.configuration.modulePath + path.sep + "hashconstruction" + path.sep + "main").init(grunt);
-            module.modulePath = path.dirname(plugin.configuration.builderPath);
-            module.environment = plugin.environment;
             it("Hash finalized files", function(done){
-                module.run();
-                process.nextTick(function(){
-            */
-            //      glob(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"), function(err, files){
-            /*
-                        should.not.exist(err, "There is error in files");
-                        files.forEach(function(file){
-                            var fromFile = grunt.file.read(file);
-                            var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.relative(__dirname + "/expected/target/optimization", file)));
-                            should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
-                        });
+                module = require(plugin.configuration.modulePath + path.sep + "hashconstruction" + path.sep + "main").init(grunt);
+                module.modulePath = path.dirname(plugin.configuration.builderPath);
+                module.environment = plugin.environment;
+
+                // Fixing - Async - 0 seconds
+                setTimeout(function(){
+                    var task = module.run();
+                    task.run(function(err){
+                        if(err){
+                            done(err);
+                        }else{
+                            glob(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"), function(err, files){
+                                should.not.exist(err, "There is error in files");
+                                files.forEach(function(file){
+                                    var fromFile = grunt.file.read(file);
+                                    var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.relative(__dirname + "/expected/target/optimization", file)));
+                                    should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
+                                });
+                            });
+                            done();
+                        }
                     });
-                    done();
-                });
+                }, 0);
             });
-            */
         });
     });
 });

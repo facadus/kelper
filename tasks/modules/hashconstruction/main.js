@@ -9,7 +9,7 @@ exports.init = function(grunt){
     var configuration = {};
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
 
-    grunt.registerTask('hashconstruction', 'Build task', function(){
+    module.registerTask('hashconstruction', 'Build task', function(){
         if(typeof module.environment.hash != "undefined"){
             configuration.hash = module.environment.hash;
             if(crypt.getHashes().indexOf(configuration.hash) < 0){
@@ -44,7 +44,8 @@ exports.init = function(grunt){
                     configuration = this.mergeObjects(configuration, config);
 
                     grunt.log.debug(this.name + " has loaded finalization plugin default configuration!");
-                }catch(ex){}
+                }catch(ex){
+                }
             }
 
             // Load user created configuration
@@ -56,7 +57,7 @@ exports.init = function(grunt){
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
-            grunt.tasks(["hashconstruction"]);
+            return this.runTask("hashconstruction", {default: {}}, []);
         },
         makeLibraries: function(){
             var libraries = {};
@@ -92,11 +93,14 @@ exports.init = function(grunt){
             return libraries;
         },
         makeLibs: function(){
-            var hash = crypt.createHash(configuration.hash);
-            hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "/main.js"));
-            hash = hash.digest("hex");
-            fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + hash + ".js");
-            return hash;
+            if(grunt.file.exists(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "/main.js")){
+                var hash = crypt.createHash(configuration.hash);
+                hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "/main.js"));
+                hash = hash.digest("hex");
+                fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + hash + ".js");
+                return hash;
+            }
+            return null;
         },
         generateAppNoCache: function(){
             var libraries = this.makeLibraries();
@@ -169,7 +173,9 @@ exports.init = function(grunt){
             }
 
             fileText += "function __bootstrap(){\n";
-            fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
+            if(libs){
+                fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
+            }
             fileText += "}\n";
             fileText += grunt.file.read(process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "app.nocache.js");
 

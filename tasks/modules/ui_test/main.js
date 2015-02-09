@@ -8,7 +8,9 @@ exports.init = function(grunt){
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
 
     module.registerTask('UITests', 'Build task', function(){
+        module.loadPlugin("grunt-mocha-phantomjs");
 
+        console.log("Mocha and PhantomJS is loaded!");
     });
 
     util._extend(module, {

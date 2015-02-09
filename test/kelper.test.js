@@ -40,14 +40,14 @@ describe("Kelper", function(){
         });
 
         it('Check module phases', function(){
-            var modules = plugin.configuration.phase[lastPhase];
+            var modules = plugin.configuration.phase(lastPhase);
             assert.deepEqual(modules, plugin.configuration.modules, "Finalization phase doesn't include all phases");
         });
     });
     // Checking modules for errors
 
     var plugin = kelper(grunt);
-    var modules = plugin.configuration.phase[lastPhase];
+    var modules = plugin.configuration.phase(lastPhase);
 
     describe("Checking modules", function(){
         modules.forEach(function(module){

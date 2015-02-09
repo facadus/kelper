@@ -13,13 +13,23 @@ module.exports = function(grunt){
             "hashconstruction",
             "ui_test"
         ],
-        phase: {
-            "c": ["compile"],
-            "compile": ["compile"],
-            "o": ["compile", "optimization"],
-            "optimization": ["compile", "optimization"],
-            "f": ["compile", "optimization", "finalization", "hashconstruction", "ui_test"],
-            "finalization": ["compile", "optimization", "finalization", "hashconstruction", "ui_test"]
+        phase: function(operation){
+            if(typeof operation != "undefined"){
+                switch (operation) {
+                    case "c":
+                    case "compile":
+                        return ["compile"];
+                    case "o":
+                    case "optiomization":
+                        return ["compile", "optimization"];
+                    case "f":
+                    case "finalization":
+                        return ["compile", "optimization", "finalization", "hashconstruction", "ui_test"];
+                    default:
+                        throw new Error("[ERROR] There is no '" + phase + "' phase");
+                }
+            }
+            return ["compile", "optimization", "finalization", "hashconstruction", "ui_test"];
         }
     };
 
@@ -37,11 +47,7 @@ module.exports = function(grunt){
     }
 
     var phase = grunt.option("process") || grunt.option("p") || "finalization";
-    var modules = plugin.configuration.phase[phase];
-    if(!modules){
-        grunt.log.error("[ERROR] There is no '" + phase + "' phase");
-        return 1;
-    }
+    var modules = plugin.configuration.phase(phase);
 
     grunt.registerTask('kelper', 'Build task', function(){
 

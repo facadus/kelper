@@ -13,6 +13,7 @@ var should = require('chai').should();
 describe("Kelper", function(){
 
     var lastPhase = "finalization";
+    var oldConfig = {};
 
     // Setting up Test options
     grunt.file.setBase(__dirname);
@@ -65,8 +66,11 @@ describe("Kelper", function(){
                 var module = require(plugin.configuration.modulePath + path.sep + "compile" + path.sep + "main").init(grunt);
                 module.modulePath = path.dirname(plugin.configuration.builderPath);
                 module.environment = plugin.environment;
+                module.lastConfigurations = oldConfig;
 
                 var task = module.run();
+                oldConfig["compile"] = module.configuration;
+
                 task.run(function(err){
                     if(err){
                         done(err);
@@ -90,8 +94,10 @@ describe("Kelper", function(){
                 var module = require(plugin.configuration.modulePath + path.sep + "optimization" + path.sep + "main").init(grunt);
                 module.modulePath = path.dirname(plugin.configuration.builderPath);
                 module.environment = plugin.environment;
+                module.lastConfigurations = oldConfig;
 
                 var task = module.run();
+                oldConfig["optimization"] = module.configuration;
                 task.run(function(err){
                     if(err){
                         done(err);
@@ -115,8 +121,10 @@ describe("Kelper", function(){
                 var module = require(plugin.configuration.modulePath + path.sep + "finalization" + path.sep + "main").init(grunt);
                 module.modulePath = path.dirname(plugin.configuration.builderPath);
                 module.environment = plugin.environment;
+                module.lastConfigurations = oldConfig;
 
                 var task = module.run();
+                oldConfig["finalization"] = module.configuration;
                 task.run(function(err){
                     if(err){
                         done(err);
@@ -138,10 +146,12 @@ describe("Kelper", function(){
                 module = require(plugin.configuration.modulePath + path.sep + "hashconstruction" + path.sep + "main").init(grunt);
                 module.modulePath = path.dirname(plugin.configuration.builderPath);
                 module.environment = plugin.environment;
+                module.lastConfigurations = oldConfig;
 
                 // Fixing - Async - 0 seconds
                 setTimeout(function(){
                     var task = module.run();
+                    oldConfig["hashconstruction"] = module.configuration;
                     task.run(function(err){
                         if(err){
                             done(err);

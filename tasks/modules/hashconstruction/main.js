@@ -50,9 +50,10 @@ exports.init = function(grunt){
                 this.environment.libraries.forEach(function(library){
                     if(typeof library == "object" && library.hasOwnProperty("name")){
                         var hash = crypt.createHash(configuration.hash);
-                        hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + "/main.js"));
+                        hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js")));
                         libraries[library.name] = hash.digest("hex");
-                        fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + library.name + path.sep + libraries[library.name] + ".js")
+                        fs.renameSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js"), path.resolve(process.cwd(), configuration.target, library.name, libraries[library.name] + ".js"));
+
                     }else{
                         grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
                     }
@@ -64,9 +65,9 @@ exports.init = function(grunt){
                 this.environment.packages.forEach(function(pkg){
                     if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
                         var hash = crypt.createHash(configuration.hash);
-                        hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + pkg.name + path.sep + "/main.js"));
+                        hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js")));
                         libraries[pkg.name] = hash.digest("hex");
-                        fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + pkg.name + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + pkg.name + path.sep + libraries[pkg.name] + ".js")
+                        fs.renameSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js"), path.resolve(process.cwd(), configuration.target, pkg.name, libraries[pkg.name] + ".js"));
                     }else{
                         grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
                     }
@@ -78,9 +79,9 @@ exports.init = function(grunt){
         makeLibs: function(){
             if(grunt.file.exists(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "/main.js")){
                 var hash = crypt.createHash(configuration.hash);
-                hash.update(fs.readFileSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "/main.js"));
+                hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, "base", "main.js")));
                 hash = hash.digest("hex");
-                fs.renameSync(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "main.js", process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + hash + ".js");
+                fs.renameSync(path.resolve(process.cwd(), configuration.target, "base", "main.js"), path.resolve(process.cwd(), configuration.target, "base", hash + ".js"));
                 return hash;
             }
             return null;
@@ -90,7 +91,7 @@ exports.init = function(grunt){
             var libs = this.makeLibs();
 
             // Gettings path
-            var filePath = process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "app.nocache.js";
+            var filePath = path.resolve(process.cwd(), configuration.target, "app.nocache.js");
             var fileText = "window.require = window.require || {};\n";
 
             var libPackages = [];
@@ -160,7 +161,7 @@ exports.init = function(grunt){
                 fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
             }
             fileText += "}\n";
-            fileText += grunt.file.read(process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "app.nocache.js");
+            fileText += grunt.file.read(path.resolve(process.cwd(), configuration.source, "app.nocache.js"));
 
             grunt.file.write(filePath, fileText);
 

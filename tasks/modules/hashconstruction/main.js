@@ -50,9 +50,9 @@ exports.init = function(grunt){
                 this.environment.libraries.forEach(function(library){
                     if(typeof library == "object" && library.hasOwnProperty("name")){
                         var hash = crypt.createHash(configuration.hash);
-                        hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js")));
+                        hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, library.name, "main.js")));
                         libraries[library.name] = hash.digest("hex");
-                        fs.renameSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js"), path.resolve(process.cwd(), configuration.target, library.name, libraries[library.name] + ".js"));
+                        fs.renameSync(path.resolve(process.cwd(), configuration.target, library.name, "main.js"), path.resolve(process.cwd(), configuration.target, library.name, libraries[library.name] + ".js"));
 
                     }else{
                         grunt.log.error("[ERROR] Unknown format of environment library, please fix it");

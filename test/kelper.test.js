@@ -96,11 +96,11 @@ describe("Kelper", function(){
                     if(err){
                         done(err);
                     }else{
-                        glob(path.normalize(__dirname + "/expected/target/optimization/**/*.js"), function(err, files){
+                        glob(path.normalize(__dirname + "/expected/target/optimized/**/*.js"), function(err, files){
                             should.not.exist(err, "There is error in files");
                             files.forEach(function(file){
                                 var fromFile = grunt.file.read(file);
-                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.relative(__dirname + "/expected/target/optimization", file)));
+                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimized/", path.relative(__dirname + "/expected/target/optimized", file)));
                                 should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
                             });
                         });

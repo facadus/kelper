@@ -7,7 +7,7 @@ exports.init = function(grunt){
     var configuration = {};
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
 
-    module.registerTask('ui_test', 'Build task', function(){
+    module.registerTask('UITests', 'Build task', function(){
 
     });
 

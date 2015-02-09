@@ -46,11 +46,8 @@ exports.init = function(grunt){
 
             // Setting configuration
             this.loadPlugin("grunt-typescript");
-            var task = this.runTask("typescript", configuration);
-
-            this.runUnitTests();
-
-            return task;
+            this.configuration = configuration;
+            return this.runTask("typescript", configuration);
         },
         parse: function(configuration){
 
@@ -172,63 +169,6 @@ exports.init = function(grunt){
             if(!grunt.file.exists(appJs)){
                 grunt.file.write(appJs, "__bootstrap();");
             }
-        },
-        runUnitTests: function(){
-            if(grunt.hasOwnProperty("test") && grunt.test){
-                return;
-            }
-
-            var pathToSource = path.normalize(configuration.default.src).replace(path.normalize("**/*.ts"), "");
-
-            var packages = [];
-            if(typeof this.environment.libraries != "undefined"){
-                if(grunt.util.kindOf(this.environment.libraries) == "array"){
-                    this.environment.libraries.forEach(function(library){
-                        if(typeof library == "object" && library.hasOwnProperty("name")){
-                            packages.push(path.dirname(path.resolve(process.cwd(), pathToSource, library.name, "main.js")));
-                        }
-                    });
-                }else{
-                    grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
-                }
-            }
-
-            // Parse packages
-            if(typeof this.environment.packages != "undefined"){
-                if(grunt.util.kindOf(this.environment.packages) == "array"){
-                    this.environment.packages.forEach(function(pkg){
-                        if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
-                            packages.push(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js")));
-                        }
-                    });
-                }else{
-                    grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
-                }
-            }
-
-            var thisObj = this;
-            this.registerTask("UnitTests", "Running Unit Tests", function(){
-                thisObj.loadPlugin("grunt-mocha-phantomjs");
-
-                // Copying all Unit Tests
-                var testPackages = [];
-                if(packages.length > 0){
-                    for(var i=0; i < packages.length; i++){
-                        if(grunt.file.exists(packages[i] + path.sep + "UnitTests.html")){
-                            testPackages.push(packages[i] + path.sep + "UnitTests.html");
-                        }
-                    }
-                }
-                packages = testPackages;
-                delete testPackages;
-
-                thisObj.runTask("mocha_phantomjs", {
-                    all: packages
-                });
-            });
-
-            this.runTask("UnitTests");
-
         }
     });
 

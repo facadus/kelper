@@ -113,6 +113,8 @@ exports.init = function(grunt){
                 this.runTask("copy", configuration.copy, "resources");
             }
 
+            this.configuration = configuration;
+
             // Run uglify
             this.loadPlugin("grunt-contrib-uglify");
             return this.runTask("uglify", configuration.uglify, ["minimize", "libs"]);

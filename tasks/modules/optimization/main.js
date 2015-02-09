@@ -51,6 +51,8 @@ exports.init = function(grunt){
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 
+            this.configuration = configuration;
+
             // Setting configuration
             this.loadPlugin("grunt-contrib-requirejs");
             return this.runTask("requirejs", configuration);

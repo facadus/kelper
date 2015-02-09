@@ -37,25 +37,8 @@ exports.init = function(grunt){
                 }
             }
 
-            // Load Finalization module default configuration
-            if(grunt.file.exists(this.modulePath + path.sep + "tasks" + path.sep + "modules" + path.sep + "finalization" + path.sep + "config" + path.sep + "default.json")){
-                try{
-                    var config = grunt.file.readJSON(this.modulePath + path.sep + "tasks" + path.sep + "modules" + path.sep + "finalization" + path.sep + "config" + path.sep + "default.json");
-                    configuration = this.mergeObjects(configuration, config);
-
-                    grunt.log.debug(this.name + " has loaded finalization plugin default configuration!");
-                }catch(ex){
-                }
-            }
-
-            // Load user created configuration
-            if(grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + "finalization.js")){
-                var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + "finalization.js")(grunt);
-
-                configuration = this.mergeObjects(configuration, config);
-            }else{
-                grunt.log.debug(this.name + " user configuration not found, continue");
-            }
+            this.configuration = configuration;
+            configuration = this.mergeObjects(configuration, this.lastConfigurations.finalization);
 
             return this.runTask("hashconstruction", {default: {}}, []);
         },

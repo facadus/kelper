@@ -17,15 +17,18 @@ npm install git+https://git.ctco.lv/r/~alexander.domotenko/training/builder.git 
 or add as dependency to package.json file.
 
 ```
-module.exports = function (grunt) {
-    grunt.loadNpmTasks('kelper');
-};
+"dependencies": {
+    "kelper": "git+https://git.ctco.lv/r/~alexander.domotenko/training/builder.git",
+    "grunt": "^0.4.5"
+}
 ```
 
 Once the plugin has been installed, your Gruntfile should look like this:
 
 ```
-grunt.loadNpmTasks('kelper');
+module.exports = function (grunt) {
+    grunt.loadNpmTasks('kelper');
+};
 ```
 
 ##Configuration

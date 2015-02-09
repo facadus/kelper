@@ -10,15 +10,16 @@ module.exports = function(grunt){
             "compile",
             "optimization",
             "finalization",
-            "hashconstruction"
+            "hashconstruction",
+            "ui_test"
         ],
         phase: {
             "c": ["compile"],
             "compile": ["compile"],
             "o": ["compile", "optimization"],
             "optimization": ["compile", "optimization"],
-            "f": ["compile", "optimization", "finalization", "hashconstruction"],
-            "finalization": ["compile", "optimization", "finalization", "hashconstruction"]
+            "f": ["compile", "optimization", "finalization", "hashconstruction", "ui_test"],
+            "finalization": ["compile", "optimization", "finalization", "hashconstruction", "ui_test"]
         }
     };
 

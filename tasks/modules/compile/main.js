@@ -103,6 +103,7 @@ exports.init = function(grunt){
 
             var configFile = destPath + path.sep + "config.js";
             var pathRel = path.relative(process.cwd(), configuration.default.dest).replace(/\\/g, "/");
+            var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
 
             var fileText = "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return (('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1]).src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
             fileText += "window.require = window.require || {};\n";
@@ -158,7 +159,7 @@ exports.init = function(grunt){
             if(grunt.util.kindOf(this.environment.base) == "object"){
                 fileText += "window.require.paths = window.require.paths || {};\n";
                 for(var lib in this.environment.base){
-                    fileText += 'window.require.paths["' + lib + '"] = rootDir + "' + path.normalize(this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
+                    fileText += 'window.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
                 }
             }
 

@@ -40,7 +40,13 @@ exports.init = function(grunt){
                 if(grunt.util.kindOf(this.environment.libraries) == "array"){
                     this.environment.libraries.forEach(function(library){
                         if(typeof library == "object" && library.hasOwnProperty("name")){
-                            packages.push(path.dirname(path.resolve(process.cwd(), pathToSource, library.name, "main.js")));
+                            if(library.hasOwnProperty("packages") && grunt.util.kindOf(library.packages) == "array"){
+                                library.packages.forEach(function(pkg){
+                                    if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
+                                        packages.push(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js")));
+                                    }
+                                });
+                            }
                         }
                     });
                 }else{

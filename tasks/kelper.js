@@ -11,8 +11,8 @@ module.exports = function (grunt) {
             "unit_test",
             "optimization",
             "finalization",
-            "hashconstruction",
-            "ui_test"
+            "ui_test",
+            "hashconstruction"
         ],
         phase: function (operation) {
             var $operations = [];
@@ -22,8 +22,8 @@ module.exports = function (grunt) {
                 case "f":
                 case "finalization":
                     $operations.push(
-                        "ui_test",
                         "hashconstruction",
+                        "ui_test",
                         "finalization"
                     );
                 case "o":

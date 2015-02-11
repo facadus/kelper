@@ -1,10 +1,8 @@
 #![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png) Kelper 0.1.1
-------------
 
 Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatical checks for Unit test and UI test mistakes in webpages that are using by project.
 
 ##Features
-----------
 
 * Be awesome
 * Automatically download dependencies
@@ -12,14 +10,12 @@ Kelper is a tool that is based on Grunt and is used for simplifying the process 
 * Make required tests
 
 ##Support
----------
 
 If you are having issues or ideas, please let me know throught email **[pavel.kotov@ctco.lv](mailto://pavel.kotov@ctco.lv)** or add this issue as comment to **[Confluence](https://confluence.ctco.lv/confluence/display/UICM/Training)**.
 
 Source code: http://git.ctco.lv/tree/?r=~alexander.domotenko/training/builder.git
 
 ##Installation
---------------
 
 This plugin requires Grunt `0.4.5 or newer`.
 
@@ -49,7 +45,6 @@ module.exports = function (grunt) {
 ```
 
 ##Configuration
----------------
 
 To make plugin working you should create config folder in root of project directory.
 
@@ -302,7 +297,6 @@ If parameter is not exist or is empty, finalization process continue it's work w
 ```
 
 ##Usage
--------
 
 If project is correctly configured, just launch project using `grunt`.
 

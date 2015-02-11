@@ -1,6 +1,6 @@
 {
   "name": "kelper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kelper is a project builder/compiler",
   "author": "Pavel Kotov <pavel.kotov@ctco.lv>",
   "dependencies": {

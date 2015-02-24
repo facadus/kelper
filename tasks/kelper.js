@@ -51,6 +51,19 @@ module.exports = function (grunt) {
     var env_file = grunt.option('target') || grunt.option('t') || 'local';
     try {
         plugin.environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "target" + path.sep + env_file + ".json");
+        // Add RequireJS
+        if(plugin.environment.hasOwnProperty("base")){
+            if(!plugin.environment.base.hasOwnProperty("require")){
+                // Prepend RequireJS
+                plugin.environment.base = grunt.util._.extend({
+                    require: path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
+                }, plugin.environment.base);
+            }
+        }else{
+            plugin.environment.base = {
+                "require": path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
+            }
+        }
     } catch (ex) {
         if (ex.origError.code == "ENOENT") {
             grunt.log.error("[ERROR] There is no '" + env_file + ".json' environment file!");

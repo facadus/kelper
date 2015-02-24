@@ -80,7 +80,7 @@ exports.init = function(grunt){
                 var libs = {};
                 libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"] = [];
                 for(var lib in this.environment.base){
-                    libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"].push(process.cwd() + path.sep + path.normalize(this.environment.base[lib]) + ".js");
+                    libs[path.resolve(process.cwd(), configuration.target, "base/main.js")].push(path.resolve(process.cwd(), this.environment.base[lib]) + ".js");
                 }
 
                 configuration.uglify.libs = {

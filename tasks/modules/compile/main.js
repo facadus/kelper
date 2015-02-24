@@ -41,7 +41,7 @@ exports.init = function (grunt) {
 
             // Generating files
             this.generateAppNoCache(configuration.default.dest);
-            this.generateConfigFile(configuration.default.dest);
+            this.generateBootstrap(configuration.default.dest);
 
             // Setting configuration
             this.loadPlugin("grunt-typescript");
@@ -81,13 +81,10 @@ exports.init = function (grunt) {
             };
         },
         generateConfigFile: function (destPath) {
-
-            var configFile = destPath + path.sep + "config.js";
             var pathRel = path.relative(process.cwd(), configuration.default.dest).replace(/\\/g, "/");
             var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
 
-            var fileText = "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return (('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1]).src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
-            fileText += "window.require = window.require || {};\n";
+            var fileText = "window.require = window.require || {};\n";
             fileText += "window.require.baseUrl = rootDir + '" + pathRel + "';\n";
 
             var deps = [];
@@ -151,13 +148,22 @@ exports.init = function (grunt) {
                 }
             }
 
-            grunt.file.write(configFile, fileText);
+            return fileText;
         },
         generateAppNoCache: function (destPath) {
             var appJs = destPath + path.sep + "app.nocache.js";
             if (!grunt.file.exists(appJs)) {
                 grunt.file.write(appJs, "__bootstrap();");
             }
+        },
+        generateBootstrap: function (destPath) {
+            var bootstrap = path.resolve(destPath, "bootstrap.js");
+            var defBootstrap = path.resolve(__dirname, "config/bootstrap.js");
+
+            var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];\n";
+            fileText += "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
+            fileText += grunt.file.read(defBootstrap).replace("{compiled}", this.generateConfigFile(destPath));
+            grunt.file.write(bootstrap, fileText);
         }
     });
 

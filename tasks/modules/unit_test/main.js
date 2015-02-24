@@ -8,21 +8,14 @@ exports.init = function(grunt){
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
 
     module.registerTask("UnitTests", "Running Unit Tests", function(){
-        module.loadPlugin("grunt-mocha-phantomjs");
 
-        // Copying all Unit Tests
-        var testPackages = [];
-        if(module.configuration.packages.length > 0){
-            for(var i=0; i < module.configuration.packages.length; i++){
-                if(grunt.file.exists(module.configuration.packages[i] + path.sep + "UnitTests.html")){
-                    testPackages.push(module.configuration.packages[i] + path.sep + "UnitTests.html");
-                }
-            }
+        if(grunt.util.kindOf(module.configuration.unitFiles) == "array" && module.configuration.unitFiles.length > 0) {
+            module.loadPlugin("grunt-mocha-phantomjs");
+            module.runTask("mocha_phantomjs", {
+                all: module.configuration.unitFiles
+            });
         }
 
-        module.runTask("mocha_phantomjs", {
-            all: testPackages
-        });
     });
 
     util._extend(module, {
@@ -40,13 +33,17 @@ exports.init = function(grunt){
                 if(grunt.util.kindOf(this.environment.libraries) == "array"){
                     this.environment.libraries.forEach(function(library){
                         if(typeof library == "object" && library.hasOwnProperty("name")){
-                            if(library.hasOwnProperty("packages") && grunt.util.kindOf(library.packages) == "array"){
-                                library.packages.forEach(function(pkg){
-                                    if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
-                                        packages.push(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js")));
-                                    }
-                                });
+
+                            if (library.hasOwnProperty("packages")) {
+                                if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
+                                    library.packages.include.forEach(function (pkg) {
+                                        if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
+                                            packages.push(path.normalize(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js")) + "/**/*.unit.html"));
+                                        }
+                                    });
+                                }
                             }
+
                         }
                     });
                 }else{
@@ -59,7 +56,7 @@ exports.init = function(grunt){
                 if(grunt.util.kindOf(this.environment.packages) == "array"){
                     this.environment.packages.forEach(function(pkg){
                         if(typeof pkg == "object" && pkg.hasOwnProperty("name")){
-                            packages.push(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js")));
+                            packages.push(path.normalize(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js"))) + "/**/*.unit.html");
                         }
                     });
                 }else{
@@ -68,7 +65,7 @@ exports.init = function(grunt){
             }
 
             this.configuration = {
-                packages: packages
+                unitFiles: grunt.file.expand(packages)
             };
 
             return this.runTask("UnitTests");

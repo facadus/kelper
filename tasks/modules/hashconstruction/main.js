@@ -140,6 +140,14 @@ exports.init = function(grunt){
                 });
             }
 
+            // Bundles
+            if(this.lastConfigurations.optimization.hasOwnProperty("bundles")){
+                fileText += "window.require.bundles = window.require.bundles || {};\n";
+                for(var bundle in this.lastConfigurations.optimization.bundles){
+                    fileText += 'window.require.bundles["' + bundle + '"] = ' + JSON.stringify(this.lastConfigurations.optimization.bundles[bundle]) + ';\n';
+                }
+            }
+
             // Deps
             if(deps.length > 0){
                 fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';

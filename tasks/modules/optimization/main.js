@@ -51,16 +51,20 @@ exports.init = function(grunt){
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 
+            // ToDo: Make it normally
             configuration.default.options.done = function(done, output){
-
-                console.log(output);
-
-                var cwd = process.cwd();
-                process.chdir(module.modulePath);
-                var duplicates = require('rjs-build-analysis').duplicates(output);
-                console.log(duplicates);
-                process.chdir(cwd);
-
+                var bundles = require('rjs-build-analysis').parse(output);
+                var output = {};
+                if(bundles.hasOwnProperty("bundles") && grunt.util.kindOf(bundles.bundles) == "array"){
+                    bundles.bundles.forEach(function(bundle){
+                        output[(bundle.parent.substr(0, bundle.parent.lastIndexOf('.')) || bundle.parent)] = bundle.children.map(function(bnd){
+                            return (bnd.substr(0, bnd.lastIndexOf('.')) || bnd);
+                        });
+                    });
+                }
+                module.configuration = module.mergeObjects(module.configuration, {
+                    bundles: output
+                });
                 done();
             }
 

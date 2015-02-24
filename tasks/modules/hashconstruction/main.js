@@ -163,9 +163,10 @@ exports.init = function(grunt){
             fileText += "}\n";
             fileText += grunt.file.read(path.resolve(process.cwd(), configuration.source, "app.nocache.js"));
 
-            // Remove Comment fields
+            // Remove comments
             fileText = fileText.replace(/\/\/.*|\/\*([^\0]*?)\*\//gm, "");
 
+            // Write to file
             grunt.file.write(filePath, fileText);
 
             return true;

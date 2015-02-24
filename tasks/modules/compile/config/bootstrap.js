@@ -2,6 +2,10 @@
 (function (window) {
     var defaultConfig = function(window){
         {compiled}
+        window.__bootstrap = function () {
+            document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
+        };
+        document.write('<script src="' + rootDir + 'target/compiled/app.nocache.js"></script>');
     }
 
     if (script.getAttribute("test")) {
@@ -14,10 +18,6 @@
             document.write('<script src="app.nocache.js"></script>');
         } else {
             defaultConfig(window);
-            window.__bootstrap = function () {
-                document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
-            };
-            document.write('<script src="' + rootDir + 'target/compiled/app.nocache.js"></script>');
         }
 
         // Setup Test Function
@@ -35,9 +35,5 @@
         };
     } else {
         defaultConfig(window);
-        window.__bootstrap = function () {
-            document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
-        };
-        document.write('<script src="' + rootDir + 'target/compiled/app.nocache.js"></script>');
     }
 })(window);

@@ -1,5 +1,9 @@
 // Bootstrap
 (function (window) {
+    var defaultConfig = function(window){
+        {compiled}
+    }
+
     if (script.getAttribute("test")) {
         document.write('<link rel="stylesheet" type="text/css" href="' + rootDir + 'node_modules/kelper/node_modules/mocha/mocha.css" />');
         document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/mocha/mocha.js"></script>');
@@ -9,7 +13,7 @@
             document.write('<base href="' + rootDir + 'target/finalized/">');
             document.write('<script src="app.nocache.js"></script>');
         } else {
-            {compiled}
+            defaultConfig(window);
             window.__bootstrap = function () {
                 document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
             };
@@ -30,6 +34,7 @@
             };
         };
     } else {
+        defaultConfig(window);
         window.__bootstrap = function () {
             document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
         };

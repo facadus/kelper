@@ -85,7 +85,7 @@ exports.init = function (grunt) {
             var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
 
             var fileText = "window.require = window.require || {};\n";
-            fileText += "window.require.baseUrl = rootDir + '" + pathRel + "';\n";
+            fileText += "\t\twindow.require.baseUrl = rootDir + '" + pathRel + "';\n";
 
             var deps = [];
             var packages = [];
@@ -93,7 +93,7 @@ exports.init = function (grunt) {
 
             // Parse Libraries
             if (grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0) {
-                fileText += "window.require.config = window.require.config || {};\n";
+                fileText += "\t\twindow.require.config = window.require.config || {};\n";
 
                 this.environment.libraries.forEach(function (library) {
 
@@ -115,7 +115,7 @@ exports.init = function (grunt) {
                 });
 
                 if (deps.length > 0) {
-                    fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
+                    fileText += '\t\twindow.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
                 }
             }
 
@@ -134,17 +134,19 @@ exports.init = function (grunt) {
             }
 
             if (deps.concat(packages).length > 0) {
-                fileText += 'window.require.packages = (window.require.packages || []).concat(["' + deps.concat(packages).join('","') + '"]);\n';
+                fileText += '\t\twindow.require.packages = (window.require.packages || []).concat(["' + deps.concat(packages).join('","') + '"]);\n';
             }
 
             for (var index in packageConfig) {
-                fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
+                fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
             }
 
             if (grunt.util.kindOf(this.environment.base) == "object") {
-                fileText += "window.require.paths = window.require.paths || {};\n";
+                fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
                 for (var lib in this.environment.base) {
-                    fileText += 'window.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
+                    if (lib != "require") {
+                        fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
+                    }
                 }
             }
 

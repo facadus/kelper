@@ -99,15 +99,15 @@ exports.init = function (grunt) {
                 fileText += "window.require.config = window.require.config || {};\n";
 
                 this.environment.libraries.forEach(function (library) {
-                    // Deps
-                    if (library.hasOwnProperty("autostart")) {
-                        deps.push(library.name);
-                    }
 
                     // Packages
                     if (library.hasOwnProperty("packages")) {
                         if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
                             library.packages.include.forEach(function (pkg) {
+                                // Deps
+                                if (library.hasOwnProperty("autoStart")) {
+                                    deps.push(pkg.name);
+                                }
                                 packages.push(pkg.name);
                                 if (pkg.hasOwnProperty("config")) {
                                     packageConfig[pkg.name + "/main"] = pkg.config;

@@ -53,7 +53,6 @@ exports.init = function(grunt){
                         hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, library.name, "main.js")));
                         libraries[library.name] = hash.digest("hex");
                         fs.renameSync(path.resolve(process.cwd(), configuration.target, library.name, "main.js"), path.resolve(process.cwd(), configuration.target, library.name, libraries[library.name] + ".js"));
-
                     }else{
                         grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
                     }
@@ -97,10 +96,15 @@ exports.init = function(grunt){
             var libPackages = [];
             var staticPackages = [];
             var packageConfig = [];
+            var deps = [];
 
             // Parse Libraries
             if(grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0){
                 this.environment.libraries.forEach(function(library){
+                    if(library.hasOwnProperty("autoStart")){
+                        deps.push(library.name);
+                    }
+
                     libPackages.push({
                         name: library.name,
                         main: libraries[library.name]
@@ -136,11 +140,8 @@ exports.init = function(grunt){
                 });
             }
 
-            if(libPackages.length > 0){
-                var deps = libPackages.map(function(pkg){
-                    return pkg.name;
-                });
-
+            // Deps
+            if(deps.length > 0){
                 fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
             }
 

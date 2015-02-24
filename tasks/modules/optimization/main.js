@@ -51,6 +51,19 @@ exports.init = function(grunt){
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 
+            configuration.default.options.done = function(done, output){
+
+                console.log(output);
+
+                var cwd = process.cwd();
+                process.chdir(module.modulePath);
+                var duplicates = require('rjs-build-analysis').duplicates(output);
+                console.log(duplicates);
+                process.chdir(cwd);
+
+                done();
+            }
+
             this.configuration = configuration;
 
             // Setting configuration
@@ -84,15 +97,32 @@ exports.init = function(grunt){
 
             source.forEach(function(library){
                 // Push Modules
-                parsed.packages.push(library.name);
-                parsed.modules.push({
-                    name: library.name
-                });
+                if(library.hasOwnProperty("packages") && library.packages.hasOwnProperty("include")){
+                    var includes = [];
+                    var excludes = [];
 
-                // Push packages
-                library.packages.forEach(function(pkg){
-                    parsed.packages.push(pkg.name);
-                });
+                    // Include
+                    library.packages.include.forEach(function(pkg){
+                        includes.push(pkg.name);
+                    });
+
+                    // Exclude
+                    if(library.packages.hasOwnProperty("exclude")) {
+                        library.packages.exclude.forEach(function (pkg) {
+                            excludes.push(pkg.name);
+                        });
+                    }
+
+                    parsed.modules.push({
+                        name: library.name,
+                        include: includes,
+                        exclude: excludes,
+                        create: true
+                    });
+
+                    parsed.packages.push(library.name);
+                }
+                parsed.packages = parsed.packages.concat(includes);
             });
 
             return parsed;

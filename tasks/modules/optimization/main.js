@@ -57,7 +57,7 @@ exports.init = function(grunt){
                 var output = {};
                 if(bundles.hasOwnProperty("bundles") && grunt.util.kindOf(bundles.bundles) == "array"){
                     bundles.bundles.forEach(function(bundle){
-                        output[(bundle.parent.substr(0, bundle.parent.lastIndexOf('.')) || bundle.parent)] = bundle.children.map(function(bnd){
+                        output[(bundle.parent.substr(0, bundle.parent.lastIndexOf('/main')) || bundle.parent)] = bundle.children.map(function(bnd){
                             return (bnd.substr(0, bnd.lastIndexOf('.')) || bnd);
                         });
                     });
@@ -121,6 +121,7 @@ exports.init = function(grunt){
                         name: library.name,
                         include: includes,
                         exclude: excludes,
+                        insertRequire: includes,
                         create: true
                     });
 

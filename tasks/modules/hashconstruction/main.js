@@ -113,6 +113,12 @@ exports.init = function (grunt) {
                     if (library.hasOwnProperty("packages")) {
                         if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
                             library.packages.include.forEach(function (pkg) {
+                                if (!library.hasOwnProperty("autoStart")) {
+                                    libPackages.push({
+                                        name: pkg.name
+                                    });
+                                }
+
                                 if (pkg.hasOwnProperty("config")) {
                                     packageConfig.push({
                                         name: pkg.name + "/main",

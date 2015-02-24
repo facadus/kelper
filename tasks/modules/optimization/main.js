@@ -62,9 +62,11 @@ exports.init = function(grunt){
                         });
                     });
                 }
+
                 module.configuration = module.mergeObjects(module.configuration, {
                     bundles: output
                 });
+
                 done();
             }
 

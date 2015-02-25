@@ -25,7 +25,14 @@ exports.init = function (grunt) {
     util._extend(module, {
         name: path.basename(__dirname),
         run: function () {
+            this.getConfiguration();
 
+            this.configuration = configuration;
+            configuration = this.mergeObjects(configuration, this.lastConfigurations.finalization);
+
+            return this.runTask("hashconstruction", {default: {}}, []);
+        },
+        getConfiguration: function () {
             // Load default configuration of Hash contructor
             if (grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")) {
                 try {
@@ -36,11 +43,6 @@ exports.init = function (grunt) {
                     configuration = {};
                 }
             }
-
-            this.configuration = configuration;
-            configuration = this.mergeObjects(configuration, this.lastConfigurations.finalization);
-
-            return this.runTask("hashconstruction", {default: {}}, []);
         },
         makeLibraries: function () {
             var libraries = {};
@@ -162,7 +164,7 @@ exports.init = function (grunt) {
             if (this.lastConfigurations.optimization.hasOwnProperty("bundles")) {
                 fileText += "window.require.bundles = window.require.bundles || {};\n";
                 for (var bundle in this.lastConfigurations.optimization.bundles) {
-                    if(deps.indexOf(bundle) == -1){
+                    if (deps.indexOf(bundle) == -1) {
                         fileText += 'window.require.bundles["' + bundle + '"] = ' + JSON.stringify(this.lastConfigurations.optimization.bundles[bundle]) + ';\n';
                     }
                 }

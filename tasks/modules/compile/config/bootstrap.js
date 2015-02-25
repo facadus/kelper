@@ -1,12 +1,12 @@
 // Bootstrap
 (function (window) {
-    var defaultConfig = function(window){
+    var defaultConfig = function (window) {
         {compiled}
         window.__bootstrap = function () {
             document.write('<script src="' + rootDir + '{path_kelper_module}grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
         };
         document.write('<script src="' + rootDir + '{path_compiled}app.nocache.js"></script>');
-    }
+    };
 
     if (script.getAttribute("test")) {
         document.write('<link rel="stylesheet" type="text/css" href="' + rootDir + '{path_kelper_module}mocha/mocha.css" />');

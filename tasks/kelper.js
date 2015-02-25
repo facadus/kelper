@@ -96,8 +96,8 @@ module.exports = function (grunt) {
         }
     });
 
-    plugin.configuration.operations.forEach(function(op){
-        grunt.registerTask('kelper:' + op, "Kelper's " + op + " module", function(){
+    plugin.configuration.operations.forEach(function (op) {
+        grunt.registerTask('kelper:' + op, "Kelper's " + op + " module", function () {
             var oldConfig = {};
             if (!grunt.hasOwnProperty("test") || !grunt.test) {
                 var modules = plugin.configuration.phase(op);

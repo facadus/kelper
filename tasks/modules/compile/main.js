@@ -10,7 +10,25 @@ exports.init = function (grunt) {
     util._extend(module, {
         name: path.basename(__dirname),
         run: function () {
+            this.getConfiguration();
 
+            if (typeof configuration.default != "undefined" && configuration.default.dest != "undefined") {
+                this.makeClear(configuration.default.dest);
+            }
+
+            // For Debug ->
+            grunt.log.debug(JSON.stringify(configuration));
+
+            // Generating files
+            this.generateAppNoCache(configuration.default.dest);
+            this.generateBootstrap(configuration.default.dest);
+
+            // Setting configuration
+            this.loadPlugin("grunt-typescript");
+            this.configuration = configuration;
+            return this.runTask("typescript", configuration);
+        },
+        getConfiguration: function () {
             // Load default configuration
             if (grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")) {
                 try {
@@ -32,21 +50,7 @@ exports.init = function (grunt) {
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
-            if (typeof configuration.default != "undefined" && configuration.default.dest != "undefined") {
-                this.makeClear(configuration.default.dest);
-            }
-
-            // For Debug ->
-            grunt.log.debug(JSON.stringify(configuration));
-
-            // Generating files
-            this.generateAppNoCache(configuration.default.dest);
-            this.generateBootstrap(configuration.default.dest);
-
-            // Setting configuration
-            this.loadPlugin("grunt-typescript");
-            this.configuration = configuration;
-            return this.runTask("typescript", configuration);
+            return configuration;
         },
         parse: function (configuration) {
 
@@ -166,14 +170,18 @@ exports.init = function (grunt) {
             fileText += "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
 
             var compFile = grunt.file.read(defBootstrap);
-            compFile = compFile.replace("{compiled}", this.generateConfigFile(destPath));
-            compFile = compFile.replace("{path_kelper_module}", path.relative(process.cwd(), this.modulePath + "/node_modules"));
-            compFile = compFile.replace("{path_compiled}", destPath);
+            compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(destPath));
+            compFile = compFile.replace(/\{path_kelper_module}/g, path.relative(process.cwd(), this.modulePath + "/node_modules") + path.sep);
 
-            // ToDo:
-            // Paths - Normal
-            compFile = compFile.replace("{path_optimized}", "target/optimized");
-            compFile = compFile.replace("{path_finalized}", "target/finalized");
+            compFile = compFile.replace(/\{path_compiled}/g, destPath + path.sep);
+
+            var optimization = require("../optimization/main").init(grunt).getConfiguration();
+            compFile = compFile.replace(/\{path_optimized}/g, optimization.default.options.dir + path.sep);
+            var finalized = require("../finalization/main").init(grunt).getConfiguration();
+            compFile = compFile.replace(/\{path_finalized}/g, finalized.target + path.sep);
+
+            // Fix slashes
+            compFile = compFile.replace(/\\/g, "/");
 
             fileText += compFile;
             grunt.file.write(bootstrap, fileText);
@@ -181,4 +189,4 @@ exports.init = function (grunt) {
     });
 
     return module;
-};
+}

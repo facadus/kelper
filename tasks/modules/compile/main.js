@@ -173,12 +173,12 @@ exports.init = function (grunt) {
             compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(destPath));
             compFile = compFile.replace(/\{path_kelper_module}/g, path.relative(process.cwd(), this.modulePath + "/node_modules") + path.sep);
 
-            compFile = compFile.replace(/\{path_compiled}/g, destPath + path.sep);
+            compFile = compFile.replace(/\{path_compiled}/g, path.relative(process.cwd(), destPath) + path.sep);
 
             var optimization = require("../optimization/main").init(grunt).getConfiguration();
-            compFile = compFile.replace(/\{path_optimized}/g, optimization.default.options.dir + path.sep);
+            compFile = compFile.replace(/\{path_optimized}/g, path.relative(process.cwd(), optimization.default.options.dir) + path.sep);
             var finalized = require("../finalization/main").init(grunt).getConfiguration();
-            compFile = compFile.replace(/\{path_finalized}/g, finalized.target + path.sep);
+            compFile = compFile.replace(/\{path_finalized}/g, path.relative(process.cwd(), finalized.target) + path.sep);
 
             // Fix slashes
             compFile = compFile.replace(/\\/g, "/");

@@ -37,7 +37,10 @@ describe("Kelper", function () {
         });
 
         it('Check plugin for being registered itself with Grunt', function () {
-            should.exist(grunt.task._tasks["kelper"]);
+            var modules = plugin.configuration.operations;
+            modules.forEach(function(module){
+                should.exist(grunt.task._tasks["kelper:" + module]);
+            });
         });
 
         it('Check module phases', function () {

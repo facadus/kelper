@@ -14,6 +14,11 @@ module.exports = function (grunt) {
             "hashconstruction",
             "ui_test"
         ],
+        operations: [
+            "compile",
+            "optimization",
+            "finalization"
+        ],
         phase: function (operation) {
             var $operations = [];
             var operation = (operation != true) ? operation : "finalization";
@@ -52,14 +57,14 @@ module.exports = function (grunt) {
     try {
         plugin.environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "target" + path.sep + env_file + ".json");
         // Add RequireJS
-        if(plugin.environment.hasOwnProperty("base")){
-            if(!plugin.environment.base.hasOwnProperty("require")){
+        if (plugin.environment.hasOwnProperty("base")) {
+            if (!plugin.environment.base.hasOwnProperty("require")) {
                 // Prepend RequireJS
                 plugin.environment.base = grunt.util._.extend({
                     require: path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
                 }, plugin.environment.base);
             }
-        }else{
+        } else {
             plugin.environment.base = {
                 "require": path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
             }
@@ -77,7 +82,6 @@ module.exports = function (grunt) {
     var modules = plugin.configuration.phase(phase);
 
     grunt.registerTask('kelper', 'Build task', function () {
-
         var oldConfig = {};
         if (!grunt.hasOwnProperty("test") || !grunt.test) {
             // Running all modules
@@ -90,7 +94,23 @@ module.exports = function (grunt) {
                 oldConfig[moduleName] = module.configuration;
             });
         }
+    });
 
+    plugin.configuration.operations.forEach(function(op){
+        grunt.registerTask('kelper:' + op, "Kelper's " + op + " module", function(){
+            var oldConfig = {};
+            if (!grunt.hasOwnProperty("test") || !grunt.test) {
+                var modules = plugin.configuration.phase(op);
+                modules.forEach(function (moduleName) {
+                    module = require(plugin.configuration.modulePath + path.sep + moduleName + path.sep + "main").init(grunt);
+                    module.modulePath = path.dirname(plugin.configuration.builderPath);
+                    module.environment = plugin.environment;
+                    module.lastConfigurations = oldConfig;
+                    module.run();
+                    oldConfig[moduleName] = module.configuration;
+                });
+            }
+        });
     });
 
     grunt.registerTask("test", "Build task test", function () {

@@ -4,8 +4,17 @@ var util = require("util");
 
 // Module Compile
 exports.init = function (grunt) {
-    module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
     var configuration = {};
+    module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
+
+    module.registerTask("addDependencies", "Adding dependencies to files", function(){
+        // Load library
+        var deps = require("./include/dependencies").init(grunt);
+        var depsPath = path.resolve(process.cwd(), configuration.default.dest);
+        // Get Modules with dependencies
+        deps.findDependencies(module.environment);
+        deps.addFoundDependenciesToFiles(depsPath);
+    });
 
     util._extend(module, {
         name: path.basename(__dirname),
@@ -26,7 +35,9 @@ exports.init = function (grunt) {
             // Setting configuration
             this.loadPlugin("grunt-typescript");
             this.configuration = configuration;
-            return this.runTask("typescript", configuration);
+            var task = this.runTask("typescript", configuration);
+            this.runTask("addDependencies", {default: {}}, []);
+            return task;
         },
         getConfiguration: function () {
             // Load default configuration

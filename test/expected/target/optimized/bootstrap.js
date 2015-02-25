@@ -1,11 +1,17 @@
+var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];
+var rootDir = Array(document.location.href.split(/[/\\]/).filter(function(e, i){return script.src.split(/[/\\]/)[i] !== e;}).length).join('../');
 // Bootstrap
 (function (window) {
     var defaultConfig = function(window){
-        {compiled}
+        window.require = window.require || {};
+		window.require.baseUrl = rootDir + 'target/compiled';
+		window.require.packages = (window.require.packages || []).concat(["application"]);
+		window.require.paths = window.require.paths || {};
+
         window.__bootstrap = function () {
-            document.write('<script src="' + rootDir + '{path_kelper_module}grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
+            document.write('<script src="' + rootDir + '..\node_modulesgrunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
         };
-        document.write('<script src="' + rootDir + '{path_compiled}app.nocache.js"></script>');
+        document.write('<script src="' + rootDir + 'C:\work\projects\sample_builder\test\target\compiledapp.nocache.js"></script>');
     }
 
     if (script.getAttribute("test")) {
@@ -14,7 +20,7 @@
         document.write('<script src="' + rootDir + '{path_kelper_module}chai/chai.js"></script>');
 
         if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
-            document.write('<base href="' + rootDir + '{path_finalized}">');
+            document.write('<base href="' + rootDir + 'target/finalized">');
             document.write('<script src="app.nocache.js"></script>');
         } else {
             defaultConfig(window);

@@ -164,7 +164,18 @@ exports.init = function (grunt) {
 
             var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];\n";
             fileText += "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
-            fileText += grunt.file.read(defBootstrap).replace("{compiled}", this.generateConfigFile(destPath));
+
+            var compFile = grunt.file.read(defBootstrap);
+            compFile = compFile.replace("{compiled}", this.generateConfigFile(destPath));
+            compFile = compFile.replace("{path_kelper_module}", path.relative(process.cwd(), this.modulePath + "/node_modules"));
+            compFile = compFile.replace("{path_compiled}", destPath);
+
+            // ToDo:
+            // Paths - Normal
+            compFile = compFile.replace("{path_optimized}", "target/optimized");
+            compFile = compFile.replace("{path_finalized}", "target/finalized");
+
+            fileText += compFile;
             grunt.file.write(bootstrap, fileText);
         }
     });

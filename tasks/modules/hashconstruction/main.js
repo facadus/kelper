@@ -43,6 +43,8 @@ exports.init = function (grunt) {
                     configuration = {};
                 }
             }
+
+            return configuration;
         },
         makeLibraries: function () {
             var libraries = {};

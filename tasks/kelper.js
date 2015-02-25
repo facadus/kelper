@@ -81,21 +81,6 @@ module.exports = function (grunt) {
     var phase = grunt.option("process") || grunt.option("p") || "finalization";
     var modules = plugin.configuration.phase(phase);
 
-    grunt.registerTask('kelper', 'Build task', function () {
-        var oldConfig = {};
-        if (!grunt.hasOwnProperty("test") || !grunt.test) {
-            // Running all modules
-            modules.forEach(function (moduleName) {
-                module = require(plugin.configuration.modulePath + path.sep + moduleName + path.sep + "main").init(grunt);
-                module.modulePath = path.dirname(plugin.configuration.builderPath);
-                module.environment = plugin.environment;
-                module.lastConfigurations = oldConfig;
-                module.run();
-                oldConfig[moduleName] = module.configuration;
-            });
-        }
-    });
-
     plugin.configuration.operations.forEach(function (op) {
         grunt.registerTask('kelper:' + op, "Kelper's " + op + " module", function () {
             var oldConfig = {};
@@ -121,7 +106,7 @@ module.exports = function (grunt) {
         });
     });
 
-    grunt.registerTask("default", ["kelper"]);
+    grunt.registerTask("default", ["kelper:" + plugin.configuration.operations.slice(-1)]);
 
     return plugin;
 };

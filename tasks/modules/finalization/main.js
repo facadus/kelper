@@ -58,9 +58,9 @@ exports.init = function (grunt) {
             if (grunt.util.kindOf(this.environment.base) == "object") {
 
                 var libs = {};
-                libs[process.cwd() + path.sep + path.normalize(configuration.target) + path.sep + "base" + path.sep + "main.js"] = [];
+                libs[path.resolve(process.cwd(), configuration.target, "base/main.js")] = [];
                 for (var lib in this.environment.base) {
-                    libs[path.resolve(process.cwd(), configuration.target, "base/main.js")] = path.resolve(process.cwd(), this.environment.base[lib]) + ".js";
+                    libs[path.resolve(process.cwd(), configuration.target, "base/main.js")].push(path.resolve(process.cwd(), this.environment.base[lib]) + ".js");
                 }
 
                 configuration.uglify.libs = {
@@ -120,6 +120,8 @@ exports.init = function (grunt) {
             } else {
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
+
+            return configuration;
         },
         parse: function (configuration) {
             var parsed = {};

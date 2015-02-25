@@ -75,6 +75,8 @@ exports.init = function (grunt) {
             } else {
                 grunt.log.debug(this.name + " user configuration not found, continue");
             }
+
+            return configuration;
         },
         parse: function (configuration) {
 

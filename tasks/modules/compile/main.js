@@ -167,6 +167,20 @@ exports.init = function (grunt) {
 
             return fileText;
         },
+        generateReplaces: function(){
+            // Replaces
+            if (this.environment.hasOwnProperty("replace")){
+                fileText = 'window.require = window.require || {};\n';
+                fileText += '\t\t\twindow.require.map = window.require.map || {};\n';
+                fileText += '\t\t\twindow.require.map["*"] = window.require.map["*"] || {};\n';
+
+                for(var key in this.environment.replace){
+                    fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "' + key + '";\n';
+                }
+                return fileText;
+            }
+            return "";
+        },
         generateAppNoCache: function (destPath) {
             var appJs = destPath + path.sep + "app.nocache.js";
             if (!grunt.file.exists(appJs)) {
@@ -182,6 +196,7 @@ exports.init = function (grunt) {
 
             var compFile = grunt.file.read(defBootstrap);
             compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(destPath));
+            compFile = compFile.replace(/\{replaces}/g, this.generateReplaces());
             compFile = compFile.replace(/\{path_kelper_module}/g, path.relative(process.cwd(), this.modulePath + "/node_modules") + path.sep);
             compFile = compFile.replace(/\{path_kelper_include}/g, path.relative(process.cwd(), this.modulePath + "/include") + path.sep);
 

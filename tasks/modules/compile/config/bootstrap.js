@@ -15,6 +15,7 @@
         document.write('<script src="' + rootDir + '{path_kelper_include}mochaRun.js"></script>');
 
         if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
+            {replaces}
             document.write('<base href="' + rootDir + '{path_finalized}">');
             document.write('<script src="app.nocache.js"></script>');
         } else {

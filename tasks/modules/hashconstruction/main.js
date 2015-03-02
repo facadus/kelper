@@ -172,7 +172,7 @@ exports.init = function (grunt) {
                 fileText += 'window.require.map["*"] = window.require.map["*"] || {};\n';
 
                 for(var key in this.environment.replace){
-                    fileText += 'window.require.map["*"]["' + key + '"] = "' + this.environment.replace[key] + '";\n';
+                    fileText += 'window.require.map["*"]["' + key + '"] = window.require.map["*"]["' + key + '"] || "' + this.environment.replace[key] + '";\n';
                 }
             }
 

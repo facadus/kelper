@@ -31,7 +31,7 @@ exports.init = function (grunt) {
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 
-            // ToDo: Make it normally
+            // Make bundles
             configuration.default.options.done = function (done, output) {
                 var bundles = require('rjs-build-analysis').parse(output);
                 var output = {};
@@ -46,7 +46,7 @@ exports.init = function (grunt) {
                     bundles: output
                 });
                 done();
-            }
+            };
 
             this.configuration = configuration;
 
@@ -100,9 +100,11 @@ exports.init = function (grunt) {
         parseLibraries: function (source) {
             var parsed = {
                 modules: [],
-                packages: []
+                packages: [],
+                paths: {}
             };
 
+            var module = this;
             source.forEach(function (library) {
                 // Push Modules
                 if (library.hasOwnProperty("packages") && library.packages.hasOwnProperty("include")) {
@@ -111,7 +113,12 @@ exports.init = function (grunt) {
 
                     // Include
                     library.packages.include.forEach(function (pkg) {
-                        includes.push(pkg.name);
+                        if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
+                            includes.push(pkg.name);
+                            if(pkg.hasOwnProperty("replace")){
+                                parsed.paths = module.mergeObjects(parsed.paths, pkg.replace);
+                            }
+                        }
                     });
 
                     // Exclude
@@ -149,6 +156,9 @@ exports.init = function (grunt) {
                 packages.forEach(function (pkg) {
                     if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
                         parsed.push(pkg.name);
+                        if(pkg.hasOwnProperty("replace")){
+                            parsed.paths = module.mergeObjects(parsed.paths, pkg.replace);
+                        }
                     }
                 });
             }

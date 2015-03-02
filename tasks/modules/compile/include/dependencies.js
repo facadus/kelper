@@ -60,7 +60,7 @@ exports.init = function(grunt){
                     // Parse file's components
                     while((m = regEx.exec(result[1])) != null){
                         if(m.index === regEx.lastIndex){
-                            re.lastIndex++;
+                            regEx.lastIndex++;
                         }
                         deps[path.resolve(path.dirname(file), m[1])] = m[1];
                     }

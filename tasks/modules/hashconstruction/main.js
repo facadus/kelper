@@ -102,6 +102,10 @@ exports.init = function (grunt) {
             var packageConfig = [];
             var deps = [];
 
+            if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0){
+                fileText += 'window.baseUrl = "' + this.environment.cdnUrl + '";\n';
+            }
+
             // Parse Libraries
             if (grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0) {
                 this.environment.libraries.forEach(function (library) {
@@ -181,13 +185,17 @@ exports.init = function (grunt) {
 
             fileText += "function __bootstrap(){\n";
             if (libs) {
-                fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
+                if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0){
+                    fileText += "   document.write(\"<script src='" + this.environment.cdnUrl + "base/" + libs + ".js' defer='defer'></script>\");\n";
+                }else{
+                    fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
+                }
             }
             fileText += "}\n";
             fileText += grunt.file.read(path.resolve(process.cwd(), configuration.source, "app.nocache.js"));
 
             // Remove comments
-            fileText = fileText.replace(/\/\/.*|\/\*([^\0]*?)\*\//gm, "");
+            fileText = fileText.replace(/\s\/\/.*|\/\*([^\0]*?)\*\//gm, "");
 
             // Write to file
             grunt.file.write(filePath, fileText);

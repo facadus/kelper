@@ -21,15 +21,17 @@
         }
 
         // Setup Test Function
-        mocha.setup('bdd');
-        window.expect = chai.expect;
-        // Setup RunTest function
-        window.__runTest = function () {
-            if (window.mochaPhantomJS) {
-                mochaPhantomJS.run();
-            } else {
-                mocha.run();
-            }
+        window.__setupTest = function () {
+            mocha.setup('bdd');
+            window.expect = chai.expect;
+            // Setup RunTest function
+            window.__runTest = function () {
+                if (window.mochaPhantomJS) {
+                    mochaPhantomJS.run();
+                } else {
+                    mocha.run();
+                }
+            };
         };
     } else {
         defaultConfig(window);

@@ -62,14 +62,14 @@ exports.init = function(grunt){
                         if(m.index === regEx.lastIndex){
                             re.lastIndex++;
                         }
-                        deps[path.resolve(filePath, m[1])] = m[1];
+                        deps[path.resolve(path.dirname(file), m[1])] = m[1];
                     }
 
                     // Parse additional components
-                    files.forEach(function(file){
-                        var filePathed = path.resolve(filePath, file);
+                    files.forEach(function(dependencies){
+                        var filePathed = path.resolve(path.dirname(file), dependencies);
                         if(deps[filePathed] == undefined){
-                            deps[filePathed] = file;
+                            deps[filePathed] = dependencies;
                         }
                     });
 

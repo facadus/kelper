@@ -18,6 +18,7 @@ var rootDir = Array(document.location.href.split(/[/\\]/).filter(function(e, i){
         document.write('<link rel="stylesheet" type="text/css" href="' + rootDir + '../node_modules/mocha/mocha.css" />');
         document.write('<script src="' + rootDir + '../node_modules/mocha/mocha.js"></script>');
         document.write('<script src="' + rootDir + '../node_modules/chai/chai.js"></script>');
+        document.write('<script src="' + rootDir + '../include/mochaRun.js"></script>');
 
         if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
             document.write('<base href="' + rootDir + 'target/finalized/">');
@@ -26,9 +27,6 @@ var rootDir = Array(document.location.href.split(/[/\\]/).filter(function(e, i){
             defaultConfig(window);
         }
 
-        // Setup Test Function
-        mocha.setup('bdd');
-        window.expect = chai.expect;
         // Setup RunTest function
         window.__runTest = function () {
             if (window.mochaPhantomJS) {

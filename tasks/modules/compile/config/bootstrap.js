@@ -12,6 +12,7 @@
         document.write('<link rel="stylesheet" type="text/css" href="' + rootDir + '{path_kelper_module}mocha/mocha.css" />');
         document.write('<script src="' + rootDir + '{path_kelper_module}mocha/mocha.js"></script>');
         document.write('<script src="' + rootDir + '{path_kelper_module}chai/chai.js"></script>');
+        document.write('<script src="' + rootDir + '{path_kelper_include}mochaRun.js"></script>');
 
         if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
             document.write('<base href="' + rootDir + '{path_finalized}">');
@@ -20,18 +21,13 @@
             defaultConfig(window);
         }
 
-        // Setup Test Function
-        window.__setupTest = function () {
-            mocha.setup('bdd');
-            window.expect = chai.expect;
-            // Setup RunTest function
-            window.__runTest = function () {
-                if (window.mochaPhantomJS) {
-                    mochaPhantomJS.run();
-                } else {
-                    mocha.run();
-                }
-            };
+        // Setup RunTest function
+        window.__runTest = function () {
+            if (window.mochaPhantomJS) {
+                mochaPhantomJS.run();
+            } else {
+                mocha.run();
+            }
         };
     } else {
         defaultConfig(window);

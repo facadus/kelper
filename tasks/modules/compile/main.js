@@ -183,6 +183,7 @@ exports.init = function (grunt) {
             var compFile = grunt.file.read(defBootstrap);
             compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(destPath));
             compFile = compFile.replace(/\{path_kelper_module}/g, path.relative(process.cwd(), this.modulePath + "/node_modules") + path.sep);
+            compFile = compFile.replace(/\{path_kelper_include}/g, path.relative(process.cwd(), this.modulePath + "/include") + path.sep);
 
             compFile = compFile.replace(/\{path_compiled}/g, path.relative(process.cwd(), destPath) + path.sep);
 

@@ -80,7 +80,7 @@ exports.init = function (grunt) {
             return libraries;
         },
         makeLibs: function () {
-            if (grunt.file.exists(process.cwd() + path.sep + configuration.target + path.sep + "base" + path.sep + "/main.js")) {
+            if (grunt.file.exists(path.resolve(process.cwd(), configuration.target, "base/main.js"))) {
                 var hash = crypt.createHash(configuration.hash);
                 hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, "base", "main.js")));
                 hash = hash.digest("hex");

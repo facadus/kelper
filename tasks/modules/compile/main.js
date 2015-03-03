@@ -7,7 +7,7 @@ exports.init = function (grunt) {
     var configuration = {};
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
 
-    module.registerTask("addDependencies", "Adding dependencies to files", function(){
+    module.registerTask("addDependencies", "Adding dependencies to files", function () {
         // Load library
         var deps = require("./include/dependencies").init(grunt);
         var depsPath = path.resolve(process.cwd(), configuration.default.dest);
@@ -167,18 +167,47 @@ exports.init = function (grunt) {
 
             return fileText;
         },
-        generateReplaces: function(){
+        generateReplaces: function () {
+            var replaces = {};
+            var generated = false;
+
             // Replaces
-            if (this.environment.hasOwnProperty("replace")){
-                fileText = 'window.require = window.require || {};\n';
+            if (grunt.util.kindOf(this.environment.libraries) == "array") {
+                this.environment.libraries.forEach(function (library) {
+                    library.packages.include.forEach(function (pkg) {
+                        if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
+                            if (pkg.hasOwnProperty("replace")) {
+                                replaces = module.mergeObjects(replaces, pkg.replace);
+                                generated = true;
+                            }
+                        }
+                    });
+                });
+            }
+
+            if (grunt.util.kindOf(this.environment.packages) == "array") {
+                this.environment.packages.forEach(function (pkg) {
+                    if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
+                        if (pkg.hasOwnProperty("replace")) {
+                            replaces = module.mergeObjects(replaces, pkg.replace);
+                            generated = true;
+                        }
+                    }
+                });
+            }
+
+            if (generated) {
+                var fileText = 'window.require = window.require || {};\n';
                 fileText += '\t\t\twindow.require.map = window.require.map || {};\n';
                 fileText += '\t\t\twindow.require.map["*"] = window.require.map["*"] || {};\n';
 
-                for(var key in this.environment.replace){
-                    fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "' + key + '";\n';
+                for (var key in replaces) {
+                    fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "../../target/compiled/' + key + '";\n';
                 }
+
                 return fileText;
             }
+
             return "";
         },
         generateAppNoCache: function (destPath) {

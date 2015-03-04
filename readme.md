@@ -96,7 +96,7 @@ There are 3 main parameters:
 
 * **source** - path of folder from base directory that should be compiled
 * **target** - path of folder from base directory that collects compiled files
-* **version** - compiled javascript standart
+* **version** - compiled javascript standard
 * **baseConfig** - is callback function that is used for each package, returned information will be merged or overwritten by environment config.
 
 ##### baseConfig
@@ -108,6 +108,14 @@ This function is used as callback function for each package. Returned informatio
 
 * Firstly, will be taken default configuration and overwritten with baseConfig returned data.
 * Secondly, will be taken Environment data and merged using smart merge function (object will be extended, arrays merged and all otherwise will be overwritten)
+
+Function will receive object that have these parameters:
+
+* **name** *(string)* - Package name *(ex. "common")*
+* **package** *(string)* - Package full name *(ex. "common/main")*
+* **library** *(string)* - Library name *(ex. "application")*
+* **sourcePath** *(string)* - Full path of sources *(ex. "C:\work\Example\src\common")*
+* **compiledPath** *(string)* - Full path of compile directory *(ex. "C:\work\Example\target\compiled\common")*
 
 *Example*:
 
@@ -195,7 +203,7 @@ By adding additional configuration Kelper will make additional functions like mi
 
 There can be these configuration parameters:
 
-* **uglify** - is used in finalization process to minify files
+* **uglify** - is used in finalization process to minimize files
 * **base** - is used in optimization and finalization process to define static libraries like jQuery, Backbone and others.
 * **libraries** - is used in optimization and finalization process to define libraries that should be exported.
 * **packages** - is used in optimization and finalization process to define RequireJS static packages.
@@ -205,7 +213,7 @@ There can be these configuration parameters:
 #### Uglify configuration parameter
 -----------------------------------
 
-Without this parameter finalization process will continue it's work without minification process. This is standart Uglify configuration that will be copied to it's process.
+Without this parameter finalization process will continue it's work without minimization process. This is standard Uglify configuration that will be copied to it's process.
 
 For more information [follow this link](https://github.com/gruntjs/grunt-contrib-uglify).
 
@@ -253,7 +261,7 @@ Packages object has 2 parameters:
 
 Each included packages has it's own configuration. For more information, look at next paragraph (Packages configuration parameter).
 
-If library has ***autoStart*** option, it will be added as dependency to requireJS and will be autoloaded.
+If library has ***autoStart*** option, it will be added as dependency to requireJS and will be loaded automatically.
 
 *Example of usage:*
 
@@ -262,34 +270,34 @@ If library has ***autoStart*** option, it will be added as dependency to require
     "libraries": [
         {
             "name": "sample",
-		    "autoStart": true,
+            "autoStart": true,
             "packages": {
-	            "include": [
-	                {
-	                    "name": "common"
-	                },
-	                {
-	                    "name": "application",
-	                    "config": {
-	                        "title": "My Application"
-	                    }
-	                }
-	            ]
-		    }
+                "include": [
+                    {
+                        "name": "common"
+                    },
+                    {
+                        "name": "application",
+                        "config": {
+                            "title": "My Application"
+                        }
+                    }
+                ]
+            }
         },
         {
-	        "name": "widgets",
-	        "packages": {
-		        "include": [
-			        {
-				        "name": "widget1"
-				    }
-				],
-				"exclude": [
-					"common"
-				]
-			}
-		}
+            "name": "widgets",
+            "packages": {
+                "include": [
+                    {
+                        "name": "widget1"
+                    }
+                ],
+                "exclude": [
+                    "common"
+                ]
+            }
+        }
     ]
 }
 ```

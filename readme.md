@@ -118,11 +118,11 @@ module.exports = function(grunt){
         target: 'target/compiled',
         version: 'es5',
         baseConfig: function(pkg){
-            switch (package.package) {
+            switch (pkg.package) {
                 case "common/main":
                     return {
                         "libraryMetadata": [
-                            grunt.file.readJSON(path.resolve(package.sourcePath, 'module.json'))
+                            grunt.file.readJSON(path.resolve(pkg.sourcePath, 'module.json'))
                         ]
                     };
                 default:

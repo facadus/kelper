@@ -81,6 +81,7 @@ There are available these commands:
 ```
 grunt -process optimization
 ```
+
 or
 
 ```
@@ -241,8 +242,16 @@ RequireJS is not needed here, it will be automatically downloaded and loaded as 
 Libraries is used in optimization and finalization process to define libraries that should be exported.
 This function automatically generates library files and compile them. All configurations that are set in packages are copied to configuration (bootstrap.js or app.nocache.js) files for usage.
 
-Each library has 3 parameters - **"name"** *(string)*, **"include"** *(array of packages)* and **"exclude"** *(array of strings)*, other parameters will be ignored. Library will be automatically generated from inner packages if they exist otherwise library will be ignored.
-Each packages has it's own configuration. For more information, look at next paragraph (Packages configuration parameter).
+Each library has 3 parameters - **"name"** *(string)*, **"autoStart"** *(boolean)* and **"packages"** *(object)*, other parameters will be ignored. Library will be automatically generated from inner packages if they exist otherwise library will be ignored.
+
+Packages object has 2 parameters:
+
+* ***include*** *(array of packages)*
+* ***exclude*** *(array of strings)*
+
+Each included packages has it's own configuration. For more information, look at next paragraph (Packages configuration parameter).
+
+If library has ***autoStart*** option, it will be added as dependency to requireJS and will be autoloaded.
 
 *Example of usage:*
 
@@ -251,18 +260,34 @@ Each packages has it's own configuration. For more information, look at next par
     "libraries": [
         {
             "name": "sample",
-            "packages": [
-                {
-                    "name": "common"
-                },
-                {
-                    "name": "application",
-                    "config": {
-                        "title": "My Application"
-                    }
-                }
-            ]
-        }
+		    "autoStart": true,
+            "packages": {
+	            "include": [
+	                {
+	                    "name": "common"
+	                },
+	                {
+	                    "name": "application",
+	                    "config": {
+	                        "title": "My Application"
+	                    }
+	                }
+	            ]
+		    }
+        },
+        {
+	        "name": "widgets",
+	        "packages": {
+		        "include": [
+			        {
+				        "name": "widget1"
+				    }
+				],
+				"exclude": [
+					"common"
+				]
+			}
+		}
     ]
 }
 ```

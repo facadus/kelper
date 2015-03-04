@@ -99,7 +99,7 @@ exports.init = function (grunt) {
 
             var libPackages = [];
             var staticPackages = [];
-            var packageConfig = [];
+            var packageConfig = this.lastConfigurations.compile.packageConfig;
             var deps = [];
 
             if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0){
@@ -126,13 +126,6 @@ exports.init = function (grunt) {
                                         name: pkg.name
                                     });
                                 }
-
-                                if (pkg.hasOwnProperty("config")) {
-                                    packageConfig.push({
-                                        name: pkg.name + "/main",
-                                        config: pkg.config
-                                    });
-                                }
                             });
                         }
                     }
@@ -146,13 +139,6 @@ exports.init = function (grunt) {
                         name: pkg.name,
                         main: libraries[pkg.name]
                     });
-
-                    if (pkg.hasOwnProperty("config")) {
-                        packageConfig.push({
-                            name: pkg.name + "/main",
-                            config: pkg.config
-                        });
-                    }
                 });
             }
 
@@ -176,11 +162,12 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (packageConfig.length > 0) {
+            if (Object.keys(packageConfig).length > 0) {
                 fileText += "window.require.config = window.require.config || {};\n";
-                packageConfig.forEach(function (config) {
-                    fileText += 'window.require.config["' + config.name + '"] = ' + JSON.stringify(config.config) + ";\n";
-                });
+                for (var index in packageConfig) {
+                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ';\n';
+                }
+                fileText += configs.join("\n") + "\n";
             }
 
             fileText += "function __bootstrap(){\n";

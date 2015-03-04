@@ -5,6 +5,8 @@ var util = require("util");
 // Module Compile
 exports.init = function (grunt) {
     var configuration = {};
+    var baseConfig = null;
+
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
 
     module.registerTask("addDependencies", "Adding dependencies to files", function () {
@@ -30,7 +32,8 @@ exports.init = function (grunt) {
 
             // Generating files
             this.generateAppNoCache(configuration.default.dest);
-            this.generateBootstrap(configuration.default.dest);
+            this.generateBootstrap(configuration.default.sourcePath, configuration.default.dest);
+
 
             // Setting configuration
             this.loadPlugin("grunt-typescript");
@@ -69,7 +72,8 @@ exports.init = function (grunt) {
 
             // Parsing
             if (configuration.hasOwnProperty("source")) {
-                parsed.src = process.cwd() + path.sep + path.normalize(configuration.source) + path.sep + "**" + path.sep + "*.ts";
+                parsed.sourcePath = process.cwd() + path.sep + path.normalize(configuration.source);
+                parsed.src = parsed.sourcePath + path.sep + "**" + path.sep + "*.ts";
                 if (parsed.hasOwnProperty("options")) {
                     parsed.options.basePath = path.normalize(configuration.source);
                 } else {
@@ -82,6 +86,7 @@ exports.init = function (grunt) {
             if (configuration.hasOwnProperty("target")) {
                 parsed.dest = process.cwd() + path.sep + path.normalize(configuration.target);
             }
+
             if (configuration.hasOwnProperty("version")) {
                 if (parsed.hasOwnProperty("options")) {
                     parsed.options.target = configuration.version;
@@ -90,12 +95,16 @@ exports.init = function (grunt) {
                 }
             }
 
+            if (configuration.hasOwnProperty("baseConfig") && typeof configuration.baseConfig == "function") {
+                baseConfig = configuration.baseConfig;
+            }
+
             // Fix for TypeScript
             return {
                 default: parsed
             };
         },
-        generateConfigFile: function (destPath) {
+        generateConfigFile: function (srcPath, destPath) {
             var pathRel = path.relative(process.cwd(), configuration.default.dest).replace(/\\/g, "/");
             var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
 
@@ -111,7 +120,6 @@ exports.init = function (grunt) {
                 fileText += "\t\twindow.require.config = window.require.config || {};\n";
 
                 this.environment.libraries.forEach(function (library) {
-
                     // Packages
                     if (library.hasOwnProperty("packages")) {
                         if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
@@ -121,8 +129,28 @@ exports.init = function (grunt) {
                                     deps.push(pkg.name);
                                 }
                                 packages.push(pkg.name);
+
+                                // baseConfig
+                                if (typeof baseConfig == "function") {
+                                    var ret = baseConfig({
+                                        name: pkg.name,
+                                        package: pkg.name + "/main",
+                                        library: library.name,
+                                        sourcePath: path.resolve(process.cwd(), srcPath, pkg.name),
+                                        compiledPath: path.resolve(process.cwd(), pathRel, pkg.name)
+                                    });
+
+                                    if (typeof ret != "undefined" && ret != null) {
+                                        packageConfig[pkg.name + "/main"] = ret;
+                                    }
+                                }
+
                                 if (pkg.hasOwnProperty("config")) {
-                                    packageConfig[pkg.name + "/main"] = pkg.config;
+                                    if (typeof packageConfig[pkg.name + "/main"] != "undefined") {
+                                        module.smartMerge(packageConfig[pkg.name + "/main"], pkg.config);
+                                    } else {
+                                        packageConfig[pkg.name + "/main"] = pkg.config;
+                                    }
                                 }
                             });
                         }
@@ -139,8 +167,28 @@ exports.init = function (grunt) {
                 this.environment.packages.forEach(function (pkg) {
                     if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
                         packages.push(pkg.name);
+
+                        // baseConfig
+                        if (typeof baseConfig == "function") {
+                            var ret = baseConfig({
+                                name: pkg.name,
+                                package: pkg.name + "/main",
+                                library: library.name,
+                                sourcePath: path.resolve(process.cwd(), srcPath, pkg.name),
+                                compiledPath: path.resolve(process.cwd(), pathRel, pkg.name)
+                            });
+
+                            if (typeof ret != "undefined" && ret != null) {
+                                packageConfig[pkg.name + "/main"] = ret;
+                            }
+                        }
+
                         if (pkg.hasOwnProperty("config")) {
-                            packageConfig[pkg.name + "/main"] = pkg.config;
+                            if (typeof packageConfig[pkg.name + "/main"] != "undefined") {
+                                module.smartMerge(packageConfig[pkg.name + "/main"], pkg.config);
+                            } else {
+                                packageConfig[pkg.name + "/main"] = pkg.config;
+                            }
                         }
                     } else {
                         grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
@@ -151,6 +199,8 @@ exports.init = function (grunt) {
             if (deps.concat(packages).length > 0) {
                 fileText += '\t\twindow.require.packages = (window.require.packages || []).concat(["' + deps.concat(packages).join('","') + '"]);\n';
             }
+
+            // asd
 
             for (var index in packageConfig) {
                 fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
@@ -165,11 +215,12 @@ exports.init = function (grunt) {
                 }
             }
 
+            configuration.packageConfig = packageConfig;
+
             return fileText;
         },
         generateReplaces: function () {
             var replaces = {};
-            var generated = false;
 
             // Replaces
             if (grunt.util.kindOf(this.environment.libraries) == "array") {
@@ -178,7 +229,6 @@ exports.init = function (grunt) {
                         if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
                             if (pkg.hasOwnProperty("replace")) {
                                 replaces = module.mergeObjects(replaces, pkg.replace);
-                                generated = true;
                             }
                         }
                     });
@@ -190,13 +240,12 @@ exports.init = function (grunt) {
                     if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
                         if (pkg.hasOwnProperty("replace")) {
                             replaces = module.mergeObjects(replaces, pkg.replace);
-                            generated = true;
                         }
                     }
                 });
             }
 
-            if (generated) {
+            if (Object.keys(replaces).length > 0) {
                 var fileText = 'window.require = window.require || {};\n';
                 fileText += '\t\t\twindow.require.map = window.require.map || {};\n';
                 fileText += '\t\t\twindow.require.map["*"] = window.require.map["*"] || {};\n';
@@ -204,10 +253,8 @@ exports.init = function (grunt) {
                 for (var key in replaces) {
                     fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "../../target/compiled/' + key + '";\n';
                 }
-
                 return fileText;
             }
-
             return "";
         },
         generateAppNoCache: function (destPath) {
@@ -216,7 +263,7 @@ exports.init = function (grunt) {
                 grunt.file.write(appJs, "__bootstrap();");
             }
         },
-        generateBootstrap: function (destPath) {
+        generateBootstrap: function (srcPath, destPath) {
             var bootstrap = path.resolve(destPath, "bootstrap.js");
             var defBootstrap = path.resolve(__dirname, "config/bootstrap.js");
 
@@ -224,7 +271,7 @@ exports.init = function (grunt) {
             fileText += "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
 
             var compFile = grunt.file.read(defBootstrap);
-            compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(destPath));
+            compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(srcPath, destPath));
             compFile = compFile.replace(/\{replaces}/g, this.generateReplaces());
             compFile = compFile.replace(/\{path_kelper_module}/g, path.relative(process.cwd(), this.modulePath + "/node_modules") + path.sep);
             compFile = compFile.replace(/\{path_kelper_include}/g, path.relative(process.cwd(), this.modulePath + "/include") + path.sep);

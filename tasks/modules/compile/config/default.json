@@ -1,6 +1,7 @@
 {
   "default": {
     "src": "src/**/*.ts",
+    "sourcePath": "src",
     "dest": "target/compiled",
     "options": {
       "module": "amd",

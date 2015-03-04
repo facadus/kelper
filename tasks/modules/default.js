@@ -77,14 +77,37 @@ exports.init = function (grunt) {
                     return destination;
                 }
             }
-            return destination[0] || {};
+            return arguments[0] || {};
+        },
+        smartMerge: function () {
+            if (arguments.length > 1) {
+                var destination = arguments[0];
+                for (var i = 1; i < arguments.length; i++) {
+                    var source = arguments[i];
+                    for (var property in source) {
+                        // Merge objects
+                        if (grunt.util.kindOf(destination[property]) == "object" && grunt.util.kindOf(source[property]) == "object") {
+                            destination[property] = destination[property] || {};
+                            arguments.callee(destination[property], source[property]);
+                        } else if (grunt.util.kindOf(destination[property]) == "array" && grunt.util.kindOf(source[property]) == "array") {
+                            destination[property] = destination[property].concat(source[property]);
+                        } else {
+                            destination[property] = source[property];
+                        }
+                    }
+                }
+                arguments[0] = destination;
+                return true;
+            }
+            return arguments[0] || {};
         },
         makeClear: function (target) {
             if (grunt.file.isDir(target) || grunt.file.isFile(target)) {
                 grunt.verbose.ok(path.relative(process.cwd(), target) + " has been deleted");
                 grunt.file.delete(target, {force: true});
             }
-        },
+        }
+        ,
         registerTask: function (title, description, callback) {
             if (grunt.hasOwnProperty("test") && grunt.test) {
                 return runTask.registerTask(title, description, callback);

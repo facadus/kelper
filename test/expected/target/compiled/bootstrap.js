@@ -21,6 +21,7 @@ var rootDir = Array(document.location.href.split(/[/\\]/).filter(function(e, i){
         document.write('<script src="' + rootDir + '../include/mochaRun.js"></script>');
 
         if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
+            
             document.write('<base href="' + rootDir + 'target/finalized/">');
             document.write('<script src="app.nocache.js"></script>');
         } else {

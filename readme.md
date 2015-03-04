@@ -344,8 +344,8 @@ If project is correctly configured, just launch project using `grunt`.
 ###Tests
 -------------
 
-Every test file should contain bootstrap script and __runTest function that is automatically extended to file. Test bootstrap file will be generated to ***compiled*** folder.
-When adding bootstrap file, there should be added additional parameter ***test*** with value ***"ui"*** or ***unit*** depends on test file.
+Every test file should contain bootstrap script and ***__runTest*** function that is automatically extended to file. Test bootstrap file will be generated to ***compiled*** folder.
+When adding bootstrap file, there should be added additional parameter ***test*** with value ***"ui"*** or ***"unit"*** depends on test file.
 
 *Example of adding script:*
 
@@ -356,7 +356,7 @@ When adding bootstrap file, there should be added additional parameter ***test**
 ### Unit tests
 --------------
 
-To use automatic Unit tests should be added `*unit.html` file directly into enabled package source folder that should be tested.
+To use automatic Unit tests should be added `*.unit.html` file directly into enabled package source folder that should be tested.
 
 All unit tests will be run after compile process.
 

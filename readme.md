@@ -56,8 +56,8 @@ There should be these folders:
 ### Build configuration
 -----------------------
 
-There can be 3 files that is used to setup builder configuration on each process that should be written as grunt export plugin. There files should contain Javascript and return JSON with pre-defined values. These values are parsed and used in builder.
-If there is no files or configuration is not rewrited then default configuration will be taken.
+There can be 3 files that is used to setup builder configuration on each process that should be written as grunt export plugin. There files should contain Javascript and return JSON with pre-defined keys. These keys are parsed and used in builder.
+If there is no files or configuration is set, will be taken default configuration.
 
 Processes:
 
@@ -118,7 +118,8 @@ module.exports = function(grunt){
         target: 'target/compiled',
         version: 'es5',
         baseConfig: function(pkg){
-	        case "common/main":
+            switch (package.package) {
+                case "common/main":
                     return {
                         "libraryMetadata": [
                             grunt.file.readJSON(path.resolve(package.sourcePath, 'module.json'))
@@ -126,6 +127,7 @@ module.exports = function(grunt){
                     };
                 default:
                     return null;
+            }
         }
     };
 };

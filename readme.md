@@ -65,7 +65,10 @@ Processes:
 * **Optimization** (optimization.js) - Used to run RequireJS
 * **Finalization** (finalization.js) - Used to minify, copy and hash files
 
-By default all 3 tasks will be runned. To change this parameter **-process** or **-p** parameter should be used.
+By default all 3 tasks will be runned. There are 2 types, how this parameter can be changed:
+
+ 1. with additional parameter **-process** or **-p**;
+ 2. Use task **"kelper"** with process name ( *Only full process name is available* )
 
 There are available these commands:
 
@@ -78,6 +81,11 @@ There are available these commands:
 ```
 grunt -process optimization
 ```
+or
+
+```
+grunt kelper:optimization
+```
 
 #### Compile
 ------------
@@ -88,6 +96,17 @@ There are 3 main parameters:
 * **source** - path of folder from base directory that should be compiled
 * **target** - path of folder from base directory that collects compiled files
 * **version** - compiled javascript standart
+* **baseConfig** - is callback function that is used for each package, returned information will be merged or overwritten by environment config.
+
+##### baseConfig
+------------
+
+This function is used as callback function for each package. Returned information will be merged or overwritten by environment config.
+
+*Usage*:
+
+* Firstly, will be taken default configuration and overwritten with baseConfig returned data.
+* Secondly, will be taken Environment data and merged using smart merge function (object will be extended, arrays merged and all otherwise will be overwritten)
 
 *Example*:
 
@@ -96,7 +115,17 @@ module.exports = function(grunt){
     return {
         source: 'src',
         target: 'target/compiled',
-        version: 'es5'
+        version: 'es5',
+        baseConfig: function(pkg){
+	        case "common/main":
+                    return {
+                        "libraryMetadata": [
+                            grunt.file.readJSON(path.resolve(package.sourcePath, 'module.json'))
+                        ]
+                    };
+                default:
+                    return null;
+        }
     };
 };
 ```
@@ -194,13 +223,13 @@ For more information [follow this link](https://github.com/gruntjs/grunt-contrib
 ---------------------------------
 
 Base is used in optimization and finalization process to define static libraries like jQuery, Backbone and others.
+RequireJS is not needed here, it will be automatically downloaded and loaded as library.
 
 *Example of usage:*
 
 ```
 {
     "base": {
-        "require": "lib/require/require",
         "jquery": "lib/jquery/jquery"
     }
 }
@@ -210,9 +239,9 @@ Base is used in optimization and finalization process to define static libraries
 --------------------------------------
 
 Libraries is used in optimization and finalization process to define libraries that should be exported.
-This function automatically generates library files and compile them. All configurations that are set in packages are copied to configuration (config.js or app.nocache.js) files for usage.
+This function automatically generates library files and compile them. All configurations that are set in packages are copied to configuration (bootstrap.js or app.nocache.js) files for usage.
 
-Each library has 2 parameters - **"name"** *(string)* and **"packages"** *(array)*, other parameters will be ignored. Library will be automatically generated from inner packages it they exist otherwise library will be ignored.
+Each library has 3 parameters - **"name"** *(string)*, **"include"** *(array of packages)* and **"exclude"** *(array of strings)*, other parameters will be ignored. Library will be automatically generated from inner packages if they exist otherwise library will be ignored.
 Each packages has it's own configuration. For more information, look at next paragraph (Packages configuration parameter).
 
 *Example of usage:*
@@ -245,9 +274,13 @@ Packages is used in optimization and finalization process to define RequireJS st
 
 Packages can be used in libraries and separate configuration. Packages configuration looks as array of objects.
 
-Each package contain 1 mandatory field **"name"** *(string)* and 1 optional field **"config"** *(object)*.
+Each package contain 1 mandatory field **"name"** *(string)* and 3 optional fields:
 
-Configuration of package will be transferred like in libraries to config.js file in compile/optimization process and app.nocache file in finalization process.
+* **"config"** *(object)* - is used to setup requireJS configuration
+* **"replace"** *(object)* - is used to replace one module with another in production (For UI tests this replacements will be ignored)
+* **"dependencies"** *(object)* - is used to add dependencies with ***glob*** functions. There are include and exclude functions available.
+
+Configuration of package will be transferred like in libraries to bootstrap.js file into compile/optimization process and app.nocache.js file into finalization process.
 
 *Example of usage:*
 
@@ -258,7 +291,15 @@ Configuration of package will be transferred like in libraries to config.js file
             "name": "application1",
             "config": {
                 "title": "My package"
-            }
+            },
+            "replace": {
+              "common/Component": "common/ComponentProd"
+            },
+            "dependencies": [
+              "**/*.js",
+              "!**/*Test.js",
+              "!**/*Prod.js"
+            ]
         }
     ]
 }
@@ -303,44 +344,25 @@ If project is correctly configured, just launch project using `grunt`.
 ###Tests
 -------------
 
-Every test file should contain script file with all needed dependencies.
+Every test file should contain bootstrap script and __runTest function that is automatically extended to file. Test bootstrap file will be generated to ***compiled*** folder.
+When adding bootstrap file, there should be added additional parameter ***test*** with value ***"ui"*** or ***unit*** depends on test file.
 
 *Example of adding script:*
 
 ```
-<script src="../../target/compiled/test/bootstrap.js"></script>
-```
-
-*Example of 'src/test/bootstrap.ts' (TypeScript) that is used after compile:*
-
-```
-(function (window) {
-    var rootDir = Array(document.location.href.split(/[/\\]/).filter(function(e, i){return (('currentScript' in document) ? document["currentScript"] : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1]).src.split(/[/\\]/)[i] !== e;}).length).join('../');
-
-    window.__bootstrap = function () {
-        document.write('<script src="' + rootDir + 'lib/require/require.js" defer="defer"></script>');
-    };
-
-    document.write('<script src="' + rootDir + 'target/compiled/config.js"></script>');
-    document.write('<script src="' + rootDir + 'target/compiled/app.nocache.js"></script>');
-
-    // For test
-    document.write('<link rel="stylesheet" type="text/css" href="' + rootDir + 'node_modules/kelper/node_modules/mocha/mocha.css" />');
-    document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/mocha/mocha.js"></script>');
-    document.write('<script src="' + rootDir + 'node_modules/kelper/node_modules/chai/chai.js"></script>');
-}(window));
+<script src="../../target/compiled/bootstrap.js" test="ui"></script>
 ```
 
 ### Unit tests
 --------------
 
-To use automatic Unit tests should be added `UnitTests.html` file directly into package source folder that should be tested.
+To use automatic Unit tests should be added `*unit.html` file directly into enabled package source folder that should be tested.
 
 All unit tests will be run after compile process.
 
 ###UI tests
 -----------
 
-To use automatic UI tests should be added HTML file that ends with `*.test.html` into any source folder.
+To use automatic UI tests should be added HTML file that ends with `*.test.html` into enabled package source folder.
 
 All UI tests will be run after finalize process.

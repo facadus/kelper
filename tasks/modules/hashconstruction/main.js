@@ -167,7 +167,6 @@ exports.init = function (grunt) {
                 for (var index in packageConfig) {
                     fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ';\n';
                 }
-                fileText += configs.join("\n") + "\n";
             }
 
             fileText += "function __bootstrap(){\n";

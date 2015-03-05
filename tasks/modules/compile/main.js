@@ -6,9 +6,8 @@ var util = require("util");
 exports.init = function (grunt) {
     var configuration = {};
     var baseConfig = null;
-    var kindOf = grunt.util.kindOf;
 
-    module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
+    module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
 
     module.registerTask("addDependencies", "Adding dependencies to files", function () {
         // Load library
@@ -45,9 +44,10 @@ exports.init = function (grunt) {
         },
         getConfiguration: function () {
             // Load default configuration
-            if (grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")) {
+            var configFile = path.resolve(__dirname, "config/default.json");
+            if (grunt.file.exists(configFile)) {
                 try {
-                    configuration = grunt.file.readJSON(__dirname + path.sep + "config" + path.sep + "default.json");
+                    configuration = grunt.file.readJSON(configFile);
                     grunt.log.debug(this.name + " plugin default configuration is loaded!");
                 } catch (ex) {
                     grunt.log.error("[ERROR] " + this.name + " plugin default configuration has error!");
@@ -73,8 +73,8 @@ exports.init = function (grunt) {
 
             // Parsing
             if (configuration.hasOwnProperty("source")) {
-                parsed.sourcePath = process.cwd() + path.sep + path.normalize(configuration.source);
-                parsed.src = parsed.sourcePath + path.sep + "**" + path.sep + "*.ts";
+                parsed.sourcePath = path.resolve(process.cwd(), configuration.source);
+                parsed.src = path.resolve(parsed.sourcePath, "**/*.ts");
                 if (parsed.hasOwnProperty("options")) {
                     parsed.options.basePath = path.normalize(configuration.source);
                 } else {
@@ -85,7 +85,7 @@ exports.init = function (grunt) {
             }
 
             if (configuration.hasOwnProperty("target")) {
-                parsed.dest = process.cwd() + path.sep + path.normalize(configuration.target);
+                parsed.dest = path.resolve(process.cwd(), configuration.target);
             }
 
             if (configuration.hasOwnProperty("version")) {
@@ -96,7 +96,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (kindOf(configuration.baseConfig) == "function") {
+            if (grunt.util.kindOf(configuration.baseConfig) == "function") {
                 baseConfig = configuration.baseConfig;
             }
 
@@ -117,7 +117,7 @@ exports.init = function (grunt) {
             var packageConfig = {};
 
             // Parse Libraries
-            if (kindOf(this.environment.libraries) == "object" && Object.keys(this.environment.libraries).length > 0) {
+            if (this.isNotEmptyObject(this.environment.libraries)) {
                 fileText += "\t\twindow.require.config = window.require.config || {};\n";
 
                 for (var libraryName in this.environment.libraries) {
@@ -126,7 +126,7 @@ exports.init = function (grunt) {
                     // Check each library and library name
                     if (library) {
                         // Check packages
-                        if (kindOf(library.packages) == "object" && Object.keys(library.packages).length > 0) {
+                        if (this.isNotEmptyObject(library.packages)) {
                             for (var packageName in library.packages) {
                                 var pkg = library.packages[packageName];
 
@@ -173,7 +173,7 @@ exports.init = function (grunt) {
             }
 
             // Parse packages for configs
-            if (kindOf(this.environment.packages) == "object" && Object.keys(this.environment.packages).length > 0) {
+            if (this.isNotEmptyObject(this.environment.packages)) {
                 for (var packageName in this.environment.packages) {
                     var pkg = this.environment.packages[packageName];
                     if (pkg) {
@@ -211,7 +211,7 @@ exports.init = function (grunt) {
                 fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
             }
 
-            if (kindOf(this.environment.base) == "object") {
+            if (grunt.util.kindOf(this.environment.base) == "object") {
                 fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
                 for (var lib in this.environment.base) {
                     if (lib != "require") {
@@ -228,17 +228,17 @@ exports.init = function (grunt) {
             var replaces = {};
 
             // Replaces
-            if (kindOf(this.environment.libraries) == "object" && Object.keys(this.environment.libraries).length > 0) {
+            if (this.isNotEmptyObject(this.environment.libraries)) {
                 for (var libraryName in this.environment.libraries) {
                     var library = this.environment.libraries[libraryName];
-                    if(library){
-                        if (kindOf(library.packages) == "object" && Object.keys(library.packages).length > 0) {
+                    if (library) {
+                        if (this.isNotEmptyObject(library.packages)) {
                             for (var packageName in library.packages) {
                                 var pkg = library.packages[packageName];
 
                                 // Check package and package name
                                 if (pkg) {
-                                    if(pkg.replace){
+                                    if (pkg.replace) {
                                         replaces = this.mergeObjects(replaces, pkg.replace);
                                     }
                                 }
@@ -248,13 +248,13 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (kindOf(this.environment.packages) == "object" && Object.keys(this.environment.packages).length > 0) {
+            if (this.isNotEmptyObject(this.environment.packages)) {
                 for (var packageName in this.environment.packages) {
                     var pkg = this.environment.packages[packageName];
 
                     // Check package and package name
                     if (pkg) {
-                        if(pkg.replace){
+                        if (pkg.replace) {
                             replaces = this.mergeObjects(replaces, pkg.replace);
                         }
                     }
@@ -274,7 +274,7 @@ exports.init = function (grunt) {
             return "";
         },
         generateAppNoCache: function (destPath) {
-            var appJs = destPath + path.sep + "app.nocache.js";
+            var appJs = path.join(destPath, "app.nocache.js");
             if (!grunt.file.exists(appJs)) {
                 grunt.file.write(appJs, "__bootstrap();");
             }

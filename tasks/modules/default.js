@@ -106,14 +106,16 @@ exports.init = function (grunt) {
                 grunt.verbose.ok(path.relative(process.cwd(), target) + " has been deleted");
                 grunt.file.delete(target, {force: true});
             }
-        }
-        ,
+        },
         registerTask: function (title, description, callback) {
             if (grunt.hasOwnProperty("test") && grunt.test) {
                 return runTask.registerTask(title, description, callback);
             } else {
                 return grunt.registerTask(title, description, callback);
             }
+        },
+        isNotEmptyObject: function(obj){
+            return grunt.util.kindOf(obj) == "object" && Object.keys(obj).length > 0;
         }
     }
 };

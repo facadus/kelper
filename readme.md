@@ -1,4 +1,4 @@
-#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png) Kelper 0.1.1
+#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png) Kelper 0.2.0
 
 Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatical checks for Unit test and UI test mistakes in webpages that are using by project.
 
@@ -13,7 +13,13 @@ Kelper is a tool that is based on Grunt and is used for simplifying the process 
 
 If you are having issues or ideas, please let me know throught email **[pavel.kotov@ctco.lv](mailto://pavel.kotov@ctco.lv)** or add this issue as comment to **[Confluence](https://confluence.ctco.lv/confluence/display/UICM/Training)**.
 
-Source code: http://git.ctco.lv/tree/?r=~alexander.domotenko/training/builder.git
+Source code: **[here](http://git.ctco.lv/tree/?r=~alexander.domotenko/training/builder.git)**
+
+##Sample project
+
+You can see sample project that is build with Kelper here:
+
+Source code: **[here](http://git.ctco.lv/tree/?r=~alexander.domotenko/training/sample.git)**
 
 ##Installation
 
@@ -98,6 +104,7 @@ There are 3 main parameters:
 * **target** - path of folder from base directory that collects compiled files
 * **version** - compiled javascript standard
 * **baseConfig** - is callback function that is used for each package, returned information will be merged or overwritten by environment config.
+* **unitTestPattern** - pattern of unit test files (Default - **"*.unit.html"**)
 
 ##### baseConfig
 ------------
@@ -172,6 +179,7 @@ There are 3 main parameters:
 * **resourcePath** - resource folder path from base directory
 * **source** - path of folder from base directory that should be finalized
 * **target** - path of folder from base directory that collects finalized files
+* **uiTestPattern** - pattern of unit test files (Default - **"*.test.html"**)
 
 *Finalization file example*:
 
@@ -189,7 +197,7 @@ module.exports = function(grunt){
 ### Environment (Target) configuration
 --------------------------------------
 
-Environment configuration is used for builder to get project build information. All information should be in **JSON** format. Default file is **"local.json"**, but if you need use another one, Kelper should be runned with additional parameter **"-target"** or **"-t"**.
+Environment configuration is used for builder to get project build information. All information should be in ***JSON*** or ***YAML*** format. Default file is **"local.json"** or **"local.yml"**, but if you need use another one, Kelper should be runned with additional parameter **"-target"** or **"-t"**.
 
 *Example:*
 
@@ -197,7 +205,7 @@ Environment configuration is used for builder to get project build information. 
 grunt -target dev
 ```
 
-Environment configuration should contain **JSON** format data and all data is optional.
+Environment configuration all data is optional.
 
 By adding additional configuration Kelper will make additional functions like minifying, building libraries and packages, copying resources.
 
@@ -220,14 +228,11 @@ For more information [follow this link](https://github.com/gruntjs/grunt-contrib
 *Example of configuration:*
 
 ```
-{
-    "uglify": {
-        "mangle": false,
-        "compress": false,
-        "beautify": true,
-        "preserveComments": "some"
-    }
-}
+  uglify:
+    mangle: false
+    compress: false
+    beautify: true
+    preserveComments: "none"
 ```
 
 #### Base configuration parameter
@@ -239,11 +244,8 @@ RequireJS is not needed here, it will be automatically downloaded and loaded as 
 *Example of usage:*
 
 ```
-{
-    "base": {
-        "jquery": "lib/jquery/jquery"
-    }
-}
+  base:
+    jquery: "lib/jquery/jquery"
 ```
 
 #### Libraries configuration parameter
@@ -254,10 +256,10 @@ This function automatically generates library files and compile them. All config
 
 Each library has 3 parameters - **"name"** *(string)*, **"autoStart"** *(boolean)* and **"packages"** *(object)*, other parameters will be ignored. Library will be automatically generated from inner packages if they exist otherwise library will be ignored.
 
-Packages object has 2 parameters:
+**Packages can contain only 2 value types:**
 
-* ***include*** *(array of packages)*
-* ***exclude*** *(array of strings)*
+* ***object*** - pacakge that will be included into build
+* ***boolean*** - package will be excluded from build
 
 Each included packages has it's own configuration. For more information, look at next paragraph (Packages configuration parameter).
 
@@ -266,40 +268,18 @@ If library has ***autoStart*** option, it will be added as dependency to require
 *Example of usage:*
 
 ```
-{
-    "libraries": [
-        {
-            "name": "sample",
-            "autoStart": true,
-            "packages": {
-                "include": [
-                    {
-                        "name": "common"
-                    },
-                    {
-                        "name": "application",
-                        "config": {
-                            "title": "My Application"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "name": "widgets",
-            "packages": {
-                "include": [
-                    {
-                        "name": "widget1"
-                    }
-                ],
-                "exclude": [
-                    "common"
-                ]
-            }
-        }
-    ]
-}
+  libraries:
+    application:
+      sample: true
+      packages:
+        common: {}
+        application:
+          config:
+            title: "My Application"
+    widgets:
+      packages:
+        common: false
+        widget1: {}
 ```
 
 #### Packages configuration parameter
@@ -320,24 +300,16 @@ Configuration of package will be transferred like in libraries to bootstrap.js f
 *Example of usage:*
 
 ```
-{
-    "packages": [
-        {
-            "name": "application1",
-            "config": {
-                "title": "My package"
-            },
-            "replace": {
-              "common/Component": "common/ComponentProd"
-            },
-            "dependencies": [
-              "**/*.js",
-              "!**/*Test.js",
-              "!**/*Prod.js"
-            ]
-        }
-    ]
-}
+  packages:
+    common:
+      replace:
+        common/Component: "common/ComponentProd"
+      dependencies:
+        - "**/*.js"
+        - "!**/*Test.js"
+        - "!**/*Prod.js"
+      config:
+        title: "My package"
 ```
 
 
@@ -364,12 +336,9 @@ If parameter is not exist or is empty, finalization process continue it's work w
 *Example of usage:*
 
 ```
-{
-    "resources": [
-        "main",
-        "prod"
-    ]
-}
+  resources:
+    - "main"
+    - "prod"
 ```
 
 ##Usage
@@ -391,13 +360,14 @@ When adding bootstrap file, there should be added additional parameter ***test**
 ### Unit tests
 --------------
 
-To use automatic Unit tests should be added `*.unit.html` file directly into enabled package source folder that should be tested.
+To use automatic Unit tests should be added HTML file directly into enabled package source folder that should be tested. Default file name format is `*.unit.html`
 
 All unit tests will be run after compile process.
 
 ###UI tests
 -----------
 
-To use automatic UI tests should be added HTML file that ends with `*.test.html` into enabled package source folder.
+To use automatic UI tests should be added HTML file into enabled package source folder.
+Default file name format is `*.unit.html`
 
 All UI tests will be run after finalize process.

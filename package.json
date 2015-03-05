@@ -1,6 +1,6 @@
 {
   "name": "kelper",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Kelper is a project builder/compiler",
   "author": {
     "name": "Pavel Kotov",
@@ -8,11 +8,11 @@
   },
   "dependencies": {
     "chai": "^1.10.0",
-    "glob": "^4.3.5",
+    "glob": "^4.4.2",
     "grunt-contrib-copy": "^0.7.0",
     "grunt-contrib-requirejs": "^0.4.4",
     "grunt-contrib-uglify": "^0.7.0",
-    "grunt-mocha-phantomjs": "^0.6.0",
+    "grunt-mocha-phantomjs": "^0.6.1",
     "grunt-run-task": "^0.1.2",
     "grunt-typescript": "^0.6.1",
     "mocha": "^2.1.0",

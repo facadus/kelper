@@ -165,7 +165,7 @@ exports.init = function (grunt) {
             // Parse packages for configs
             if (grunt.util.kindOf(this.environment.packages) == "array" && this.environment.packages.length > 0) {
                 this.environment.packages.forEach(function (pkg) {
-                    if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
+                    if (pkg && pkg.name) {
                         packages.push(pkg.name);
 
                         // baseConfig
@@ -178,12 +178,12 @@ exports.init = function (grunt) {
                                 compiledPath: path.resolve(process.cwd(), pathRel, pkg.name)
                             });
 
-                            if (typeof ret != "undefined" && ret != null) {
+                            if (ret) {
                                 packageConfig[pkg.name + "/main"] = ret;
                             }
                         }
 
-                        if (pkg.hasOwnProperty("config")) {
+                        if (pkg.config) {
                             if (typeof packageConfig[pkg.name + "/main"] != "undefined") {
                                 module.smartMerge(packageConfig[pkg.name + "/main"], pkg.config);
                             } else {

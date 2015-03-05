@@ -7,7 +7,7 @@ var fs = require('fs');
 // Module Compile
 exports.init = function (grunt) {
     var configuration = {};
-    module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
+    module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
 
     module.registerTask('hashconstruction', 'Build task', function () {
         if (typeof module.environment.hash != "undefined") {

@@ -4,7 +4,7 @@ var util = require("util");
 
 // Module Compile
 exports.init = function (grunt) {
-    module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
+    module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
     var configuration = {};
 
     util._extend(module, {

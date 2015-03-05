@@ -6,14 +6,6 @@ module.exports = function (grunt) {
     plugin.configuration = {
         builderPath: path.normalize(__dirname),
         modulePath: path.normalize(__dirname) + path.sep + "modules",
-        modules: [
-            "compile",
-            "unit_test",
-            "optimization",
-            "finalization",
-            "hashconstruction",
-            "ui_test"
-        ],
         operations: [
             "compile",
             "optimization",
@@ -77,9 +69,6 @@ module.exports = function (grunt) {
         }
         return 1;
     }
-
-    var phase = grunt.option("process") || grunt.option("p") || "finalization";
-    var modules = plugin.configuration.phase(phase);
 
     plugin.configuration.operations.forEach(function (op) {
         grunt.registerTask('kelper:' + op, "Kelper's " + op + " module", function () {

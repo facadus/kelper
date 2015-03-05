@@ -32,8 +32,6 @@ exports.init = function(grunt){
                     }
                 });
             }
-
-            return dependencies;
         },
         addFoundDependenciesToFiles: function(filePath){
             for(var deps in dependencies){

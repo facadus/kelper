@@ -42,11 +42,6 @@ describe("Kelper", function () {
                 should.exist(grunt.task._tasks["kelper:" + module]);
             });
         });
-
-        it('Check module phases', function () {
-            var modules = plugin.configuration.phase(lastPhase);
-            assert.deepEqual(modules, plugin.configuration.modules, "Finalization phase doesn't include all phases");
-        });
     });
     // Checking modules for errors
 

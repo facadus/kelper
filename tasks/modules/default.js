@@ -61,7 +61,7 @@ exports.init = function (grunt) {
                 grunt.task.run(pluginName);
             }
         },
-        mergeObjects: function () {
+        mergeObjects: function mergeObj() {
             if (arguments.length > 1) {
                 var destination = arguments[0];
                 for (var i = 1; i < arguments.length; i++) {
@@ -69,17 +69,17 @@ exports.init = function (grunt) {
                     for (var property in source) {
                         if (grunt.util.kindOf(destination[property]) == "object" && grunt.util.kindOf(source[property]) == "object") {
                             destination[property] = destination[property] || {};
-                            arguments.callee(destination[property], source[property]);
+                            mergeObj(destination[property], source[property]);
                         } else {
                             destination[property] = source[property];
                         }
                     }
-                    return destination;
                 }
+                return destination;
             }
             return arguments[0] || {};
         },
-        smartMerge: function () {
+        smartMerge: function mergeObj() {
             if (arguments.length > 1) {
                 var destination = arguments[0];
                 for (var i = 1; i < arguments.length; i++) {
@@ -88,7 +88,7 @@ exports.init = function (grunt) {
                         // Merge objects
                         if (grunt.util.kindOf(destination[property]) == "object" && grunt.util.kindOf(source[property]) == "object") {
                             destination[property] = destination[property] || {};
-                            arguments.callee(destination[property], source[property]);
+                            mergeObj(destination[property], source[property]);
                         } else if (grunt.util.kindOf(destination[property]) == "array" && grunt.util.kindOf(source[property]) == "array") {
                             destination[property] = destination[property].concat(source[property]);
                         } else {

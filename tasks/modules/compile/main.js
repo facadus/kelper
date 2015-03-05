@@ -6,6 +6,7 @@ var util = require("util");
 exports.init = function (grunt) {
     var configuration = {};
     var baseConfig = null;
+    var kindOf = grunt.util.kindOf;
 
     module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
 
@@ -55,8 +56,8 @@ exports.init = function (grunt) {
             }
 
             // Load user created configuration
-            if (grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")) {
-                var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
+            if (grunt.file.exists(path.resolve(process.cwd(), "config/build", this.name + ".js"))) {
+                var config = require(path.resolve(process.cwd(), "config/build", this.name + ".js"))(grunt);
 
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, this.parse(config));
@@ -95,7 +96,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (configuration.hasOwnProperty("baseConfig") && typeof configuration.baseConfig == "function") {
+            if (kindOf(configuration.baseConfig) == "function") {
                 baseConfig = configuration.baseConfig;
             }
 
@@ -116,46 +117,55 @@ exports.init = function (grunt) {
             var packageConfig = {};
 
             // Parse Libraries
-            if (grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0) {
+            if (kindOf(this.environment.libraries) == "object" && Object.keys(this.environment.libraries).length > 0) {
                 fileText += "\t\twindow.require.config = window.require.config || {};\n";
 
-                this.environment.libraries.forEach(function (library) {
-                    // Packages
-                    if (library.hasOwnProperty("packages")) {
-                        if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
-                            library.packages.include.forEach(function (pkg) {
-                                // Deps
-                                if (library.hasOwnProperty("autoStart")) {
-                                    deps.push(pkg.name);
-                                }
-                                packages.push(pkg.name);
+                for (var libraryName in this.environment.libraries) {
+                    var library = this.environment.libraries[libraryName];
 
-                                // baseConfig
-                                if (typeof baseConfig == "function") {
-                                    var ret = baseConfig({
-                                        name: pkg.name,
-                                        package: pkg.name + "/main",
-                                        library: library.name,
-                                        sourcePath: path.resolve(process.cwd(), srcPath, pkg.name),
-                                        compiledPath: path.resolve(process.cwd(), pathRel, pkg.name)
-                                    });
+                    // Check each library and library name
+                    if (library) {
+                        // Check packages
+                        if (kindOf(library.packages) == "object" && Object.keys(library.packages).length > 0) {
+                            for (var packageName in library.packages) {
+                                var pkg = library.packages[packageName];
 
-                                    if (typeof ret != "undefined" && ret != null) {
-                                        packageConfig[pkg.name + "/main"] = ret;
+                                // Check package and package name
+                                if (pkg) {
+                                    packages.push(packageName);
+
+                                    // Check autoStart function in libraries
+                                    if (library.autoStart) {
+                                        deps.push(packageName);
+                                    }
+
+                                    // baseConfig
+                                    if (typeof baseConfig == "function") {
+                                        var ret = baseConfig({
+                                            name: packageName,
+                                            package: packageName + "/main",
+                                            library: libraryName,
+                                            sourcePath: path.resolve(process.cwd(), srcPath, packageName),
+                                            compiledPath: path.resolve(process.cwd(), pathRel, packageName)
+                                        });
+
+                                        if (ret) {
+                                            packageConfig[packageName + "/main"] = ret;
+                                        }
+                                    }
+
+                                    if (pkg.config) {
+                                        if (packageConfig[packageName + "/main"]) {
+                                            module.smartMerge(packageConfig[packageName + "/main"], pkg.config);
+                                        } else {
+                                            packageConfig[packageName + "/main"] = pkg.config;
+                                        }
                                     }
                                 }
-
-                                if (pkg.hasOwnProperty("config")) {
-                                    if (typeof packageConfig[pkg.name + "/main"] != "undefined") {
-                                        module.smartMerge(packageConfig[pkg.name + "/main"], pkg.config);
-                                    } else {
-                                        packageConfig[pkg.name + "/main"] = pkg.config;
-                                    }
-                                }
-                            });
+                            }
                         }
                     }
-                });
+                }
 
                 if (deps.length > 0) {
                     fileText += '\t\twindow.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
@@ -163,50 +173,45 @@ exports.init = function (grunt) {
             }
 
             // Parse packages for configs
-            if (grunt.util.kindOf(this.environment.packages) == "array" && this.environment.packages.length > 0) {
-                this.environment.packages.forEach(function (pkg) {
-                    if (pkg && pkg.name) {
-                        packages.push(pkg.name);
+            if (kindOf(this.environment.packages) == "object" && Object.keys(this.environment.packages).length > 0) {
+                for (var packageName in this.environment.packages) {
+                    var pkg = this.environment.packages[packageName];
+                    if (pkg) {
+                        packages.push(packageName);
 
-                        // baseConfig
                         if (typeof baseConfig == "function") {
                             var ret = baseConfig({
-                                name: pkg.name,
-                                package: pkg.name + "/main",
-                                library: library.name,
-                                sourcePath: path.resolve(process.cwd(), srcPath, pkg.name),
-                                compiledPath: path.resolve(process.cwd(), pathRel, pkg.name)
+                                name: packageName,
+                                package: packageName + "/main",
+                                sourcePath: path.resolve(process.cwd(), srcPath, packageName),
+                                compiledPath: path.resolve(process.cwd(), pathRel, packageName)
                             });
 
                             if (ret) {
-                                packageConfig[pkg.name + "/main"] = ret;
+                                packageConfig[packageName + "/main"] = ret;
                             }
                         }
 
                         if (pkg.config) {
-                            if (typeof packageConfig[pkg.name + "/main"] != "undefined") {
-                                module.smartMerge(packageConfig[pkg.name + "/main"], pkg.config);
+                            if (packageConfig[packageName + "/main"]) {
+                                module.smartMerge(packageConfig[packageName + "/main"], pkg.config);
                             } else {
-                                packageConfig[pkg.name + "/main"] = pkg.config;
+                                packageConfig[packageName + "/main"] = pkg.config;
                             }
                         }
-                    } else {
-                        grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
                     }
-                });
+                }
             }
 
             if (deps.concat(packages).length > 0) {
                 fileText += '\t\twindow.require.packages = (window.require.packages || []).concat(["' + deps.concat(packages).join('","') + '"]);\n';
             }
 
-            // asd
-
             for (var index in packageConfig) {
                 fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
             }
 
-            if (grunt.util.kindOf(this.environment.base) == "object") {
+            if (kindOf(this.environment.base) == "object") {
                 fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
                 for (var lib in this.environment.base) {
                     if (lib != "require") {
@@ -223,26 +228,37 @@ exports.init = function (grunt) {
             var replaces = {};
 
             // Replaces
-            if (grunt.util.kindOf(this.environment.libraries) == "array") {
-                this.environment.libraries.forEach(function (library) {
-                    library.packages.include.forEach(function (pkg) {
-                        if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                            if (pkg.hasOwnProperty("replace")) {
-                                replaces = module.mergeObjects(replaces, pkg.replace);
+            if (kindOf(this.environment.libraries) == "object" && Object.keys(this.environment.libraries).length > 0) {
+                for (var libraryName in this.environment.libraries) {
+                    var library = this.environment.libraries[libraryName];
+                    if(library){
+                        if (kindOf(library.packages) == "object" && Object.keys(library.packages).length > 0) {
+                            for (var packageName in library.packages) {
+                                var pkg = library.packages[packageName];
+
+                                // Check package and package name
+                                if (pkg) {
+                                    if(pkg.replace){
+                                        replaces = this.mergeObjects(replaces, pkg.replace);
+                                    }
+                                }
                             }
                         }
-                    });
-                });
+                    }
+                }
             }
 
-            if (grunt.util.kindOf(this.environment.packages) == "array") {
-                this.environment.packages.forEach(function (pkg) {
-                    if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                        if (pkg.hasOwnProperty("replace")) {
-                            replaces = module.mergeObjects(replaces, pkg.replace);
+            if (kindOf(this.environment.packages) == "object" && Object.keys(this.environment.packages).length > 0) {
+                for (var packageName in this.environment.packages) {
+                    var pkg = this.environment.packages[packageName];
+
+                    // Check package and package name
+                    if (pkg) {
+                        if(pkg.replace){
+                            replaces = this.mergeObjects(replaces, pkg.replace);
                         }
                     }
-                });
+                }
             }
 
             if (Object.keys(replaces).length > 0) {

@@ -1,47 +1,54 @@
 var path = require("path");
 
-exports.init = function(grunt){
+exports.init = function (grunt) {
     var dependencies = [];
     return {
-        findDependencies: function(environment){
-            
+        findDependencies: function (environment) {
+
             // Parse Libraries
-            if (grunt.util.kindOf(environment.libraries) == "array" && environment.libraries.length > 0) {
-               environment.libraries.forEach(function (library) {
-                    if (library.hasOwnProperty("packages")) {
-                        if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
-                            library.packages.include.forEach(function (pkg) {
-                                // Every Package
-                                if(pkg.hasOwnProperty("dependencies")){
-                                    dependencies[pkg.name] = pkg.dependencies;
+            if (grunt.util.kindOf(environment.libraries) == "object" && Object.keys(environment.libraries).length > 0) {
+                for (var libraryName in environment.libraries) {
+                    var library = environment.libraries[libraryName];
+                    if (library) {
+                        // Check packages
+                        if (grunt.util.kindOf(library.packages) == "object" && Object.keys(library.packages).length > 0) {
+                            for (var packageName in library.packages) {
+                                var pkg = library.packages[packageName];
+
+                                if (pkg) {
+                                    if (pkg.dependencies) {
+                                        dependencies[packageName] = pkg.dependencies;
+                                    }
                                 }
-                            });
+                            }
                         }
                     }
-                });
+                }
             }
 
             // Parse packages for configs
-            if (grunt.util.kindOf(environment.packages) == "array" && environment.packages.length > 0) {
-                environment.packages.forEach(function (pkg) {
-                    if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                        // Every Package
-                        if(pkg.hasOwnProperty("dependencies")){
-                            dependencies[pkg.name] = pkg.dependencies;
+            if (grunt.util.kindOf(environment.packages) == "object" && Object.keys(environment.packages).length > 0) {
+                for (var packageName in environment.packages) {
+                    var pkg = environment.packages[packageName];
+                    if (pkg) {
+                        if (pkg.dependencies) {
+                            dependencies[packageName] = pkg.dependencies;
                         }
                     }
-                });
+                }
             }
+
+            return dependencies;
         },
-        addFoundDependenciesToFiles: function(filePath){
-            for(var deps in dependencies){
+        addFoundDependenciesToFiles: function (filePath) {
+            for (var deps in dependencies) {
                 dependencies[deps].push("!main.js");
                 var file = path.resolve(filePath, deps, "main.js");
 
                 // Getting dependencies
                 var files = grunt.file.expand({
                     cwd: path.dirname(file)
-                }, dependencies[deps]).map(function(iter){
+                }, dependencies[deps]).map(function (iter) {
                     return './' + iter.replace(".js", "");
                 });
 
@@ -51,29 +58,29 @@ exports.init = function(grunt){
                 var result = regexp.exec(openFile);
 
                 // Find Dependencies ^
-                if(result){
+                if (result) {
                     var regEx = /"([\w\/.]+)"/gm;
                     var deps = {};
 
                     // Parse file's components
-                    while((m = regEx.exec(result[1])) != null){
-                        if(m.index === regEx.lastIndex){
+                    while ((m = regEx.exec(result[1])) != null) {
+                        if (m.index === regEx.lastIndex) {
                             regEx.lastIndex++;
                         }
                         deps[path.resolve(path.dirname(file), m[1])] = m[1];
                     }
 
                     // Parse additional components
-                    files.forEach(function(dependencies){
+                    files.forEach(function (dependencies) {
                         var filePathed = path.resolve(path.dirname(file), dependencies);
-                        if(deps[filePathed] == undefined){
+                        if (deps[filePathed] == undefined) {
                             deps[filePathed] = dependencies;
                         }
                     });
 
                     // Calculate edits
                     var fixedPart = [];
-                    for(var key in deps){
+                    for (var key in deps) {
                         fixedPart.push('"' + deps[key] + '"');
                     }
                     fixedPart = fixedPart.join(", ");

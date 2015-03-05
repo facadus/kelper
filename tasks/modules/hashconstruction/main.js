@@ -34,9 +34,10 @@ exports.init = function (grunt) {
         },
         getConfiguration: function () {
             // Load default configuration of Hash contructor
-            if (grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")) {
+            var configFile = path.resolve(__dirname, "config/default.json");
+            if (grunt.file.exists(configFile)) {
                 try {
-                    configuration = grunt.file.readJSON(__dirname + path.sep + "config" + path.sep + "default.json");
+                    configuration = grunt.file.readJSON(configFile);
                     grunt.log.debug(this.name + " plugin default configuration is loaded!");
                 } catch (ex) {
                     grunt.log.error("[ERROR] " + this.name + " plugin default configuration has error!");
@@ -50,41 +51,51 @@ exports.init = function (grunt) {
             var libraries = {};
 
             // Make Libraries
-            if (grunt.util.kindOf(this.environment.libraries) == "array") {
-                this.environment.libraries.forEach(function (library) {
-                    if (typeof library == "object" && library.hasOwnProperty("name")) {
+            if (this.isNotEmptyObject(this.environment.libraries)) {
+                for (var libraryName in this.environment.libraries) {
+                    var library = this.environment.libraries[libraryName];
+
+                    if (library) {
+                        var libraryPath = path.resolve(process.cwd(), configuration.target, libraryName, "main.js");
                         var hash = crypt.createHash(configuration.hash);
-                        hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, library.name, "main.js")));
-                        libraries[library.name] = hash.digest("hex");
-                        fs.renameSync(path.resolve(process.cwd(), configuration.target, library.name, "main.js"), path.resolve(process.cwd(), configuration.target, library.name, libraries[library.name] + ".js"));
-                    } else {
-                        grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
+                        hash.update(fs.readFileSync(libraryPath));
+                        libraries[libraryName] = hash.digest("hex");
+                        fs.renameSync(
+                            libraryPath,
+                            path.resolve(process.cwd(), configuration.target, library.name, libraries[library.name] + ".js")
+                        );
                     }
-                });
+                }
             }
 
             // Make Packages
-            if (grunt.util.kindOf(this.environment.packages) == "array") {
-                this.environment.packages.forEach(function (pkg) {
-                    if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
+            if (this.isNotEmptyObject(this.environment.packages)) {
+                for (var packageName in this.environment.packages) {
+                    if (this.environment.packages[packageName]) {
+                        var packagePath = path.resolve(process.cwd(), configuration.target, packageName, "main.js");
                         var hash = crypt.createHash(configuration.hash);
-                        hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js")));
-                        libraries[pkg.name] = hash.digest("hex");
-                        fs.renameSync(path.resolve(process.cwd(), configuration.target, pkg.name, "main.js"), path.resolve(process.cwd(), configuration.target, pkg.name, libraries[pkg.name] + ".js"));
-                    } else {
-                        grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+                        hash.update(fs.readFileSync(packagePath));
+                        libraries[packageName] = hash.digest("hex");
+                        fs.renameSync(
+                            packagePath,
+                            path.resolve(process.cwd(), configuration.target, packageName, libraries[packageName] + ".js")
+                        );
                     }
-                });
+                }
             }
 
             return libraries;
         },
         makeLibs: function () {
-            if (grunt.file.exists(path.resolve(process.cwd(), configuration.target, "base/main.js"))) {
+            var basePath = path.resolve(process.cwd(), configuration.target, "base/main.js");
+            if (grunt.file.exists(basePath)) {
                 var hash = crypt.createHash(configuration.hash);
-                hash.update(fs.readFileSync(path.resolve(process.cwd(), configuration.target, "base", "main.js")));
+                hash.update(fs.readFileSync(basePath));
                 hash = hash.digest("hex");
-                fs.renameSync(path.resolve(process.cwd(), configuration.target, "base", "main.js"), path.resolve(process.cwd(), configuration.target, "base", hash + ".js"));
+                fs.renameSync(
+                    basePath,
+                    path.resolve(process.cwd(), configuration.target, "base", hash + ".js")
+                );
                 return hash;
             }
             return null;
@@ -102,44 +113,46 @@ exports.init = function (grunt) {
             var packageConfig = this.lastConfigurations.compile.packageConfig;
             var deps = [];
 
-            if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0){
+            if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0) {
                 fileText += 'window.baseUrl = "' + this.environment.cdnUrl + '";\n';
             }
 
             // Parse Libraries
-            if (grunt.util.kindOf(this.environment.libraries) == "array" && this.environment.libraries.length > 0) {
-                this.environment.libraries.forEach(function (library) {
-                    if (library.hasOwnProperty("autoStart")) {
-                        deps.push(library.name);
-                    }
+            if (this.isNotEmptyObject(this.environment.libraries)) {
+                for (var libraryName in this.environment.libraries) {
+                    var library = this.environment.libraries[libraryName];
 
-                    libPackages.push({
-                        name: library.name,
-                        main: libraries[library.name]
-                    });
+                    if (library) {
+                        libPackages.push({
+                            name: libraryName,
+                            main: libraries[libraryName]
+                        });
 
-                    if (library.hasOwnProperty("packages")) {
-                        if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
-                            library.packages.include.forEach(function (pkg) {
-                                if (!library.hasOwnProperty("autoStart")) {
+                        if (library.autoStart) {
+                            deps.push(libraryName);
+                        }
+
+                        if (this.isNotEmptyObject(library.packages)) {
+                            for (var packageName in library.packages) {
+                                if(library.packages[packageName] && !library.autoStart) {
                                     libPackages.push({
-                                        name: pkg.name
+                                        name: packageName
                                     });
                                 }
-                            });
+                            }
                         }
                     }
-                });
+                }
             }
 
             // Parse packages
-            if (grunt.util.kindOf(this.environment.packages) == "array" && this.environment.packages.length > 0) {
-                this.environment.packages.forEach(function (pkg) {
+            if (this.isNotEmptyObject(this.environment.packages)) {
+                for (var packageName in this.environment.packages) {
                     staticPackages.push({
-                        name: pkg.name,
-                        main: libraries[pkg.name]
+                        name: packageName,
+                        main: libraries[packageName]
                     });
-                });
+                }
             }
 
             // Deps
@@ -171,14 +184,16 @@ exports.init = function (grunt) {
 
             fileText += "function __bootstrap(){\n";
             if (libs) {
-                if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0){
+                if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0) {
                     fileText += "   document.write(\"<script src='" + this.environment.cdnUrl + "base/" + libs + ".js' defer='defer'></script>\");\n";
-                }else{
+                } else {
                     fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
                 }
             }
             fileText += "}\n";
-            fileText += grunt.file.read(path.resolve(process.cwd(), configuration.source, "app.nocache.js"));
+            fileText += grunt.file.read(
+                path.resolve(process.cwd(), configuration.source, "app.nocache.js")
+            );
 
             // Remove comments
             fileText = fileText.replace(/\s\/\/.*|\/\*([^\0]*?)\*\//gm, "");

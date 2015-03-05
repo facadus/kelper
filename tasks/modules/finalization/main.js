@@ -20,32 +20,27 @@ exports.init = function (grunt) {
 
             // Step 1 = Uglify
             if (typeof this.environment.uglify != "undefined" || grunt.test) {
-
                 var fileList = {};
 
                 // Parse libraries
-                if (typeof this.environment.libraries != "undefined") {
-                    if (grunt.util.kindOf(this.environment.libraries) == "array") {
-                        this.environment.libraries.forEach(function (library) {
-                            if (typeof library == "object" && library.hasOwnProperty("name")) {
-                                fileList[path.resolve(process.cwd(), configuration.target, library.name, "main.js")] = path.resolve(process.cwd(), configuration.source, library.name, "main.js");
-                            }
-                        });
-                    } else {
-                        grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
+                if (this.isNotEmptyObject(this.environment.libraries)) {
+                    for (var libraryName in this.environment.libraries) {
+                        if (this.environment.libraries[libraryName]) {
+                            var pathFrom = path.resolve(process.cwd(), configuration.target, libraryName, "main.js");
+                            var pathTo = path.resolve(process.cwd(), configuration.source, libraryName, "main.js");
+                            fileList[pathFrom] = pathTo;
+                        }
                     }
                 }
 
                 // Parse packages
-                if (typeof this.environment.packages != "undefined") {
-                    if (grunt.util.kindOf(this.environment.packages) == "array") {
-                        this.environment.packages.forEach(function (pkg) {
-                            if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                                fileList[path.resolve(process.cwd(), configuration.target, pkg.name, "main.js")] = path.resolve(process.cwd(), configuration.source, pkg.name, "main.js");
-                            }
-                        });
-                    } else {
-                        grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+                if (this.isNotEmptyObject(this.environment.packages)) {
+                    for (var packageName in this.environment.packages) {
+                        if (this.environment.packages[packageName]) {
+                            var pathFrom = path.resolve(process.cwd(), configuration.target, packageName, "main.js")
+                            var pathTo = path.resolve(process.cwd(), configuration.source, packageName, "main.js");
+                            fileList[pathFrom] = pathTo;
+                        }
                     }
                 }
 
@@ -55,12 +50,15 @@ exports.init = function (grunt) {
             }
 
             // Step 2 = Libs
-            if (grunt.util.kindOf(this.environment.base) == "object") {
-
+            if (this.isNotEmptyObject(this.environment.base)) {
                 var libs = {};
-                libs[path.resolve(process.cwd(), configuration.target, "base/main.js")] = [];
+                var mainLib = path.resolve(process.cwd(), configuration.target, "base/main.js");
+
+                libs[mainLib] = [];
                 for (var lib in this.environment.base) {
-                    libs[path.resolve(process.cwd(), configuration.target, "base/main.js")].push(path.resolve(process.cwd(), this.environment.base[lib]) + ".js");
+                    libs[mainLib].push(
+                        path.resolve(process.cwd(), this.environment.base[lib]) + ".js"
+                    );
                 }
 
                 configuration.uglify.libs = {
@@ -82,9 +80,9 @@ exports.init = function (grunt) {
                 this.environment.resources.forEach(function (resource) {
                     configuration.copy.resources.files.push({
                         expand: true,
-                        cwd: process.cwd() + path.sep + path.normalize(configuration.resourcePath) + path.sep + resource + path.sep,
+                        cwd: path.resolve(process.cwd(), configuration.resourcePath, resource) + path.sep,
                         src: ["*.*", "**/*.*"],
-                        dest: process.cwd() + path.sep + path.normalize(configuration.target)
+                        dest: path.resolve(process.cwd(), configuration.target)
                     });
                 });
 
@@ -101,9 +99,10 @@ exports.init = function (grunt) {
         },
         getConfiguration: function () {
             // Load default configuration
-            if (grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")) {
+            var configFile = path.resolve(__dirname, "config/default.json");
+            if (grunt.file.exists(configFile)) {
                 try {
-                    configuration = grunt.file.readJSON(__dirname + path.sep + "config" + path.sep + "default.json");
+                    configuration = grunt.file.readJSON(configFile);
                     grunt.log.debug(this.name + " plugin default configuration is loaded!");
                 } catch (ex) {
                     grunt.log.error("[ERROR] " + this.name + " plugin default configuration has error!");
@@ -112,8 +111,9 @@ exports.init = function (grunt) {
             }
 
             // Load user created configuration
-            if (grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")) {
-                var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
+            var userFile = path.resolve(process.cwd(), "config/build", this.name + ".js");
+            if (grunt.file.exists(userFile)) {
+                var config = require(userFile)(grunt);
 
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, this.parse(config));
@@ -128,13 +128,15 @@ exports.init = function (grunt) {
 
             // Parsing
             if (configuration.hasOwnProperty("source")) {
-                parsed.source = process.cwd() + path.sep + path.normalize(configuration.source);
+                parsed.source = path.resolve(process.cwd(), configuration.source);
             }
+
             if (configuration.hasOwnProperty("resourcePath")) {
-                parsed.resourcePath = process.cwd() + path.sep + path.normalize(configuration.resourcePath);
+                parsed.resourcePath = path.resolve(process.cwd(), configuration.resourcePath);
             }
+
             if (configuration.hasOwnProperty("target")) {
-                parsed.target = process.cwd() + path.sep + path.normalize(configuration.target);
+                parsed.target = path.resolve(process.cwd(), configuration.target);
             }
 
             // Fix for RequireJS

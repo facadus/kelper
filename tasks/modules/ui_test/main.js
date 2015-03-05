@@ -5,7 +5,7 @@ var util = require("util");
 // Module Compile
 exports.init = function (grunt) {
     var configuration = {};
-    module = require(path.dirname(__dirname) + path.sep + "default").init(grunt);
+    module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
 
     module.registerTask('UITests', 'Build task', function () {
 
@@ -28,38 +28,44 @@ exports.init = function (grunt) {
             var pathToSource = path.normalize(this.lastConfigurations.compile.default.src).replace(path.normalize("**/*.ts"), "");
 
             var packages = [];
-            if (typeof this.environment.libraries != "undefined") {
-                if (grunt.util.kindOf(this.environment.libraries) == "array") {
-                    this.environment.libraries.forEach(function (library) {
-                        if (typeof library == "object" && library.hasOwnProperty("name")) {
 
-                            if (library.hasOwnProperty("packages")) {
-                                if (library.packages.hasOwnProperty("include") && grunt.util.kindOf(library.packages.include) == "array") {
-                                    library.packages.include.forEach(function (pkg) {
-                                        if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                                            packages.push(path.normalize(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js")) + "/**/*.test.html"));
-                                        }
-                                    });
+            // Parse libraries
+            if (this.isNotEmptyObject(this.environment.libraries)) {
+                for (var libraryName in this.environment.libraries) {
+                    var library = this.environment.libraries[libraryName];
+
+                    // Check each library and library name
+                    if (library) {
+                        // Check packages
+                        if (this.isNotEmptyObject(library.packages)) {
+                            for (var packageName in library.packages) {
+                                var pkg = library.packages[packageName];
+
+                                // Check package and package name
+                                if (pkg) {
+                                    var packagePath = path.dirname(
+                                        path.resolve(process.cwd(), pathToSource, packageName, "main.js")
+                                    );
+                                    packages.push(path.normalize(packagePath + "/**/*.test.html"));
                                 }
                             }
-
                         }
-                    });
-                } else {
-                    grunt.log.error("[ERROR] Unknown format of environment library, please fix it");
+                    }
                 }
             }
 
             // Parse packages
-            if (typeof this.environment.packages != "undefined") {
-                if (grunt.util.kindOf(this.environment.packages) == "array") {
-                    this.environment.packages.forEach(function (pkg) {
-                        if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                            packages.push(path.normalize(path.dirname(path.resolve(process.cwd(), pathToSource, pkg.name, "main.js"))) + "/**/*.test.html");
-                        }
-                    });
-                } else {
-                    grunt.log.error("[ERROR] Unknown format of environment package, please fix it");
+            if (this.isNotEmptyObject(this.environment.packages)) {
+                for (var packageName in this.environment.packages) {
+                    var pkg = this.environment.packages[packageName];
+
+                    // Check package and package name
+                    if (pkg) {
+                        var packagePath = path.dirname(
+                            path.resolve(process.cwd(), pathToSource, packageName, "main.js")
+                        );
+                        packages.push(path.normalize(packagePath + "/**/*.test.html"));
+                    }
                 }
             }
 

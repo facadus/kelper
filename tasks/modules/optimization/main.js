@@ -20,7 +20,7 @@ exports.init = function (grunt) {
                 this.parsePackages(this.environment.packages, configuration.default.options.packages);
             }
 
-            if (typeof this.environment.base != "undefined") {
+            if (this.isNotEmptyObject(this.environment.base)) {
                 configuration.default.options = this.mergeObjects(configuration.default.options, this.parseBaseLibs(this.environment.base));
             }
 
@@ -107,7 +107,7 @@ exports.init = function (grunt) {
             };
 
             var module = this;
-            for(var libraryName in source){
+            for (var libraryName in source) {
                 var library = source[libraryName];
 
                 // Check each library and library name
@@ -120,11 +120,11 @@ exports.init = function (grunt) {
                         for (var packageName in library.packages) {
                             var pkg = library.packages[packageName];
 
-                            if(typeof pkg == "boolean"){
+                            if (typeof pkg == "boolean") {
                                 excludes.push(packageName);
-                            }else{
+                            } else {
                                 includes.push(packageName);
-                                if(pkg.replace){
+                                if (pkg.replace) {
                                     parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);
                                 }
                             }
@@ -159,12 +159,12 @@ exports.init = function (grunt) {
         parsePackages: function (packages, confPackages) {
             var parsed = confPackages || [];
 
-            for(var packageName in packages){
+            for (var packageName in packages) {
                 var pkg = packages[packageName];
 
-                if(pkg){
+                if (pkg) {
                     parsed.push(packageName);
-                    if(pkg.replace){
+                    if (pkg.replace) {
                         parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);
                     }
                 }

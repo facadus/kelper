@@ -31,20 +31,22 @@ exports.init = function (grunt) {
             var packages = [];
 
             // Parse libraries
-            if (grunt.util.kindOf(this.environment.libraries) == "object" && Object.keys(this.environment.libraries).length > 0) {
+            if (this.isNotEmptyObject(this.environment.libraries)) {
                 for (var libraryName in this.environment.libraries) {
                     var library = this.environment.libraries[libraryName];
 
                     // Check each library and library name
                     if (library) {
                         // Check packages
-                        if (grunt.util.kindOf(library.packages) == "object" && Object.keys(library.packages).length > 0) {
+                        if (this.isNotEmptyObject(library.packages)) {
                             for (var packageName in library.packages) {
                                 var pkg = library.packages[packageName];
 
                                 // Check package and package name
-                                if(pkg) {
-                                    var packagePath = path.dirname(path.resolve(process.cwd(), pathToSource, packageName, "main.js"));
+                                if (pkg) {
+                                    var packagePath = path.dirname(
+                                        path.resolve(process.cwd(), pathToSource, packageName, "main.js")
+                                    );
                                     packages.push(path.normalize(packagePath + "/**/*.unit.html"));
                                 }
                             }
@@ -54,13 +56,15 @@ exports.init = function (grunt) {
             }
 
             // Parse packages
-            if (grunt.util.kindOf(this.environment.packages) == "object" && Object.keys(this.environment.packages).length > 0) {
+            if (this.isNotEmptyObject(this.environment.packages)) {
                 for (var packageName in this.environment.packages) {
                     var pkg = this.environment.packages[packageName];
 
                     // Check package and package name
-                    if(pkg) {
-                        var packagePath = path.dirname(path.resolve(process.cwd(), pathToSource, packageName, "main.js"));
+                    if (pkg) {
+                        var packagePath = path.dirname(
+                            path.resolve(process.cwd(), pathToSource, packageName, "main.js")
+                        );
                         packages.push(path.normalize(packagePath + "/**/*.unit.html"));
                     }
                 }

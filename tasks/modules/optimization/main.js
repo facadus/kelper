@@ -12,11 +12,11 @@ exports.init = function (grunt) {
         run: function () {
             this.getConfiguration();
 
-            if (typeof this.environment.libraries != "undefined") {
+            if (this.isNotEmptyObject(this.environment.libraries)) {
                 configuration.default.options = this.mergeObjects(configuration.default.options, this.parseLibraries(this.environment.libraries));
             }
 
-            if (typeof this.environment.packages != "undefined") {
+            if (this.isNotEmptyObject(this.environment.packages)) {
                 this.parsePackages(this.environment.packages, configuration.default.options.packages);
             }
 
@@ -56,9 +56,10 @@ exports.init = function (grunt) {
         },
         getConfiguration: function () {
             // Load default configuration
-            if (grunt.file.exists(__dirname + path.sep + "config" + path.sep + "default.json")) {
+            var configFile = path.resolve(__dirname, "config/default.json");
+            if (grunt.file.exists(configFile)) {
                 try {
-                    configuration = grunt.file.readJSON(__dirname + path.sep + "config" + path.sep + "default.json");
+                    configuration = grunt.file.readJSON(configFile);
                     grunt.log.debug(this.name + " plugin default configuration is loaded!");
                 } catch (ex) {
                     grunt.log.error("[ERROR] " + this.name + " plugin default configuration has error!");
@@ -67,8 +68,9 @@ exports.init = function (grunt) {
             }
 
             // Load user created configuration
-            if (grunt.file.exists(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")) {
-                var config = require(process.cwd() + path.sep + "config" + path.sep + "build" + path.sep + this.name + ".js")(grunt);
+            var userFile = path.resolve(process.cwd(), "config/build", this.name + ".js");
+            if (grunt.file.exists(userFile)) {
+                var config = require(userFile)(grunt);
 
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, this.parse(config));
@@ -79,15 +81,15 @@ exports.init = function (grunt) {
             return configuration;
         },
         parse: function (configuration) {
-
             var parsed = {};
 
             // Parsing
             if (configuration.hasOwnProperty("source")) {
-                parsed.baseUrl = process.cwd() + path.sep + path.normalize(configuration.source);
+                parsed.baseUrl = path.resolve(process.cwd(), configuration.source);
             }
+
             if (configuration.hasOwnProperty("target")) {
-                parsed.dir = process.cwd() + path.sep + path.normalize(configuration.target);
+                parsed.dir = path.resolve(process.cwd(), configuration.target);
             }
 
             // Fix for RequireJS
@@ -105,41 +107,43 @@ exports.init = function (grunt) {
             };
 
             var module = this;
-            source.forEach(function (library) {
-                // Push Modules
-                if (library.hasOwnProperty("packages") && library.packages.hasOwnProperty("include")) {
+            for(var libraryName in source){
+                var library = source[libraryName];
+
+                // Check each library and library name
+                if (library) {
                     var includes = [];
                     var excludes = [];
 
-                    // Include
-                    library.packages.include.forEach(function (pkg) {
-                        if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                            includes.push(pkg.name);
-                            if(pkg.hasOwnProperty("replace")){
-                                parsed.paths = module.mergeObjects(parsed.paths, pkg.replace);
+                    // Check packages
+                    if (this.isNotEmptyObject(library.packages)) {
+                        for (var packageName in library.packages) {
+                            var pkg = library.packages[packageName];
+
+                            if(typeof pkg == "boolean"){
+                                excludes.push(packageName);
+                            }else{
+                                includes.push(packageName);
+                                if(pkg.replace){
+                                    parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);
+                                }
                             }
                         }
-                    });
-
-                    // Exclude
-                    if (library.packages.hasOwnProperty("exclude")) {
-                        library.packages.exclude.forEach(function (pkg) {
-                            excludes.push(pkg.name);
-                        });
                     }
 
                     parsed.modules.push({
-                        name: library.name,
+                        name: libraryName,
                         include: includes,
                         exclude: excludes,
                         insertRequire: includes,
                         create: true
                     });
 
-                    parsed.packages.push(library.name);
+                    parsed.packages.push(libraryName);
                 }
+
                 parsed.packages = parsed.packages.concat(includes);
-            });
+            }
 
             return parsed;
         },
@@ -148,20 +152,24 @@ exports.init = function (grunt) {
             for (var lib in libs) {
                 paths[lib] = "empty:";
             }
-            return {paths: paths};
+            return {
+                paths: paths
+            };
         },
         parsePackages: function (packages, confPackages) {
             var parsed = confPackages || [];
-            if (grunt.util.kindOf(packages) == "array") {
-                packages.forEach(function (pkg) {
-                    if (typeof pkg == "object" && pkg.hasOwnProperty("name")) {
-                        parsed.push(pkg.name);
-                        if(pkg.hasOwnProperty("replace")){
-                            parsed.paths = module.mergeObjects(parsed.paths, pkg.replace);
-                        }
+
+            for(var packageName in packages){
+                var pkg = packages[packageName];
+
+                if(pkg){
+                    parsed.push(packageName);
+                    if(pkg.replace){
+                        parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);
                     }
-                });
+                }
             }
+
             confPackages = parsed;
         }
     });

@@ -62,7 +62,7 @@ exports.init = function (grunt) {
                         libraries[libraryName] = hash.digest("hex");
                         fs.renameSync(
                             libraryPath,
-                            path.resolve(process.cwd(), configuration.target, library.name, libraries[library.name] + ".js")
+                            path.resolve(process.cwd(), configuration.target, libraryName, libraries[libraryName] + ".js")
                         );
                     }
                 }

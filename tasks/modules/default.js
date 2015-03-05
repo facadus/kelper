@@ -9,13 +9,16 @@ exports.init = function (grunt) {
     return {
         loadPlugin: function (pluginName) {
             var cwd = process.cwd();
-            process.chdir(this.modulePath);
-            if (grunt.hasOwnProperty("test") && grunt.test) {
-                runTask.loadNpmTasks(pluginName);
-            } else {
-                grunt.loadNpmTasks(pluginName);
+            try {
+                process.chdir(this.modulePath);
+                if (grunt.hasOwnProperty("test") && grunt.test) {
+                    runTask.loadNpmTasks(pluginName);
+                } else {
+                    grunt.loadNpmTasks(pluginName);
+                }
+            } finally {
+                process.chdir(cwd);
             }
-            process.chdir(cwd);
         },
         runTask: function (pluginName, conf, subtask) {
             if (grunt.hasOwnProperty("test") && grunt.test) {
@@ -114,7 +117,7 @@ exports.init = function (grunt) {
                 return grunt.registerTask(title, description, callback);
             }
         },
-        isNotEmptyObject: function(obj){
+        isNotEmptyObject: function (obj) {
             return grunt.util.kindOf(obj) == "object" && Object.keys(obj).length > 0;
         }
     }

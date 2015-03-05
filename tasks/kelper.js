@@ -47,27 +47,31 @@ module.exports = function (grunt) {
     // Loading Environment file
     var env_file = grunt.option('target') || grunt.option('t') || 'local';
     try {
-        plugin.environment = grunt.file.readJSON(process.cwd() + path.sep + "config" + path.sep + "target" + path.sep + env_file + ".json");
-        // Add RequireJS
-        if (plugin.environment.hasOwnProperty("base")) {
-            if (!plugin.environment.base.hasOwnProperty("require")) {
-                // Prepend RequireJS
-                plugin.environment.base = grunt.util._.extend({
-                    require: path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
-                }, plugin.environment.base);
-            }
+        var env_path = path.resolve(process.cwd(), "config/target", env_file);
+        if (grunt.file.exists(env_path + ".json")) {
+            plugin.environment = grunt.file.readJSON(env_path + ".json");
+        } else if (grunt.file.exists(env_path + ".yml")) {
+            plugin.environment = grunt.file.readYAML(env_path + ".yml");
         } else {
-            plugin.environment.base = {
-                "require": path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
-            }
+            throw new Error("[ERROR] There is no '" + env_file + "' environment file!")
         }
     } catch (ex) {
-        if (ex.origError.code == "ENOENT") {
-            grunt.log.error("[ERROR] There is no '" + env_file + ".json' environment file!");
-        } else {
-            grunt.log.error("[ERROR] Unable to parse '" + env_file + ".json' environment file!");
-        }
+        grunt.log.error(ex);
         return 1;
+    }
+
+    // Add RequireJS
+    if (plugin.environment.hasOwnProperty("base")) {
+        if (!plugin.environment.base.hasOwnProperty("require")) {
+            // Prepend RequireJS
+            plugin.environment.base = grunt.util._.extend({
+                require: path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
+            }, plugin.environment.base);
+        }
+    } else {
+        plugin.environment.base = {
+            "require": path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
+        }
     }
 
     plugin.configuration.operations.forEach(function (op) {

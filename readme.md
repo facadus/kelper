@@ -1,4 +1,4 @@
-#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png) Kelper 0.2.0
+#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png)Kelper 0.2.0
 
 Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatical checks for Unit test and UI test mistakes in webpages that are using by project.
 

@@ -16,6 +16,10 @@ exports.init = function (grunt) {
                 configuration.default.options = this.mergeObjects(configuration.default.options, this.parseLibraries(this.environment.libraries));
             }
 
+            if (this.isNotEmptyObject(this.environment.reqModules)) {
+                this.smartMerge(configuration.default.options, this.parseRequireModules(this.environment.reqModules));
+            }
+
             if (this.isNotEmptyObject(this.environment.packages)) {
                 this.parsePackages(this.environment.packages, configuration.default.options.packages);
             }
@@ -171,6 +175,17 @@ exports.init = function (grunt) {
             }
 
             confPackages = parsed;
+        },
+        parseRequireModules: function (reqModules) {
+            var result = {};
+
+            for (var lib in reqModules) {
+                result[lib] = path.resolve(this.modulePath, reqModules[lib]).replace(/.js$/, "");
+            }
+
+            return {
+                paths: result
+            };
         }
     });
 

@@ -74,6 +74,16 @@ module.exports = function (grunt) {
         }
     }
 
+    // Add RequireJS modules to RequireJS
+    var reqModulesPath = path.resolve(path.dirname(plugin.configuration.builderPath), "include/require/*.req.js");
+    grunt.file.expand(reqModulesPath).forEach(function(requireModule){
+        if(!plugin.environment.reqModules){
+            plugin.environment.reqModules = {};
+        }
+        var name = /(\w+).req.js$/.exec(requireModule)[1];
+        plugin.environment.reqModules[name] = path.relative(path.dirname(__dirname), requireModule);
+    });
+
     plugin.configuration.operations.forEach(function (op) {
         grunt.registerTask('kelper:' + op, "Kelper's " + op + " module", function () {
             var oldConfig = {};

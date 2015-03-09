@@ -6,6 +6,7 @@ var util = require("util");
 exports.init = function (grunt) {
     var configuration = {};
     var baseConfig = null;
+    var kindOf = grunt.util.kindOf;
 
     module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
 
@@ -97,7 +98,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (grunt.util.kindOf(configuration.baseConfig) == "function") {
+            if (kindOf(configuration.baseConfig) == "function") {
                 baseConfig = configuration.baseConfig;
             }
 
@@ -212,11 +213,24 @@ exports.init = function (grunt) {
                 fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
             }
 
-            if (grunt.util.kindOf(this.environment.base) == "object") {
-                fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
-                for (var lib in this.environment.base) {
-                    if (lib != "require") {
-                        fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
+            if (kindOf(this.environment.base) == "object" || kindOf(this.environment.reqModules) == "object") {
+                fileText += "\t\twindow.require.paths = window.require.paths || {};\n"
+
+                if (kindOf(this.environment.base) == "object") {
+                    for (var lib in this.environment.base) {
+                        if (lib != "require") {
+                            fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
+                        }
+                    }
+                }
+
+                if (kindOf(this.environment.reqModules) == "object") {
+                    for (var lib in this.environment.reqModules) {
+                        var reqModulePath = path.relative(
+                            process.cwd(),
+                            path.resolve(this.modulePath, this.environment.reqModules[lib]).replace(/.js$/, "")
+                        );
+                        fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + reqModulePath).replace(/\\/g, "/") + '";\n';
                     }
                 }
             }
@@ -227,6 +241,8 @@ exports.init = function (grunt) {
         },
         generateReplaces: function () {
             var replaces = {};
+            var pathRel = path.relative(process.cwd(), configuration.default.dest).replace(/\\/g, "/");
+            var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
 
             // Replaces
             if (this.isNotEmptyObject(this.environment.libraries)) {
@@ -268,8 +284,13 @@ exports.init = function (grunt) {
                 fileText += '\t\t\twindow.require.map["*"] = window.require.map["*"] || {};\n';
 
                 for (var key in replaces) {
-                    fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "../../target/compiled/' + key + '";\n';
+                    var pathToCompiled = path.relative(
+                        process.cwd(),
+                        path.resolve(process.cwd(), pathToLib, configuration.default.dest, key)
+                    );
+                    fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "' + pathToCompiled + '";\n';
                 }
+
                 return fileText;
             }
             return "";
@@ -286,6 +307,7 @@ exports.init = function (grunt) {
 
             var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];\n";
             fileText += "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
+            fileText += "var sourceDir = rootDir + '" + srcPath + "';\n";
 
             var compFile = grunt.file.read(defBootstrap);
             compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(srcPath, destPath));

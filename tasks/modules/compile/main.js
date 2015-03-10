@@ -306,10 +306,11 @@ exports.init = function (grunt) {
         generateBootstrap: function (srcPath, destPath) {
             var bootstrap = path.resolve(destPath, "bootstrap.js");
             var defBootstrap = path.resolve(__dirname, "config/bootstrap.js");
+            var relSourcePath = path.relative(process.cwd(), srcPath);
 
             var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];\n";
             fileText += "var rootDir = Array(document.location.href.split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
-            fileText += "var sourceDir = rootDir + '" + srcPath + "';\n";
+            fileText += "var sourceDir = rootDir + '" + relSourcePath + "';\n";
 
             var compFile = grunt.file.read(defBootstrap);
             compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(srcPath));

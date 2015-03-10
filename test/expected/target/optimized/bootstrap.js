@@ -1,12 +1,17 @@
 var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];
 var rootDir = Array(document.location.href.split(/[/\\]/).filter(function(e, i){return script.src.split(/[/\\]/)[i] !== e;}).length).join('../');
+var sourceDir = rootDir + 'src';
 // Bootstrap
 (function (window) {
+    
+
     var defaultConfig = function (window) {
         window.require = window.require || {};
 		window.require.baseUrl = rootDir + 'target/compiled';
 		window.require.packages = (window.require.packages || []).concat(["application"]);
 		window.require.paths = window.require.paths || {};
+		window.require.paths["less"] = "../../../node_modules/less/dist/less.min";
+		window.require.paths["style"] = "../../../include/require/style.req";
 
         window.__bootstrap = function () {
             document.write('<script src="' + rootDir + '../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
@@ -15,6 +20,30 @@ var rootDir = Array(document.location.href.split(/[/\\]/).filter(function(e, i){
     };
 
     if (script.getAttribute("test")) {
+        if (window.mochaPhantomJS && !Function.prototype.bind) {
+            Function.prototype.bind = function(oThis) {
+                if (typeof this !== 'function') {
+                    // closest thing possible to the ECMAScript 5
+                    // internal IsCallable function
+                    throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+                }
+
+                var aArgs   = Array.prototype.slice.call(arguments, 1),
+                    fToBind = this,
+                    fNOP    = function() {},
+                    fBound  = function() {
+                        return fToBind.apply(this instanceof fNOP
+                                ? this
+                                : oThis,
+                            aArgs.concat(Array.prototype.slice.call(arguments)));
+                    };
+
+                fNOP.prototype = this.prototype;
+                fBound.prototype = new fNOP();
+
+                return fBound;
+            };
+        }
         document.write('<link rel="stylesheet" type="text/css" href="' + rootDir + '../node_modules/mocha/mocha.css" />');
         document.write('<script src="' + rootDir + '../node_modules/mocha/mocha.js"></script>');
         document.write('<script src="' + rootDir + '../node_modules/chai/chai.js"></script>');

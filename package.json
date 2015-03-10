@@ -23,6 +23,9 @@
   "devDependencies": {
     "grunt": "latest"
   },
+  "bin": {
+    "install": "./bin/install.js"
+  },
   "scripts": {
     "test": "mocha test/kelper.test.js"
   },

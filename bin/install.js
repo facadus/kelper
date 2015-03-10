@@ -1,3 +1,6 @@
 #!/usr/bin/env node
 
-console.log('Install');
+var path = require("path");
+var fs = require("fs");
+
+console.log(process.cwd());

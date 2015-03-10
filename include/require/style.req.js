@@ -60,7 +60,7 @@ define(function () {
         },
         write: function (pluginName, moduleName, write) {
             if (moduleName in buildMap) {
-                write("define('" + pluginName + "!" + moduleName + "', ['" + pluginName + "'], function (style) { return '" + this.escape(buildMap[moduleName]) + "'; });\n");
+                write("define('" + pluginName + "!" + moduleName + "', function () { return '" + this.escape(buildMap[moduleName]) + "'; });\n");
             }
         },
         escape: function (content) {

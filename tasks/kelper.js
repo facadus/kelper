@@ -1,5 +1,4 @@
 module.exports = function (grunt) {
-
     var path = require('path');
 
     var plugin = {};
@@ -81,6 +80,9 @@ module.exports = function (grunt) {
             plugin.environment.reqModules = {};
         }
         var name = /(\w+).req.js$/.exec(requireModule)[1];
+        if(name == "style"){
+            plugin.environment.reqModules["less"] = path.resolve(__dirname, "../node_modules/less/dist/less.min");
+        }
         plugin.environment.reqModules[name] = path.relative(path.dirname(__dirname), requireModule);
     });
 

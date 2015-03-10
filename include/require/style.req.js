@@ -35,7 +35,7 @@ define(function () {
             var object = this;
             xhr.onload = function () {
                 var response = this.response;
-                require([rootDir + "node_modules/kelper/include/require/less.min"], function (less) {
+                require(["less"], function (less) {
                     object.__compile(less, response, onLoad.error, function (css) {
                         onLoad(css.css);
                     });

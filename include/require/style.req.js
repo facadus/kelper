@@ -1,6 +1,3 @@
-/**
- * Created by pkotov on 05.03.2015.
- */
 define(function () {
     'use strict';
 
@@ -47,9 +44,7 @@ define(function () {
         __buildFile: function (name, req, onLoad, config) {
             var path = require.nodeRequire('path');
             var less = require.nodeRequire('less');
-
-            // ToDo: Fix this shit - Path is fail
-            var filePath = path.resolve(process.cwd(), "src", name);
+            var filePath = path.resolve(process.cwd(), config.sourcePath, name);
             try {
                 var response = fs.readFileSync(filePath, 'utf8');
                 this.__compile(less, response, onLoad.error, function (css) {
@@ -60,7 +55,7 @@ define(function () {
                 onLoad.error(e);
             }
         },
-        normalize: function(name, normalize){
+        normalize: function (name, normalize) {
             return normalize(name);
         },
         write: function (pluginName, moduleName, write) {

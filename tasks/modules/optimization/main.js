@@ -32,6 +32,9 @@ exports.init = function (grunt) {
                 this.makeClear(configuration.default.options.dir);
             }
 
+            // Set SourcePath
+            configuration.default.options.sourcePath = this.lastConfigurations.compile.default.sourcePath;
+
             // For Debug ->
             grunt.log.debug(JSON.stringify(configuration));
 

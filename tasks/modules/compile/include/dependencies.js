@@ -1,7 +1,10 @@
 var path = require("path");
 
 exports.init = function (grunt) {
+    'use strict';
+
     var dependencies = [];
+
     return {
         findDependencies: function (environment) {
 
@@ -61,6 +64,7 @@ exports.init = function (grunt) {
                 if (result) {
                     var regEx = /"([\w\/.]+)"/gm;
                     var deps = {};
+                    var m;
 
                     // Parse file's components
                     while ((m = regEx.exec(result[1])) != null) {

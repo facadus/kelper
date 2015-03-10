@@ -4,7 +4,9 @@ var util = require("util");
 
 // Module Compile
 exports.init = function (grunt) {
-    module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
+    'use strict';
+
+    var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
     var configuration = {};
 
     util._extend(module, {
@@ -27,6 +29,7 @@ exports.init = function (grunt) {
                     for (var libraryName in this.environment.libraries) {
                         if (this.environment.libraries[libraryName]) {
                             var pathFrom = path.resolve(process.cwd(), configuration.target, libraryName, "main.js");
+                            //noinspection UnnecessaryLocalVariableJS
                             var pathTo = path.resolve(process.cwd(), configuration.source, libraryName, "main.js");
                             fileList[pathFrom] = pathTo;
                         }
@@ -37,7 +40,7 @@ exports.init = function (grunt) {
                 if (this.isNotEmptyObject(this.environment.packages)) {
                     for (var packageName in this.environment.packages) {
                         if (this.environment.packages[packageName]) {
-                            var pathFrom = path.resolve(process.cwd(), configuration.target, packageName, "main.js")
+                            var pathFrom = path.resolve(process.cwd(), configuration.target, packageName, "main.js");
                             var pathTo = path.resolve(process.cwd(), configuration.source, packageName, "main.js");
                             fileList[pathFrom] = pathTo;
                         }

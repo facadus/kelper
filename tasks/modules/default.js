@@ -1,11 +1,9 @@
-/**
- * Created by pkotov on 29.01.2015.
- */
-
 var path = require("path");
 var runTask = require("grunt-run-task");
 
 exports.init = function (grunt) {
+    'use strict';
+
     return {
         loadPlugin: function (pluginName) {
             var cwd = process.cwd();
@@ -45,7 +43,6 @@ exports.init = function (grunt) {
                             }
                         };
 
-                        var obj = this;
                         subtask.forEach(function (task) {
                             if (conf.hasOwnProperty(task) && conf[task]) {
                                 returned.tasks.push(runTask.task(pluginName + ":" + task, conf));

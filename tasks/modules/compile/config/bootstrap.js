@@ -1,5 +1,7 @@
 // Bootstrap
 (function (window) {
+    'use strict';
+
     var defaultConfig = function (window) {
         {compiled}
         window.__bootstrap = function () {

@@ -4,7 +4,9 @@ var util = require("util");
 
 // Module Compile
 exports.init = function (grunt) {
-    module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
+    'use strict';
+
+    var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
     var configuration = {};
 
     util._extend(module, {
@@ -113,7 +115,6 @@ exports.init = function (grunt) {
                 paths: {}
             };
 
-            var module = this;
             for (var libraryName in source) {
                 var library = source[libraryName];
 

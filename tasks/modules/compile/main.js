@@ -4,11 +4,13 @@ var util = require("util");
 
 // Module Compile
 exports.init = function (grunt) {
+    'use strict';
+
+    var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
+
     var configuration = {};
     var baseConfig = null;
     var kindOf = grunt.util.kindOf;
-
-    module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
 
     module.registerTask("addDependencies", "Adding dependencies to files", function () {
         // Load library
@@ -107,7 +109,7 @@ exports.init = function (grunt) {
                 default: parsed
             };
         },
-        generateConfigFile: function (srcPath, destPath) {
+        generateConfigFile: function (srcPath) {
             var pathRel = path.relative(process.cwd(), configuration.default.dest).replace(/\\/g, "/");
             var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
 
@@ -214,7 +216,7 @@ exports.init = function (grunt) {
             }
 
             if (kindOf(this.environment.base) == "object" || kindOf(this.environment.reqModules) == "object") {
-                fileText += "\t\twindow.require.paths = window.require.paths || {};\n"
+                fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
 
                 if (kindOf(this.environment.base) == "object") {
                     for (var lib in this.environment.base) {
@@ -310,7 +312,7 @@ exports.init = function (grunt) {
             fileText += "var sourceDir = rootDir + '" + srcPath + "';\n";
 
             var compFile = grunt.file.read(defBootstrap);
-            compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(srcPath, destPath));
+            compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(srcPath));
             compFile = compFile.replace(/\{replaces}/g, this.generateReplaces());
             compFile = compFile.replace(/\{path_kelper_module}/g, path.relative(process.cwd(), this.modulePath + "/node_modules") + path.sep);
             compFile = compFile.replace(/\{path_kelper_include}/g, path.relative(process.cwd(), this.modulePath + "/include") + path.sep);
@@ -331,4 +333,4 @@ exports.init = function (grunt) {
     });
 
     return module;
-}
+};

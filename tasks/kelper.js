@@ -1,4 +1,6 @@
 module.exports = function (grunt) {
+    'use strict';
+
     var path = require('path');
 
     var plugin = {};
@@ -92,7 +94,7 @@ module.exports = function (grunt) {
             if (!grunt.hasOwnProperty("test") || !grunt.test) {
                 var modules = plugin.configuration.phase(op);
                 modules.forEach(function (moduleName) {
-                    module = require(plugin.configuration.modulePath + path.sep + moduleName + path.sep + "main").init(grunt);
+                    var module = require(plugin.configuration.modulePath + path.sep + moduleName + path.sep + "main").init(grunt);
                     module.modulePath = path.dirname(plugin.configuration.builderPath);
                     module.environment = plugin.environment;
                     module.lastConfigurations = oldConfig;

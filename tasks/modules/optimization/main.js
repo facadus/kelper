@@ -184,7 +184,8 @@ exports.init = function (grunt) {
             }
 
             return {
-                paths: result
+                paths: result,
+                stubModules: Object.keys(result)
             };
         }
     });

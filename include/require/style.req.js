@@ -15,50 +15,66 @@ define(function () {
                 return;
             }
 
-            if (this.checkNode() && config && config.isBuild) {
+            if (config && config.isBuild) {
                 this.__buildFile(name, req, onLoad, config);
             } else {
                 this.__loadFile(sourceDir + "/" + name, onLoad);
             }
         },
+        __compile: function (less, contents, onError, onSuccess) {
+            var parsed = less.render(contents, function (e, output) {
+                if (e) {
+                    onError(e);
+                } else {
+                    onSuccess(output);
+                }
+            });
+        },
         __loadFile: function (file, onLoad) {
             var xhr = new XMLHttpRequest();
+            var object = this;
             xhr.onload = function () {
                 var response = this.response;
                 require([rootDir + "node_modules/kelper/include/require/less.min"], function (less) {
-                    var parsed = less.render(response);
-                    parsed.then(function (result) {
-                        onLoad(result.css);
+                    object.__compile(less, response, onLoad.error, function (css) {
+                        onLoad(css.css);
                     });
                 });
             };
             xhr.open("GET", file, true);
             xhr.send();
         },
-        checkNode: function () {
-            return typeof process !== "undefined" && process.versions && !!process.versions.node;
-        },
         __buildFile: function (name, req, onLoad, config) {
             var path = require.nodeRequire('path');
             var less = require.nodeRequire('less');
-            console.log(less);
 
-
-
-            var path = require.nodeRequire('path');
             // ToDo: Fix this shit - Path is fail
             var filePath = path.resolve(process.cwd(), "src", name);
-            var file = fs.readFileSync(filePath);
-            var less = path.relative(
-                config.dir,
-                path.resolve(process.cwd(), "node_modules/kelper/include/require/less.min")
-            );
-
+            try {
+                var response = fs.readFileSync(filePath, 'utf8');
+                this.__compile(less, response, onLoad.error, function (css) {
+                    buildMap[name] = css.css;
+                    onLoad(css.css);
+                });
+            } catch (e) {
+                onLoad.error(e);
+            }
+        },
+        normalize: function(name, normalize){
+            return normalize(name);
         },
         write: function (pluginName, moduleName, write) {
             if (moduleName in buildMap) {
-                write("define('" + pluginName + "!" + moduleName  + "', ['" + pluginName + "'], function (style) { return '" + buildMap[moduleName] + "'; });\n");
+                write("define('" + pluginName + "!" + moduleName + "', ['" + pluginName + "'], function (style) { return '" + this.escape(buildMap[moduleName]) + "'; });\n");
             }
+        },
+        escape: function (content) {
+            return content.replace(/(['\\])/g, '\\$1')
+                .replace(/[\f]/g, "\\f")
+                .replace(/[\b]/g, "\\b")
+                .replace(/[\n]/g, "\\n")
+                .replace(/[\t]/g, "\\t")
+                .replace(/[\r]/g, "\\r");
         }
     }
 });

@@ -15,6 +15,7 @@
     "grunt-mocha-phantomjs": "^0.6.1",
     "grunt-run-task": "^0.1.2",
     "grunt-typescript": "^0.6.1",
+    "less": "^2.4.0",
     "mocha": "^2.1.0",
     "rjs-build-analysis": "0.0.3",
     "typescript": "^1.4.1"

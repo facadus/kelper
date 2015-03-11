@@ -33,3 +33,5 @@ node_modules
 
 # Test target
 test/target
+
+npm-debug.log

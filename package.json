@@ -1,10 +1,19 @@
 {
-  "name": "kelper",
+  "name": "poc-kelper",
   "version": "0.2.0",
   "description": "Kelper is a project builder/compiler",
-  "author": {
-    "name": "Pavel Kotov",
-    "email": "pavel.kotov@ctco.lv"
+  "publishConfig": {
+    "registry": "http://artifactory.ctco.lv/artifactory/api/npm/npm-local"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://git.ctco.lv/r/~alexander.domotenko/training/builder.git"
+  },
+  "bin": {
+    "install": "./bin/install.js"
+  },
+  "scripts": {
+    "test": "grunt test"
   },
   "dependencies": {
     "chai": "^1.10.0",
@@ -21,16 +30,8 @@
     "typescript": "^1.4.1"
   },
   "devDependencies": {
-    "grunt": "latest"
-  },
-  "bin": {
-    "install": "./bin/install.js"
-  },
-  "scripts": {
-    "test": "mocha test/kelper.test.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://git.ctco.lv/r/~alexander.domotenko/training/builder.git"
+    "grunt": "latest",
+    "grunt-bump": "0.0.14",
+    "grunt-exec": "~0.4.5"
   }
 }

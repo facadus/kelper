@@ -7,7 +7,7 @@ var copyPath = path.resolve(process.cwd(), process.argv[2] || "src");
 var BUF_LENGTH = 64 * 1024;
 var _buff = new Buffer(BUF_LENGTH);
 
-function readPackageJson(dependency) {
+var readPackageJson = function (dependency) {
     if (dependency) {
         dependency = "node_modules/" + dependency;
     } else {
@@ -26,7 +26,7 @@ function readPackageJson(dependency) {
     }
 
     return false;
-}
+};
 
 var copyFileSync = function (srcFile, destFile) {
     var fdr = fs.openSync(srcFile, 'r');
@@ -43,7 +43,7 @@ var copyFileSync = function (srcFile, destFile) {
 
     fs.closeSync(fdr);
     fs.closeSync(fdw);
-}
+};
 
 var copySync = function (source, dest) {
     var stats = fs.statSync(source);
@@ -80,7 +80,7 @@ var deleteSync = function deleteSync(path) {
         });
         fs.rmdirSync(path);
     }
-}
+};
 
 var config = readPackageJson();
 
@@ -146,13 +146,13 @@ if (config && config.dependencies) {
     if (fs.existsSync(pathToGitIgnore)) {
         var parsedGitIgnore = fs.readFileSync(pathToGitIgnore, "utf8");
         copiedFF.forEach(function (rules) {
-            var regEx = new RegExp("^" + rules.replace(/\//gm, "\\/") + "$","gm");
+            var regEx = new RegExp("^" + rules.replace(/\//gm, "\\/") + "$", "gm");
             if (!regEx.test(parsedGitIgnore)) {
                 toAppend.push(rules);
             }
         });
         fs.appendFileSync(pathToGitIgnore, toAppend.join("\n"));
     } else {
-        fs.writeFileSync(pathToGitIgnore, copiedFF.join("\n"));
+        fs.writeFileSync(pathToGitIgnore, "\n" + copiedFF.join("\n"));
     }
 }

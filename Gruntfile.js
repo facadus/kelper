@@ -25,7 +25,7 @@ module.exports = function (grunt) {
                 cmd: 'npm pack'
             },
             test: {
-                cmd: 'mocha ' + path.resolve(__dirname, 'test/kelper.test.js')
+                cmd: path.relative("", "node_modules/.bin/mocha") + ' test/kelper.test.js'
             }
         }
     });

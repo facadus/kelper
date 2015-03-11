@@ -21,8 +21,8 @@ module.exports = function (grunt) {
             }
         },
         exec: {
-            pack: {
-                cmd: 'npm pack'
+            publish: {
+                cmd: 'npm publish'
             },
             test: {
                 cmd: path.relative("", "node_modules/.bin/mocha") + ' test/kelper.test.js'
@@ -31,6 +31,6 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("test", ["exec:test"]);
-    grunt.registerTask('patch', ['test', 'bump:patch', 'exec:pack']);
+    grunt.registerTask('patch', ['test', 'bump:patch', 'exec:publish']);
 
 };

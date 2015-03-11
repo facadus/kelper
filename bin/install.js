@@ -22,7 +22,7 @@ function readPackageJson(dependency) {
             console.log("File `package.json` can not be parsed!");
         }
     } catch (ex) {
-        console.log("File `package.json` was not found!");
+        console.log("File `" + dependency + "/package.json` was not found!");
     }
 
     return false;
@@ -45,7 +45,7 @@ var copyFileSync = function (srcFile, destFile) {
     fs.closeSync(fdw);
 }
 
-function copySync(source, dest) {
+var copySync = function (source, dest) {
     var stats = fs.statSync(source);
     var destFolder = path.dirname(dest);
 
@@ -68,41 +68,91 @@ function copySync(source, dest) {
     }
 }
 
+var deleteSync = function deleteSync(path) {
+    if (fs.existsSync(path)) {
+        fs.readdirSync(path).forEach(function (file, index) {
+            var curPath = path + "/" + file;
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteSync(curPath);
+            } else {
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+}
+
 var config = readPackageJson();
 
 if (config && config.dependencies) {
     var copiedFF = [];
     for (var deps in config.dependencies) {
-        var dependencyPackage = readPackageJson(deps);
-        if (dependencyPackage && dependencyPackage.moduleType && dependencyPackage.moduleType.toUpperCase() == "AMD") {
-            var directory = path.resolve(process.cwd(), "node_modules", deps);
-            var files = fs.readdirSync(directory);
-            files.forEach(function (file) {
-                if (file !== "package.json") {
-                    // Error if already copied
-                    if (file in copiedFF) {
-                        throw new Error("File `" + file + "` was already copied!");
-                    }
+        if (deps !== "poc-kelper") {
+            var dependencyPackage = readPackageJson(deps);
+            if (dependencyPackage && dependencyPackage.moduleType && dependencyPackage.moduleType.toUpperCase() == "AMD") {
+                var directory = path.resolve(process.cwd(), "node_modules", deps);
+                var files = fs.readdirSync(directory);
+                if (files.length) {
+                    console.log("\u2565 Copied files & folders");
+                    files.forEach(function (file) {
+                        if (file !== "package.json") {
+                            // Error if already copied
+                            var relFile = path.relative(
+                                process.cwd(),
+                                path.resolve(copyPath, file)
+                            );
 
-                    // Remove is exists
-                    if (fs.exists(path.resolve(copyPath, file))) {
-                        console.log("Exists :D");
-                    }
+                            if (relFile in copiedFF) {
+                                throw new Error("File `" + file + "` was already copied!");
+                            }
 
-                    console.log(
-                        path.resolve(directory, file),
-                        path.resolve(copyPath, file)
-                    );
+                            // Remove is exists
+                            deleteSync(path.resolve(copyPath, file));
 
-                    // Copy
-                    copySync(
-                        path.resolve(directory, file),
-                        path.resolve(copyPath, file)
-                    );
+                            // Output
+                            if (file == files[files.length - 1]) {
+                                console.log("\u2559\u2500 " + file);
+                            } else {
+                                console.log("\u255F\u2500 " + file);
+                            }
+
+                            // Copy
+                            copySync(
+                                path.resolve(directory, file),
+                                path.resolve(copyPath, file)
+                            );
+
+                            // Push to copiedFF
+                            copiedFF.push(
+                                path.relative(
+                                    process.cwd(),
+                                    path.resolve(copyPath, file)
+                                )
+                            );
+                        }
+                    });
                 }
-            });
-
-
+            }
         }
+    }
+
+    var pathToGitIgnore = path.resolve(process.cwd(), ".gitignore");
+    copiedFF.push("node_modules");
+    copiedFF = copiedFF.map(function (result) {
+        return "/" + result.replace(/\\/gm, "/");
+    });
+
+    var toAppend = [];
+    if (fs.existsSync(pathToGitIgnore)) {
+        var parsedGitIgnore = fs.readFileSync(pathToGitIgnore, "utf8");
+        copiedFF.forEach(function (rules) {
+            var regEx = new RegExp("^" + rules.replace(/\//gm, "\\/") + "$","gm");
+            if (!regEx.test(parsedGitIgnore)) {
+                toAppend.push(rules);
+            }
+        });
+        fs.appendFileSync(pathToGitIgnore, toAppend.join("\n"));
+    } else {
+        fs.writeFileSync(pathToGitIgnore, copiedFF.join("\n"));
     }
 }

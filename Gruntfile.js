@@ -31,6 +31,6 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("test", ["exec:test"]);
-    grunt.registerTask('patch', ['bump:patch', 'default', 'exec:pack']);
+    grunt.registerTask('patch', ['bump:patch', 'test', 'exec:pack']);
 
 };

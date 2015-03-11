@@ -70,15 +70,20 @@ var copySync = function (source, dest) {
 
 var deleteSync = function deleteSync(path) {
     if (fs.existsSync(path)) {
-        fs.readdirSync(path).forEach(function (file, index) {
-            var curPath = path + "/" + file;
-            if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                deleteSync(curPath);
-            } else {
-                fs.unlinkSync(curPath);
-            }
-        });
-        fs.rmdirSync(path);
+        var stats = fs.statSync(path);
+        if (stats.isFile()) {
+            fs.unlinkSync(path);
+        } else if (stats.isDirectory()) {
+            fs.readdirSync(path).forEach(function (file, index) {
+                var curPath = path + "/" + file;
+                if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                    deleteSync(curPath);
+                } else {
+                    fs.unlinkSync(curPath);
+                }
+            });
+            fs.rmdirSync(path);
+        }
     }
 };
 
@@ -95,7 +100,7 @@ if (config && config.dependencies) {
                 if (files.length) {
                     console.log("\u2565 Copied files & folders");
                     files.forEach(function (file) {
-                        if (file !== "package.json") {
+                        if (file !== "package.json" && file !== "Gruntfile.js" && !/^\./gm.test(file)) {
                             // Error if already copied
                             var relFile = path.relative(
                                 process.cwd(),
@@ -151,7 +156,7 @@ if (config && config.dependencies) {
                 toAppend.push(rules);
             }
         });
-        fs.appendFileSync(pathToGitIgnore, toAppend.join("\n"));
+        fs.appendFileSync(pathToGitIgnore, "\n" + toAppend.join("\n"));
     } else {
         fs.writeFileSync(pathToGitIgnore, "\n" + copiedFF.join("\n"));
     }

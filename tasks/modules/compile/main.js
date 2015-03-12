@@ -191,13 +191,14 @@ exports.init = function (grunt) {
             // Usage of baseConfig
             if (allPackages && allPackages.length) {
                 if (typeof baseConfig == "function") {
+                    var object = this;
                     allPackages.forEach(function (pkg) {
                         var ret = baseConfig(pkg, allPackages);
                         if (ret) {
-                            if (packageConfig[packageName + "/main"]) {
-                                this.smartMerge(ret, packageConfig[packageName + "/main"]);
+                            if (packageConfig[pkg.name + "/main"]) {
+                                object.smartMerge(ret, packageConfig[pkg.name + "/main"]);
                             }
-                            packageConfig[packageName + "/main"] = ret;
+                            packageConfig[pkg.name + "/main"] = ret;
                         }
                     });
                 }

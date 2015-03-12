@@ -119,51 +119,36 @@ exports.init = function (grunt) {
             var deps = [];
             var packages = [];
             var packageConfig = {};
+            var allPackages = [];
 
-            // Parse Libraries
+
+            // Collect all library packages for baseConfig
             if (this.isNotEmptyObject(this.environment.libraries)) {
-                fileText += "\t\twindow.require.config = window.require.config || {};\n";
-
                 for (var libraryName in this.environment.libraries) {
                     var library = this.environment.libraries[libraryName];
 
                     // Check each library and library name
                     if (library) {
-                        // Check packages
                         if (this.isNotEmptyObject(library.packages)) {
                             for (var packageName in library.packages) {
                                 var pkg = library.packages[packageName];
-
-                                // Check package and package name
                                 if (pkg) {
                                     packages.push(packageName);
 
-                                    // Check autoStart function in libraries
                                     if (library.autoStart) {
                                         deps.push(packageName);
                                     }
 
-                                    // baseConfig
-                                    if (typeof baseConfig == "function") {
-                                        var ret = baseConfig({
-                                            name: packageName,
-                                            package: packageName + "/main",
-                                            library: libraryName,
-                                            sourcePath: path.resolve(process.cwd(), srcPath, packageName),
-                                            compiledPath: path.resolve(process.cwd(), pathRel, packageName)
-                                        });
-
-                                        if (ret) {
-                                            packageConfig[packageName + "/main"] = ret;
-                                        }
-                                    }
+                                    allPackages.push({
+                                        name: packageName,
+                                        package: packageName + "/main",
+                                        library: libraryName,
+                                        sourcePath: path.resolve(process.cwd(), srcPath, packageName),
+                                        compiledPath: path.resolve(process.cwd(), pathRel, packageName)
+                                    });
 
                                     if (pkg.config) {
-                                        if (packageConfig[packageName + "/main"]) {
-                                            module.smartMerge(packageConfig[packageName + "/main"], pkg.config);
-                                        } else {
-                                            packageConfig[packageName + "/main"] = pkg.config;
-                                        }
+                                        packageConfig[packageName + "/main"] = pkg.config;
                                     }
                                 }
                             }
@@ -176,30 +161,21 @@ exports.init = function (grunt) {
                 }
             }
 
-            // Parse packages for configs
+            // Collect all library packages for baseConfig
             if (this.isNotEmptyObject(this.environment.packages)) {
                 for (var packageName in this.environment.packages) {
-                    var pkg = this.environment.packages[packageName];
-                    if (pkg) {
-                        packages.push(packageName);
+                    if (this.environment.packages[packageName]) {
+                        if (pkg) {
+                            packages.push(packageName);
 
-                        if (typeof baseConfig == "function") {
-                            var ret = baseConfig({
+                            allPackages.push({
                                 name: packageName,
                                 package: packageName + "/main",
                                 sourcePath: path.resolve(process.cwd(), srcPath, packageName),
                                 compiledPath: path.resolve(process.cwd(), pathRel, packageName)
                             });
 
-                            if (ret) {
-                                packageConfig[packageName + "/main"] = ret;
-                            }
-                        }
-
-                        if (pkg.config) {
-                            if (packageConfig[packageName + "/main"]) {
-                                module.smartMerge(packageConfig[packageName + "/main"], pkg.config);
-                            } else {
+                            if (pkg.config) {
                                 packageConfig[packageName + "/main"] = pkg.config;
                             }
                         }
@@ -207,12 +183,30 @@ exports.init = function (grunt) {
                 }
             }
 
+            // Usage of baseConfig
+            if (allPackages && allPackages.length) {
+                if (typeof baseConfig == "function") {
+                    allPackages.forEach(function(pkg){
+                        var ret = baseConfig(pkg, allPackages);
+                        if (ret) {
+                            if(packageConfig[packageName + "/main"]){
+                                this.smartMerge(ret, packageConfig[packageName + "/main"]);
+                            }
+                            packageConfig[packageName + "/main"] = ret;
+                        }
+                    });
+                }
+            }
+
             if (deps.concat(packages).length > 0) {
                 fileText += '\t\twindow.require.packages = (window.require.packages || []).concat(["' + deps.concat(packages).join('","') + '"]);\n';
             }
 
-            for (var index in packageConfig) {
-                fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
+            if (this.isNotEmptyObject(packageConfig)) {
+                fileText += '\t\twindow.require.config = window.require.config || {};\n';
+                for (var index in packageConfig) {
+                    fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
+                }
             }
 
             if (kindOf(this.environment.base) == "object" || kindOf(this.environment.reqModules) == "object") {

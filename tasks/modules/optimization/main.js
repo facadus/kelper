@@ -122,6 +122,7 @@ exports.init = function (grunt) {
                 if (library) {
                     var includes = [];
                     var excludes = [];
+                    var includeRequire = [];
 
                     // Check packages
                     if (this.isNotEmptyObject(library.packages)) {
@@ -132,6 +133,11 @@ exports.init = function (grunt) {
                                 excludes.push(packageName);
                             } else {
                                 includes.push(packageName);
+
+                                includeRequire.push(
+                                    pkg.requireName ? pkg.requireName : packageName
+                                );
+
                                 if (pkg.replace) {
                                     parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);
                                 }
@@ -143,7 +149,7 @@ exports.init = function (grunt) {
                         name: libraryName,
                         include: includes,
                         exclude: excludes,
-                        insertRequire: includes,
+                        insertRequire: includeRequire,
                         create: true
                     });
 

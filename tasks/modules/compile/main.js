@@ -100,6 +100,10 @@ exports.init = function (grunt) {
                 }
             }
 
+            if (configuration.hasOwnProperty("jsMapping")) {
+                parsed.jsMapping = configuration.jsMapping;
+            }
+
             if (kindOf(configuration.baseConfig) == "function") {
                 baseConfig = configuration.baseConfig;
             }
@@ -186,10 +190,10 @@ exports.init = function (grunt) {
             // Usage of baseConfig
             if (allPackages && allPackages.length) {
                 if (typeof baseConfig == "function") {
-                    allPackages.forEach(function(pkg){
+                    allPackages.forEach(function (pkg) {
                         var ret = baseConfig(pkg, allPackages);
                         if (ret) {
-                            if(packageConfig[packageName + "/main"]){
+                            if (packageConfig[packageName + "/main"]) {
                                 this.smartMerge(ret, packageConfig[packageName + "/main"]);
                             }
                             packageConfig[packageName + "/main"] = ret;
@@ -209,7 +213,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (kindOf(this.environment.base) == "object" || kindOf(this.environment.reqModules) == "object") {
+            if (kindOf(this.environment.base) == "object" || kindOf(this.environment.reqModules) == "object" || kindOf(configuration.default.jsMapping) == "object") {
                 fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
 
                 if (kindOf(this.environment.base) == "object") {
@@ -227,6 +231,24 @@ exports.init = function (grunt) {
                             path.resolve(this.modulePath, this.environment.reqModules[lib]).replace(/.js$/, "")
                         );
                         fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + reqModulePath).replace(/\\/g, "/") + '";\n';
+                    }
+                }
+
+                if (kindOf(configuration.default.jsMapping) == "object") {
+                    if (configuration.default.jsMapping.files && configuration.default.jsMapping.files.length > 0) {
+                        var pathRelToSource = path.relative(process.cwd(), srcPath);
+                        configuration.default.jsMapping.files.forEach(function(map){
+                            var files = grunt.file.expand(
+                                path.resolve(process.cwd(), srcPath, map)
+                            );
+                            files.forEach(function(file){
+                                var fileMap = path.relative(
+                                    path.resolve(process.cwd(), srcPath),
+                                    file.replace(/\.js$/i, "")
+                                ).replace(/\\/g, "/");
+                                fileText += '\t\twindow.require.paths["' + fileMap + '"] = "' + path.join(pathToLib, pathRelToSource,fileMap).replace(/\\/g, "/") + '";\n';
+                            });
+                        });
                     }
                 }
             }

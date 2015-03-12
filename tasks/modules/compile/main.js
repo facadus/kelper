@@ -100,7 +100,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (configuration.hasOwnProperty("jsMapping")) {
+            if (configuration.hasOwnProperty("jsMapping") && configuration.jsMapping && kindOf(configuration.jsMapping.files) == "array" && configuration.jsMapping.files.length) {
                 parsed.jsMapping = configuration.jsMapping;
             }
 
@@ -169,6 +169,7 @@ exports.init = function (grunt) {
             if (this.isNotEmptyObject(this.environment.packages)) {
                 for (var packageName in this.environment.packages) {
                     if (this.environment.packages[packageName]) {
+                        var pkg = this.environment.packages[packageName];
                         if (pkg) {
                             packages.push(packageName);
 
@@ -213,7 +214,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (kindOf(this.environment.base) == "object" || kindOf(this.environment.reqModules) == "object" || kindOf(configuration.default.jsMapping) == "object") {
+            if ((this.isNotEmptyObject(this.environment.base) && Object.keys(this.environment.base).length > 1) || this.isNotEmptyObject(this.environment.reqModules) || this.isNotEmptyObject(configuration.default.jsMapping)) {
                 fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
 
                 if (kindOf(this.environment.base) == "object") {
@@ -237,16 +238,16 @@ exports.init = function (grunt) {
                 if (kindOf(configuration.default.jsMapping) == "object") {
                     if (configuration.default.jsMapping.files && configuration.default.jsMapping.files.length > 0) {
                         var pathRelToSource = path.relative(process.cwd(), srcPath);
-                        configuration.default.jsMapping.files.forEach(function(map){
+                        configuration.default.jsMapping.files.forEach(function (map) {
                             var files = grunt.file.expand(
                                 path.resolve(process.cwd(), srcPath, map)
                             );
-                            files.forEach(function(file){
+                            files.forEach(function (file) {
                                 var fileMap = path.relative(
                                     path.resolve(process.cwd(), srcPath),
                                     file.replace(/\.js$/i, "")
                                 ).replace(/\\/g, "/");
-                                fileText += '\t\twindow.require.paths["' + fileMap + '"] = "' + path.join(pathToLib, pathRelToSource,fileMap).replace(/\\/g, "/") + '";\n';
+                                fileText += '\t\twindow.require.paths["' + fileMap + '"] = "' + path.join(pathToLib, pathRelToSource, fileMap).replace(/\\/g, "/") + '";\n';
                             });
                         });
                     }

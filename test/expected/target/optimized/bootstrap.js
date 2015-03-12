@@ -9,9 +9,6 @@ var sourceDir = rootDir + 'src';
         window.require = window.require || {};
 		window.require.baseUrl = rootDir + 'target/compiled';
 		window.require.packages = (window.require.packages || []).concat(["application"]);
-		window.require.paths = window.require.paths || {};
-		window.require.paths["less"] = "../../../node_modules/less/dist/less.min";
-		window.require.paths["style"] = "../../../include/require/style.req";
 
         window.__bootstrap = function () {
             document.write('<script src="' + rootDir + '../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');

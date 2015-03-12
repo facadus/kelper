@@ -236,6 +236,10 @@ exports.init = function (grunt) {
                                 path.resolve(process.cwd(), pathRel),
                                 path.resolve(process.cwd(), srcPath)
                             ))
+                            .replace("{path.fromRoot}", path.relative(
+                                path.resolve(process.cwd(), pathRel),
+                                process.cwd()
+                            ))
                             .replace(/\\/g, "/");
                         fileText += '\t\twindow.require.paths["' + lib + '"] = "' + reqModulePath + '";\n';
                     }

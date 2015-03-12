@@ -77,11 +77,9 @@ module.exports = function (grunt) {
 
     // Add RequireJS modules to RequireJS
     // ToDo start -> return back to normal paths
+    plugin.environment.reqModules = {};
     //var reqModulesPath = path.resolve(path.dirname(plugin.configuration.builderPath), "include/require/*.req.js");
     //grunt.file.expand(reqModulesPath).forEach(function(requireModule){
-    //    if(!plugin.environment.reqModules){
-    //        plugin.environment.reqModules = {};
-    //    }
     //    var name = /(\w+).req.js$/.exec(requireModule)[1];
     //    if(name == "style"){
     //        plugin.environment.reqModules["less"] = "{path.fromKelper}/node_modules/less/dist/less.min";
@@ -93,10 +91,9 @@ module.exports = function (grunt) {
     if (grunt.file.exists(userFile)) {
         var config = require(userFile)(grunt);
         if (config.hasOwnProperty("plugins")) {
-            for(var index in config.plugins){
-                var value = config.plugins[index];
-                plugin.environment.reqModules[index] = "{path.fromSource}/" + value;
-            }
+            config.plugins.forEach(function (reqPlugin) {
+                plugin.environment.reqModules[path.basename(reqPlugin)] = "{path.fromRoot}/" + reqPlugin;
+            });
         }
     }
     // ToDo End <<--

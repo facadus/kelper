@@ -84,23 +84,21 @@ module.exports = function (grunt) {
     //    }
     //    var name = /(\w+).req.js$/.exec(requireModule)[1];
     //    if(name == "style"){
-    //        plugin.environment.reqModules["less"] = path.resolve(__dirname, "../node_modules/less/dist/less.min");
+    //        plugin.environment.reqModules["less"] = "{path.fromKelper}/node_modules/less/dist/less.min";
     //    }
-    //    plugin.environment.reqModules[name] = path.relative(path.dirname(__dirname), requireModule);
+    //    plugin.environment.reqModules[name] = "{path.fromKelper}/" + path.relative(path.dirname(__dirname), requireModule);
     //});
 
-    plugin.environment.reqModules = {};
     var userFile = path.resolve(process.cwd(), "config/build/compile.js");
     if (grunt.file.exists(userFile)) {
         var config = require(userFile)(grunt);
         if (config.hasOwnProperty("plugins")) {
             for(var index in config.plugins){
                 var value = config.plugins[index];
-                plugin.environment.reqModules[index] = value;
+                plugin.environment.reqModules[index] = "{path.fromSource}/" + value;
             }
         }
     }
-
     // ToDo End <<--
 
     plugin.configuration.operations.forEach(function (op) {

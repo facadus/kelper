@@ -227,11 +227,17 @@ exports.init = function (grunt) {
 
                 if (kindOf(this.environment.reqModules) == "object") {
                     for (var lib in this.environment.reqModules) {
-                        var reqModulePath = path.relative(
-                            process.cwd(),
-                            path.resolve(this.modulePath, this.environment.reqModules[lib]).replace(/.js$/, "")
-                        );
-                        fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + reqModulePath).replace(/\\/g, "/") + '";\n';
+                        var reqModulePath = this.environment.reqModules[lib]
+                            .replace("{path.fromKelper}", path.relative(
+                                path.resolve(process.cwd(), pathRel),
+                                this.modulePath
+                            ))
+                            .replace("{path.fromSource}", path.relative(
+                                path.resolve(process.cwd(), pathRel),
+                                path.resolve(process.cwd(), srcPath)
+                            ))
+                            .replace(/\\/g, "/");
+                        fileText += '\t\twindow.require.paths["' + lib + '"] = "' + reqModulePath + '";\n';
                     }
                 }
 

@@ -190,7 +190,11 @@ exports.init = function (grunt) {
             var result = {};
 
             for (var lib in reqModules) {
-                result[lib] = path.resolve(this.modulePath, reqModules[lib]).replace(/.js$/, "");
+                var reqModulePath = reqModules[lib]
+                    .replace("{path.fromKelper}", this.modulePath)
+                    .replace("{path.fromSource}", path.resolve(process.cwd(), this.lastConfigurations.compile.default.sourcePath))
+                    .replace("{path.fromRoot}", process.cwd());
+                result[lib] = path.normalize(reqModulePath);
             }
 
             return {

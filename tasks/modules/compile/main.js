@@ -337,7 +337,7 @@ exports.init = function (grunt) {
             var relSourcePath = path.relative(process.cwd(), srcPath);
 
             var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];\n";
-            fileText += "var rootDir = Array(String(document.location.origin + document.location.pathname).split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
+            fileText += "var rootDir = Array(document.location.href.replace(document.location.hash,'').split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
             fileText += "var sourceDir = rootDir + '" + relSourcePath + "';\n";
 
             var compFile = grunt.file.read(defBootstrap);

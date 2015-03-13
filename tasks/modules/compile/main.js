@@ -142,7 +142,7 @@ exports.init = function (grunt) {
                                     packages.push(packageName);
 
                                     if (library.autoStart) {
-                                        deps.push(packageName);
+                                        deps.push(pkg.requireName ? pkg.requireName : packageName);
                                     }
 
                                     allPackages.push({

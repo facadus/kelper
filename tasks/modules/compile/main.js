@@ -265,6 +265,14 @@ exports.init = function (grunt) {
                 }
             }
 
+            // Copy shims if they exists
+            if (this.isNotEmptyObject(this.environment.shim)) {
+                fileText += "\t\twindow.require.shim = window.require.shim || {};\n";
+                for (var shim in this.environment.shim) {
+                    fileText += '\t\twindow.require.shim["' + shim + '"] = ' + JSON.stringify(this.environment.shim[shim]) + ';\n';
+                }
+            }
+
             configuration.packageConfig = packageConfig;
 
             return fileText;

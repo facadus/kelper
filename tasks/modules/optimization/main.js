@@ -30,6 +30,10 @@ exports.init = function (grunt) {
                 configuration.default.options = this.mergeObjects(configuration.default.options, this.parseBaseLibs(this.environment.base));
             }
 
+            if (this.isNotEmptyObject(this.environment.shim)) {
+                configuration.default.options = this.mergeObjects(configuration.default.options, this.parseShim(this.environment.shim));
+            }
+
             if (typeof configuration.default != "undefined" && typeof configuration.default.options.dir != "undefined") {
                 this.makeClear(configuration.default.options.dir);
             }
@@ -201,6 +205,11 @@ exports.init = function (grunt) {
                 paths: result,
                 stubModules: Object.keys(result)
             };
+        },
+        parseShim: function(shims){
+            return {
+                shim: shims
+            }
         }
     });
 

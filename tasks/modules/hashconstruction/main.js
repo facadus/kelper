@@ -136,7 +136,7 @@ exports.init = function (grunt) {
 
                         if (this.isNotEmptyObject(library.packages)) {
                             for (var packageName in library.packages) {
-                                if(library.packages[packageName] && !library.autoStart) {
+                                if (library.packages[packageName] && !library.autoStart) {
                                     libPackages.push({
                                         name: packageName
                                     });
@@ -184,6 +184,14 @@ exports.init = function (grunt) {
                 }
             }
 
+            // Copy shims if they exists
+            if (this.isNotEmptyObject(this.environment.shim)) {
+                fileText += "window.require.shim = window.require.shim || {};\n";
+                for (var shim in this.environment.shim) {
+                    fileText += 'window.require.shim["' + shim + '"] = ' + JSON.stringify(this.environment.shim[shim]) + ';\n';
+                }
+            }
+
             fileText += "function __bootstrap(){\n";
             if (libs) {
                 if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0) {
@@ -202,6 +210,41 @@ exports.init = function (grunt) {
 
             // Write to file
             grunt.file.write(filePath, fileText);
+
+            this.minimize(filePath);
+
+            return true;
+        },
+        minimize: function (file) {
+            var options = this.mergeObjects({
+                banner: '',
+                footer: '',
+                compress: {
+                    warnings: false
+                },
+                mangle: {},
+                beautify: false,
+                report: 'min',
+                expression: false,
+                maxLineLen: 32000,
+                ASCIIOnly: false
+            }, this.lastConfigurations.finalization.uglify.options);
+
+            var uglify = require(
+                path.resolve(this.modulePath, "node_modules/grunt-contrib-uglify/tasks/lib/uglify")
+            ).init(grunt);
+
+            try {
+                var minified = uglify.minify(
+                    [file],
+                    path.dirname(file),
+                    options
+                );
+                grunt.file.write(file, minified.min);
+            }catch (ex){
+                console.log("Failed to minimize " + file, ex);
+                return false;
+            }
 
             return true;
         }

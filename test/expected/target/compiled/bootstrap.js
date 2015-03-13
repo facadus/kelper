@@ -7,7 +7,7 @@ var rootDir = Array(document.location.href.replace(document.location.hash,'').sp
     var defaultConfig = function (window) {
         window.require = window.require || {};
 		window.require.baseUrl = rootDir + 'target/compiled';
-		window.require.sourceDir = rootDir + 'src';
+		window.require.sourceDir = rootDir + 'src/';
 		window.require.packages = (window.require.packages || []).concat(["application"]);
 
         window.__bootstrap = function () {

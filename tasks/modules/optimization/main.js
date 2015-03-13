@@ -18,8 +18,8 @@ exports.init = function (grunt) {
                 configuration.default.options = this.mergeObjects(configuration.default.options, this.parseLibraries(this.environment.libraries));
             }
 
-            if (this.isNotEmptyObject(this.environment.reqModules)) {
-                this.smartMerge(configuration.default.options, this.parseRequireModules(this.environment.reqModules));
+            if (this.isNotEmptyObject(this.environment.reqModules) || this.isNotEmptyObject(this.lastConfigurations.compile.default.jsMapping)) {
+                this.smartMerge(configuration.default.options, this.parseRequireModules(this.environment.reqModules, this.lastConfigurations.compile.default.jsMapping));
             }
 
             if (this.isNotEmptyObject(this.environment.packages)) {
@@ -190,24 +190,43 @@ exports.init = function (grunt) {
 
             confPackages = parsed;
         },
-        parseRequireModules: function (reqModules) {
-            var result = {};
+        parseRequireModules: function (reqModules, jsMapping) {
+            var paths = {};
+            var srcPath = path.resolve(process.cwd(), this.lastConfigurations.compile.default.sourcePath) + path.sep;
 
-            for (var lib in reqModules) {
-                var reqModulePath = reqModules[lib]
-                    .replace("{path.fromKelper}", this.modulePath)
-                    .replace("{path.fromSource}", path.resolve(process.cwd(), this.lastConfigurations.compile.default.sourcePath))
-                    .replace("{path.fromRoot}", process.cwd());
-                result[lib] = path.normalize(reqModulePath);
+            if (this.isNotEmptyObject(reqModules)) {
+                for (var lib in reqModules) {
+                    var reqModulePath = reqModules[lib]
+                        .replace("{path.fromKelper}", this.modulePath)
+                        .replace("{path.fromSource}", path.resolve(process.cwd(), this.lastConfigurations.compile.default.sourcePath))
+                        .replace("{path.fromRoot}", process.cwd());
+                    paths[lib] = path.normalize(reqModulePath);
+                }
+            }
+
+            var ret = grunt.util._.clone(paths);
+            if (this.isNotEmptyObject(jsMapping)) {
+                if (jsMapping.files && jsMapping.files.length > 0) {
+                    jsMapping.files.forEach(function (map) {
+                        var files = grunt.file.expand(path.resolve(srcPath, map));
+                        files.forEach(function (file) {
+                            var fileMap = path.relative(
+                                srcPath,
+                                file.replace(/\.js$/i, "")
+                            ).replace(/\\/g, "/");
+                            paths[fileMap] = path.resolve(srcPath, fileMap).replace(/\\/g, "/");
+                        });
+                    });
+                }
             }
 
             return {
-                paths: result,
-                stubModules: Object.keys(result),
-                sourceDir: path.resolve(process.cwd(), this.lastConfigurations.compile.default.sourcePath) + path.sep
+                paths: paths,
+                stubModules: Object.keys(ret),
+                sourceDir: srcPath
             }
         },
-        parseShim: function(shims){
+        parseShim: function (shims) {
             return {
                 shim: shims
             }

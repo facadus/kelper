@@ -4,7 +4,6 @@
 
 var grunt = require("grunt");
 var path = require("path");
-var glob = require("glob");
 var kelper = require(path.resolve(__dirname, "../tasks/kelper"));
 var assert = require('chai').assert;
 var expect = require('chai').expect;
@@ -38,7 +37,7 @@ describe("Kelper", function () {
 
         it('Check plugin for being registered itself with Grunt', function () {
             var modules = plugin.configuration.operations;
-            modules.forEach(function(module){
+            modules.forEach(function (module) {
                 should.exist(grunt.task._tasks["kelper:" + module]);
             });
         });
@@ -73,13 +72,11 @@ describe("Kelper", function () {
                     if (err) {
                         done(err);
                     } else {
-                        glob(path.normalize(__dirname + "/expected/target/compiled/**/*.js"), function (err, files) {
-                            should.not.exist(err, "There is error in files");
-                            files.forEach(function (file) {
-                                var fromFile = grunt.file.read(file);
-                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/compiled/", path.relative(__dirname + "/expected/target/compiled", file)));
-                                should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
-                            });
+                        var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/compiled/**/*.js"));
+                        files.forEach(function (file) {
+                            var fromFile = grunt.file.read(file);
+                            var toFile = grunt.file.read(path.resolve(__dirname + "/target/compiled/", path.relative(__dirname + "/expected/target/compiled", file)));
+                            should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
                         });
                         done();
                     }
@@ -100,13 +97,11 @@ describe("Kelper", function () {
                     if (err) {
                         done(err);
                     } else {
-                        glob(path.normalize(__dirname + "/expected/target/optimized/**/*.js"), function (err, files) {
-                            should.not.exist(err, "There is error in files");
-                            files.forEach(function (file) {
-                                var fromFile = grunt.file.read(file);
-                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimized/", path.relative(__dirname + "/expected/target/optimized", file)));
-                                should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
-                            });
+                        var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/optimized/**/*.js"));
+                        files.forEach(function (file) {
+                            var fromFile = grunt.file.read(file);
+                            var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimized/", path.relative(__dirname + "/expected/target/optimized", file)));
+                            should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
                         });
                         done();
                     }
@@ -127,13 +122,11 @@ describe("Kelper", function () {
                     if (err) {
                         done(err);
                     } else {
-                        glob(path.normalize(__dirname + "/expected/target/finalized/**/*.js"), function (err, files) {
-                            should.not.exist(err, "There is error in files");
-                            files.forEach(function (file) {
-                                var fromFile = grunt.file.read(file);
-                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/finalized/", path.relative(__dirname + "/expected/target/finalized", file)));
-                                should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
-                            });
+                        var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/finalized/**/*.js"));
+                        files.forEach(function (file) {
+                            var fromFile = grunt.file.read(file);
+                            var toFile = grunt.file.read(path.resolve(__dirname + "/target/finalized/", path.relative(__dirname + "/expected/target/finalized", file)));
+                            should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
                         });
                         done();
                     }
@@ -154,13 +147,11 @@ describe("Kelper", function () {
                         if (err) {
                             done(err);
                         } else {
-                            glob(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"), function (err, files) {
-                                should.not.exist(err, "There is error in files");
-                                files.forEach(function (file) {
-                                    var fromFile = grunt.file.read(file);
-                                    var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.relative(__dirname + "/expected/target/optimization", file)));
-                                    should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
-                                });
+                            var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"));
+                            files.forEach(function (file) {
+                                var fromFile = grunt.file.read(file);
+                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.relative(__dirname + "/expected/target/optimization", file)));
+                                should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
                             });
                             done();
                         }

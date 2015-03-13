@@ -122,7 +122,7 @@ exports.init = function (grunt) {
 
             var fileText = "window.require = window.require || {};\n";
             fileText += "\t\twindow.require.baseUrl = rootDir + '" + pathRel + "';\n";
-            fileText += "\t\twindow.require.sourceDir = rootDir + '" + relSourcePath + "';\n";
+            fileText += "\t\twindow.require.sourceDir = rootDir + '" + relSourcePath + "/';\n";
 
             var deps = [];
             var packages = [];

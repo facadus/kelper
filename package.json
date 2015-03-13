@@ -1,6 +1,6 @@
 {
   "name": "poc-kelper",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Kelper is a project builder/compiler",
   "publishConfig": {
     "registry": "http://artifactory.ctco.lv/artifactory/api/npm/npm-local"

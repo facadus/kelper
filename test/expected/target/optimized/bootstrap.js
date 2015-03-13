@@ -1,6 +1,5 @@
 var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];
 var rootDir = Array(document.location.href.replace(document.location.hash,'').split(/[/\\]/).filter(function(e, i){return script.src.split(/[/\\]/)[i] !== e;}).length).join('../');
-var sourceDir = rootDir + 'src';
 // Bootstrap
 (function (window) {
     
@@ -8,6 +7,7 @@ var sourceDir = rootDir + 'src';
     var defaultConfig = function (window) {
         window.require = window.require || {};
 		window.require.baseUrl = rootDir + 'target/compiled';
+		window.require.sourceDir = rootDir + 'src';
 		window.require.packages = (window.require.packages || []).concat(["application"]);
 
         window.__bootstrap = function () {

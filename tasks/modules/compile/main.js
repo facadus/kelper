@@ -116,9 +116,11 @@ exports.init = function (grunt) {
         generateConfigFile: function (srcPath) {
             var pathRel = path.relative(process.cwd(), configuration.default.dest).replace(/\\/g, "/");
             var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
+            var relSourcePath = path.relative(process.cwd(), srcPath);
 
             var fileText = "window.require = window.require || {};\n";
             fileText += "\t\twindow.require.baseUrl = rootDir + '" + pathRel + "';\n";
+            fileText += "\t\twindow.require.sourceDir = rootDir + '" + relSourcePath + "';\n";
 
             var deps = [];
             var packages = [];
@@ -342,11 +344,9 @@ exports.init = function (grunt) {
         generateBootstrap: function (srcPath, destPath) {
             var bootstrap = path.resolve(destPath, "bootstrap.js");
             var defBootstrap = path.resolve(__dirname, "config/bootstrap.js");
-            var relSourcePath = path.relative(process.cwd(), srcPath);
 
             var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];\n";
             fileText += "var rootDir = Array(document.location.href.replace(document.location.hash,'').split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
-            fileText += "var sourceDir = rootDir + '" + relSourcePath + "';\n";
 
             var compFile = grunt.file.read(defBootstrap);
             compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(srcPath));

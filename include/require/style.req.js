@@ -15,7 +15,7 @@ define(function () {
             if (config && config.isBuild) {
                 this.__buildFile(name, req, onLoad, config);
             } else {
-                this.__loadFile(sourceDir + "/" + name, onLoad);
+                this.__loadFile(config.sourceDir + "/" + name, onLoad);
             }
         },
         __compile: function (less, contents, onError, onSuccess) {

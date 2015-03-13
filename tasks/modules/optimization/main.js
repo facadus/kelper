@@ -203,8 +203,9 @@ exports.init = function (grunt) {
 
             return {
                 paths: result,
-                stubModules: Object.keys(result)
-            };
+                stubModules: Object.keys(result),
+                sourceDir: path.resolve(process.cwd(), this.lastConfigurations.compile.default.sourcePath)
+            }
         },
         parseShim: function(shims){
             return {

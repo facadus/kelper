@@ -16,7 +16,9 @@ describe("Kelper", function () {
 
     // Setting up Test options
     grunt.file.setBase(__dirname);
-    grunt.file.delete("target", {force: true});
+    if(grunt.file.exists("target")) {
+        grunt.file.delete("target", {force: true});
+    }
     grunt.test = true;
 
     beforeEach(function () {

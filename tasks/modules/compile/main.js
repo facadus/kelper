@@ -41,7 +41,9 @@ exports.init = function (grunt) {
             // Setting configuration
             this.loadPlugin("grunt-typescript");
             this.configuration = configuration;
-            var task = this.runTask("typescript", configuration);
+            var task = this.runTask("typescript", {
+                default: configuration.default
+            });
             this.runTask("addDependencies", {default: {}}, []);
             return task;
         },
@@ -120,7 +122,7 @@ exports.init = function (grunt) {
 
             var fileText = "window.require = window.require || {};\n";
             fileText += "\t\twindow.require.baseUrl = rootDir + '" + pathRel + "';\n";
-            fileText += "\t\twindow.require.sourceDir = rootDir + '" + relSourcePath + "';\n";
+            fileText += "\t\twindow.require.sourceDir = rootDir + '" + relSourcePath + "/';\n";
 
             var deps = [];
             var packages = [];

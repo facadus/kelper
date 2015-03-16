@@ -131,7 +131,7 @@ exports.init = function (grunt) {
                         });
 
                         if (library.autoStart) {
-                            deps.push(library.requireName ? library.requireName : packageName);
+                            deps.push(library.requireName ? library.requireName : libraryName);
                         }
 
                         if (this.isNotEmptyObject(library.packages)) {

@@ -177,6 +177,18 @@ exports.init = function (grunt) {
                 }
             }
 
+            if (this.isNotEmptyObject(this.environment.base) && Object.keys(this.environment.base).length > 1) {
+                fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
+
+                if (grunt.util.kindOf(this.environment.base) == "object") {
+                    for (var lib in this.environment.base) {
+                        if (lib != "require") {
+                            fileText += '\t\twindow.require.paths["' + lib + '"] = "base/' + libs + '";\n';
+                        }
+                    }
+                }
+            }
+
             if (Object.keys(packageConfig).length > 0) {
                 fileText += "window.require.config = window.require.config || {};\n";
                 for (var index in packageConfig) {
@@ -241,7 +253,7 @@ exports.init = function (grunt) {
                     options
                 );
                 grunt.file.write(file, minified.min);
-            }catch (ex){
+            } catch (ex) {
                 console.log("Failed to minimize " + file, ex);
                 return false;
             }

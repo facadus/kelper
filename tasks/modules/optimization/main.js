@@ -69,11 +69,7 @@ exports.init = function (grunt) {
                     var excludes = [];
                     if(optModule.exclude && optModule.exclude.length > 0){
                         optModule.exclude.forEach(function(mdl){
-                            if(newConfig[optModule.name].options.packages.indexOf(mdl) > -1){
-                                excludes.push(mdl);
-                            }else{
-                                newConfig[optModule.name].options.paths[mdl] = "empty:";
-                            }
+                            newConfig[optModule.name].options.paths[mdl] = "empty:";
                         });
                     }
 

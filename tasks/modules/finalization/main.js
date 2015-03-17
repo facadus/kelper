@@ -16,9 +16,11 @@ exports.init = function (grunt) {
 
             this.makeClear(configuration.target);
 
-            configuration.uglify = {
-                options: this.environment.uglify || {}
-            };
+            if(typeof this.environment.uglify != "undefined") {
+                configuration.uglify = {
+                    options: this.environment.uglify
+                };
+            }
 
             // Step 1 = Uglify
             var fileList = {};
@@ -76,9 +78,27 @@ exports.init = function (grunt) {
                     );
                 }
 
-                configuration.uglify.libs = {
-                    files: libs
-                };
+                if(typeof this.environment.uglify != "undefined"){
+                    configuration.uglify.libs = {
+                        files: libs
+                    };
+                }else{
+                    this.registerTask("mergeLibs", "Merge libs into 1 file", function(){
+                        for(var lib in libs){
+                            var output = "";
+                            if(grunt.util.kindOf(libs[lib]) == "array"){
+                                libs[lib].forEach(function(file){
+                                    output += grunt.file.read(file)
+                                });
+                            }else{
+                                output += grunt.file.read(libs[lib]);
+                            }
+                            grunt.file.write(lib, output);
+                        }
+                    });
+                    this.runTask("mergeLibs", {default: {}}, []);
+                }
+
             }
 
             // Step 3 = Resources
@@ -100,17 +120,22 @@ exports.init = function (grunt) {
                 });
             }
 
+            var task;
             if(configuration.copy && Object.keys(configuration.copy).length > 0){
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
-                this.runTask("copy", configuration.copy, "resources");
+                task = this.runTask("copy", configuration.copy, "resources");
             }
 
             this.configuration = configuration;
 
             // Run uglify
             this.loadPlugin("grunt-contrib-uglify");
-            return this.runTask("uglify", configuration.uglify, ["minimize", "libs"]);
+
+            if(typeof this.environment.uglify != "undefined") {
+                return this.runTask("uglify", configuration.uglify, ["minimize", "libs"]);
+            }
+            return task;
         },
         getConfiguration: function () {
             // Load default configuration

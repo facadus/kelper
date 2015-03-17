@@ -223,7 +223,9 @@ exports.init = function (grunt) {
             // Write to file
             grunt.file.write(filePath, fileText);
 
-            this.minimize(filePath);
+            if(typeof this.environment.uglify != "undefined") {
+                this.minimize(filePath);
+            }
 
             return true;
         },
@@ -253,7 +255,7 @@ exports.init = function (grunt) {
                     options
                 );
                 grunt.file.write(file, minified.min);
-            } catch (ex) {
+            }catch (ex){
                 console.log("Failed to minimize " + file, ex);
                 return false;
             }

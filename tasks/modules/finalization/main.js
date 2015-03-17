@@ -47,7 +47,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (typeof this.environment.uglify != "undefined" || grunt.test) {
+            if (typeof this.environment.uglify != "undefined") {
                 configuration.uglify.minimize = {
                     files: fileList
                 };
@@ -124,7 +124,7 @@ exports.init = function (grunt) {
             if(configuration.copy && Object.keys(configuration.copy).length > 0){
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
-                task = this.runTask("copy", configuration.copy, "resources");
+                task = this.runTask("copy", configuration.copy, ["resources", "libs"]);
             }
 
             this.configuration = configuration;

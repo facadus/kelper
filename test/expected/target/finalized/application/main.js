@@ -1,1 +1,14 @@
-define(["require","exports"],function(a,b){var c=function(){function a(a){this.greeting=a}return a.prototype.greet=function(){return"Hello, "+this.greeting},a}();b.Application=c});
+/// <reference path="../require.d.ts" />
+define(["require", "exports"], function (require, exports) {
+    var Application = (function () {
+        function Application(message) {
+            this.greeting = message;
+        }
+        Application.prototype.greet = function () {
+            return "Hello, " + this.greeting;
+        };
+        return Application;
+    })();
+    exports.Application = Application;
+});
+//# sourceMappingURL=main.js.map

@@ -62,7 +62,7 @@ exports.init = function (grunt) {
 
                 // Find Dependencies ^
                 if (result) {
-                    var regEx = /"([\w\/.]+)"/gm;
+                    var regEx = /["']([\w\/.]+)["']/gm;
                     var deps = {};
                     var m;
 

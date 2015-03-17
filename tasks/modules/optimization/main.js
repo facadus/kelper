@@ -98,7 +98,7 @@ exports.init = function (grunt) {
 
             // Setting configuration
             this.loadPlugin("grunt-contrib-requirejs");
-            this.runTask("requirejs", newConfig, ["application", "widgets"]);
+            this.runTask("requirejs", newConfig, Object.keys(newConfig));
         },
         getConfiguration: function () {
             // Load default configuration

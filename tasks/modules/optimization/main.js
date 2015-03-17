@@ -9,12 +9,6 @@ exports.init = function (grunt) {
     var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
     var configuration = {};
 
-    module.registerTask("addOptimizationFiles", "Adding optimization files", function () {
-        var appNoCacheFileFrom = path.resolve(process.cwd(), configuration.default.options.baseUrl, "app.nocache.js");
-        var appNoCacheFileTo = path.resolve(process.cwd(), configuration.default.options.dir, "app.nocache.js");
-        grunt.file.write(appNoCacheFileTo, grunt.file.read(appNoCacheFileFrom));
-    });
-
     util._extend(module, {
         name: path.basename(__dirname),
         run: function () {
@@ -65,10 +59,10 @@ exports.init = function (grunt) {
                 done();
             };
 
-            var newConfig = {};
+            var newConfig = grunt.util._.clone(configuration);
             if(grunt.util.kindOf(configuration.default.options.modules) == "array" && configuration.default.options.modules.length > 0) {
                 for(var i = 0; i < configuration.default.options.modules.length; i++){
-                    var optModule = grunt.util._.clone(configuration.default.options.modules[i]);
+                    var optModule = grunt.util._.clone(configuration.default.options.modules[i], true);
                     newConfig[optModule.name] = grunt.util._.clone(configuration.default, true);
 
                     var excludes = [];
@@ -98,15 +92,15 @@ exports.init = function (grunt) {
                     delete newConfig[optModule.name].options.modules;
                     delete newConfig[optModule.name].options.dir;
                 }
+                delete newConfig["default"].options.modules;
             }
 
             this.configuration = configuration;
 
             // Setting configuration
             this.loadPlugin("grunt-contrib-requirejs");
-            this.runTask("requirejs", newConfig, Object.keys(newConfig));
 
-            this.runTask("addOptimizationFiles", {default: {}}, []);
+            return this.runTask("requirejs", newConfig, Object.keys(newConfig));
         },
         getConfiguration: function () {
             // Load default configuration

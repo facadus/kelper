@@ -100,7 +100,7 @@ exports.init = function (grunt) {
                 });
             }
 
-            if(Object.keys(configuration.copy).length > 0){
+            if(configuration.copy && Object.keys(configuration.copy).length > 0){
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
                 this.runTask("copy", configuration.copy, "resources");

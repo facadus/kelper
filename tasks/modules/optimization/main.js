@@ -100,7 +100,11 @@ exports.init = function (grunt) {
             // Setting configuration
             this.loadPlugin("grunt-contrib-requirejs");
 
-            return this.runTask("requirejs", newConfig, Object.keys(newConfig));
+            if(Object.keys(newConfig).length > 1){
+                return this.runTask("requirejs", newConfig, Object.keys(newConfig));
+            }
+
+            return this.runTask("requirejs", newConfig);
         },
         getConfiguration: function () {
             // Load default configuration

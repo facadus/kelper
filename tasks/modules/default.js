@@ -38,7 +38,7 @@ exports.init = function (grunt) {
                                         err.call(this, ex);
                                         return;
                                     }
-                                    err.call();
+                                    err.call(this);
                                 }
                             }
                         };

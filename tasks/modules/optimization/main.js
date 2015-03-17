@@ -52,7 +52,11 @@ exports.init = function (grunt) {
                     bundles.bundles.forEach(function (bundle) {
                         var parent = path.relative(process.cwd() + path.sep + configuration.default.options.dir, bundle.parent.substr(0, bundle.parent.lastIndexOf('/main')) || bundle.parent);
                         output[parent] = bundle.children.map(function (bnd) {
-                            return path.relative(process.cwd() + path.sep + configuration.default.options.baseUrl, bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/");
+                            if (/^[\w]+!/.test(bnd)) {
+                                return bnd;
+                            } else {
+                                return path.relative(process.cwd() + path.sep + configuration.default.options.baseUrl, bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/");
+                            }
                         });
                     });
                 }
@@ -61,14 +65,14 @@ exports.init = function (grunt) {
             };
 
             var newConfig = grunt.util._.clone(configuration);
-            if(grunt.util.kindOf(configuration.default.options.modules) == "array" && configuration.default.options.modules.length > 0) {
-                for(var i = 0; i < configuration.default.options.modules.length; i++){
+            if (grunt.util.kindOf(configuration.default.options.modules) == "array" && configuration.default.options.modules.length > 0) {
+                for (var i = 0; i < configuration.default.options.modules.length; i++) {
                     var optModule = grunt.util._.clone(configuration.default.options.modules[i], true);
                     newConfig[optModule.name] = grunt.util._.clone(configuration.default, true);
 
                     var excludes = [];
-                    if(optModule.exclude && optModule.exclude.length > 0){
-                        optModule.exclude.forEach(function(mdl){
+                    if (optModule.exclude && optModule.exclude.length > 0) {
+                        optModule.exclude.forEach(function (mdl) {
                             newConfig[optModule.name].options.paths[mdl] = "empty:";
                         });
                     }
@@ -97,7 +101,7 @@ exports.init = function (grunt) {
             // Setting configuration
             this.loadPlugin("grunt-contrib-requirejs");
 
-            if(Object.keys(newConfig).length > 1){
+            if (Object.keys(newConfig).length > 1) {
                 return this.runTask("requirejs", newConfig, Object.keys(newConfig));
             }
 

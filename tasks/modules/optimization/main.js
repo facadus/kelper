@@ -9,6 +9,12 @@ exports.init = function (grunt) {
     var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
     var configuration = {};
 
+    module.registerTask("addOptimizationFiles", "Adding optimization files", function () {
+        var appNoCacheFileFrom = path.resolve(process.cwd(), configuration.default.options.baseUrl, "app.nocache.js");
+        var appNoCacheFileTo = path.resolve(process.cwd(), configuration.default.options.dir, "app.nocache.js");
+        grunt.file.write(appNoCacheFileTo, grunt.file.read(appNoCacheFileFrom));
+    });
+
     util._extend(module, {
         name: path.basename(__dirname),
         run: function () {
@@ -99,6 +105,8 @@ exports.init = function (grunt) {
             // Setting configuration
             this.loadPlugin("grunt-contrib-requirejs");
             this.runTask("requirejs", newConfig, Object.keys(newConfig));
+
+            this.runTask("addOptimizationFiles", {default: {}}, []);
         },
         getConfiguration: function () {
             // Load default configuration

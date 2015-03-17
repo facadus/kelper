@@ -55,17 +55,50 @@ exports.init = function (grunt) {
                         });
                     });
                 }
-                module.configuration = module.mergeObjects(module.configuration, {
-                    bundles: output
-                });
+                module.configuration.bundles = module.mergeObjects(module.configuration.bundles || {}, output);
                 done();
             };
+
+            var newConfig = {};
+            if(grunt.util.kindOf(configuration.default.options.modules) == "array" && configuration.default.options.modules.length > 0) {
+                for(var i = 0; i < configuration.default.options.modules.length; i++){
+                    var optModule = grunt.util._.clone(configuration.default.options.modules[i]);
+                    newConfig[optModule.name] = grunt.util._.clone(configuration.default, true);
+
+                    var excludes = [];
+                    if(optModule.exclude && optModule.exclude.length > 0){
+                        optModule.exclude.forEach(function(mdl){
+                            if(newConfig[optModule.name].options.packages.indexOf(mdl) > -1){
+                                excludes.push(mdl);
+                            }else{
+                                newConfig[optModule.name].options.paths[mdl] = "empty:";
+                            }
+                        });
+                    }
+
+                    this.smartMerge(newConfig[optModule.name].options, {
+                        name: optModule.name,
+                        include: optModule.include,
+                        exclude: excludes,
+                        insertRequire: optModule.insertRequire,
+                        out: path.resolve(newConfig[optModule.name].options.dir, optModule.name, "main.js"),
+                        create: true
+                    });
+
+                    grunt.file.mkdir(
+                        path.resolve(newConfig[optModule.name].options.dir, optModule.name)
+                    );
+
+                    delete newConfig[optModule.name].options.modules;
+                    delete newConfig[optModule.name].options.dir;
+                }
+            }
 
             this.configuration = configuration;
 
             // Setting configuration
             this.loadPlugin("grunt-contrib-requirejs");
-            return this.runTask("requirejs", configuration);
+            this.runTask("requirejs", newConfig, ["application", "widgets"]);
         },
         getConfiguration: function () {
             // Load default configuration

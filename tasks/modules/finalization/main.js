@@ -21,35 +21,47 @@ exports.init = function (grunt) {
             };
 
             // Step 1 = Uglify
+            var fileList = {};
+
+            // Parse libraries
+            if (this.isNotEmptyObject(this.environment.libraries)) {
+                for (var libraryName in this.environment.libraries) {
+                    if (this.environment.libraries[libraryName]) {
+                        var pathFrom = path.resolve(process.cwd(), configuration.target, libraryName, "main.js");
+                        var pathTo = path.resolve(process.cwd(), configuration.source, libraryName, "main.js");
+                        fileList[pathFrom] = pathTo;
+                    }
+                }
+            }
+
+            // Parse packages
+            if (this.isNotEmptyObject(this.environment.packages)) {
+                for (var packageName in this.environment.packages) {
+                    if (this.environment.packages[packageName]) {
+                        var pathFrom = path.resolve(process.cwd(), configuration.target, packageName, "main.js");
+                        var pathTo = path.resolve(process.cwd(), configuration.source, packageName, "main.js");
+                        fileList[pathFrom] = pathTo;
+                    }
+                }
+            }
+
             if (typeof this.environment.uglify != "undefined" || grunt.test) {
-                var fileList = {};
-
-                // Parse libraries
-                if (this.isNotEmptyObject(this.environment.libraries)) {
-                    for (var libraryName in this.environment.libraries) {
-                        if (this.environment.libraries[libraryName]) {
-                            var pathFrom = path.resolve(process.cwd(), configuration.target, libraryName, "main.js");
-                            //noinspection UnnecessaryLocalVariableJS
-                            var pathTo = path.resolve(process.cwd(), configuration.source, libraryName, "main.js");
-                            fileList[pathFrom] = pathTo;
-                        }
-                    }
-                }
-
-                // Parse packages
-                if (this.isNotEmptyObject(this.environment.packages)) {
-                    for (var packageName in this.environment.packages) {
-                        if (this.environment.packages[packageName]) {
-                            var pathFrom = path.resolve(process.cwd(), configuration.target, packageName, "main.js");
-                            var pathTo = path.resolve(process.cwd(), configuration.source, packageName, "main.js");
-                            fileList[pathFrom] = pathTo;
-                        }
-                    }
-                }
-
                 configuration.uglify.minimize = {
                     files: fileList
                 };
+            }else{
+                configuration.copy = configuration.copy || {};
+                configuration.copy.libs = configuration.copy.libs || {};
+                configuration.copy.libs.files = configuration.copy.libs.files || [];
+
+                for(var libs in fileList){
+                    configuration.copy.libs.files.push({
+                        expand: true,
+                        src: path.basename(fileList[libs]),
+                        cwd: path.dirname(fileList[libs]),
+                        dest: path.dirname(libs)
+                    });
+                }
             }
 
             // Step 2 = Libs
@@ -73,11 +85,9 @@ exports.init = function (grunt) {
             if (grunt.util.kindOf(this.environment.resources) == "array" && typeof configuration.resourcePath != "undefined") {
 
                 // Empty files
-                configuration.copy = {
-                    resources: {
-                        files: []
-                    }
-                };
+                configuration.copy = configuration.copy || {};
+                configuration.copy.resources = configuration.copy.resources || {};
+                configuration.copy.resources.files = configuration.copy.resources.files || [];
 
                 // Adding files if needed
                 this.environment.resources.forEach(function (resource) {
@@ -88,7 +98,9 @@ exports.init = function (grunt) {
                         dest: path.resolve(process.cwd(), configuration.target)
                     });
                 });
+            }
 
+            if(Object.keys(configuration.copy).length > 0){
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
                 this.runTask("copy", configuration.copy, "resources");

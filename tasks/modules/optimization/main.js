@@ -50,8 +50,9 @@ exports.init = function (grunt) {
                 var output = {};
                 if (bundles.hasOwnProperty("bundles") && grunt.util.kindOf(bundles.bundles) == "array") {
                     bundles.bundles.forEach(function (bundle) {
-                        output[(bundle.parent.substr(0, bundle.parent.lastIndexOf('/main')) || bundle.parent)] = bundle.children.map(function (bnd) {
-                            return (bnd.substr(0, bnd.lastIndexOf('.')) || bnd);
+                        var parent = path.relative(process.cwd() + path.sep + configuration.default.options.dir, bundle.parent.substr(0, bundle.parent.lastIndexOf('/main')) || bundle.parent);
+                        output[parent] = bundle.children.map(function (bnd) {
+                            return path.relative(process.cwd() + path.sep + configuration.default.options.baseUrl, bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/");
                         });
                     });
                 }

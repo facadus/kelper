@@ -127,7 +127,8 @@ exports.init = function (grunt) {
             var deps = [];
             var packages = [];
             var packageConfig = {};
-            var allPackages = [];
+            var packageList = [];
+            var moduleList = [];
 
 
             // Collect all library packages for baseConfig
@@ -147,13 +148,19 @@ exports.init = function (grunt) {
                                         deps.push(pkg.requireName ? pkg.requireName : packageName);
                                     }
 
+                                    packageList.push({
+                                        packageName: packageName,
+                                        libraryName: libraryName,
+                                        sourcePath: path.resolve(process.cwd(), srcPath, packageName),
+                                        compiledPath: path.resolve(process.cwd(), pathRel, packageName)
+                                    });
+
                                     if (pkg.config) {
                                         for(var conf in pkg.config){
-                                            allPackages.push({
-                                                name: packageName,
-                                                config: packageName + "/" + conf,
-                                                pkg: packageName + "/main",
-                                                library: libraryName,
+                                            moduleList.push({
+                                                moduleName: packageName + "/" + conf,
+                                                packageName: packageName,
+                                                libraryName: libraryName,
                                                 sourcePath: path.resolve(process.cwd(), srcPath, packageName),
                                                 compiledPath: path.resolve(process.cwd(), pathRel, packageName)
                                             });
@@ -179,12 +186,17 @@ exports.init = function (grunt) {
                         if (pkg) {
                             packages.push(packageName);
 
+                            packageList.push({
+                                packageName: packageName,
+                                sourcePath: path.resolve(process.cwd(), srcPath, packageName),
+                                compiledPath: path.resolve(process.cwd(), pathRel, packageName)
+                            });
+
                             if (pkg.config) {
                                 for(var conf in pkg.config){
-                                    allPackages.push({
-                                        name: packageName,
-                                        config: packageName + "/" + conf,
-                                        pkg: packageName + "/main",
+                                    moduleList.push({
+                                        moduleName: packageName + "/" + conf,
+                                        packageName: packageName,
                                         sourcePath: path.resolve(process.cwd(), srcPath, packageName),
                                         compiledPath: path.resolve(process.cwd(), pathRel, packageName)
                                     });
@@ -197,16 +209,16 @@ exports.init = function (grunt) {
             }
 
             // Usage of baseConfig
-            if (allPackages && allPackages.length) {
+            if (moduleList && moduleList.length) {
                 if (typeof baseConfig == "function") {
                     var object = this;
-                    allPackages.forEach(function (pkg) {
-                        var ret = baseConfig(pkg, allPackages);
+                    moduleList.forEach(function (pkg) {
+                        var ret = baseConfig(pkg, packageList);
                         if (ret) {
-                            if (packageConfig[pkg.config]) {
-                                object.smartMerge(ret, packageConfig[pkg.config]);
+                            if (packageConfig[pkg.moduleName]) {
+                                object.smartMerge(ret, packageConfig[pkg.moduleName]);
                             }
-                            packageConfig[pkg.config] = ret;
+                            packageConfig[pkg.moduleName] = ret;
                         }
                     });
                 }

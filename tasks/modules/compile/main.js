@@ -63,7 +63,10 @@ exports.init = function (grunt) {
             // Load user created configuration
             var userFile = path.resolve(process.cwd(), "config/build", this.name + ".js");
             if (grunt.file.exists(userFile)) {
-                var config = require(userFile)(grunt);
+                var config = require(userFile)(grunt, {
+                    source: path.resolve(process.cwd(), configuration.default.sourcePath),
+                    target: path.resolve(process.cwd(), configuration.default.dest)
+                });
 
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, this.parse(config));

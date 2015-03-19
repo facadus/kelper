@@ -119,7 +119,7 @@ This function is used as callback function for each package. Returned informatio
 * Firstly, will be taken default configuration and overwritten with baseConfig returned data.
 * Secondly, will be taken Environment data and merged using smart merge function (object will be extended, arrays merged and all otherwise will be overwritten)
 
-Function will receive object that have these parameters:
+Function will receive object as first parameter that have these parameters:
 
 * **name** *(string)* - Package name *(ex. "common")*
 * **config** *(string)* - Package configuration name *(ex. "common/API")*
@@ -127,6 +127,9 @@ Function will receive object that have these parameters:
 * **library** *(string, optional can be empty if not a library)* - Library name *(ex. "application")*
 * **sourcePath** *(string)* - Full path of sources *(ex. "C:\work\Example\src\common")*
 * **compiledPath** *(string)* - Full path of compile directory *(ex. "C:\work\Example\target\compiled\common")*
+
+Function will receive as second parameter array of all packages.
+
 
 *Example*:
 
@@ -136,7 +139,7 @@ module.exports = function(grunt){
         source: 'src',
         target: 'target/compiled',
         version: 'es5',
-        baseConfig: function(pkg){
+        baseConfig: function(pkg, allPackages){
             switch (pkg.name) {
                 case "common":
                     return {

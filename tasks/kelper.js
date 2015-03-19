@@ -115,7 +115,7 @@ module.exports = function (grunt) {
         });
     });
 
-    grunt.registerTask("test", "Build task test", function () {
+    grunt.registerTask("kelper:test", "Build task test", function () {
         var done = this.async();
         require('child_process').exec("mocha " + path.resolve(__dirname + "/../test/kelper.test.js"), function (err, stdout) {
             grunt.log.write(stdout);
@@ -123,7 +123,7 @@ module.exports = function (grunt) {
         });
     });
 
-    grunt.registerTask("default", ["kelper:" + plugin.configuration.operations.slice(-1)]);
+    grunt.registerTask("kelper", ["kelper:" + plugin.configuration.operations.slice(-1)]);
 
     return plugin;
 };

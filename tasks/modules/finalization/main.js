@@ -16,7 +16,7 @@ exports.init = function (grunt) {
 
             this.makeClear(configuration.target);
 
-            if(typeof this.environment.uglify != "undefined") {
+            if (typeof this.environment.uglify != "undefined") {
                 configuration.uglify = {
                     options: this.environment.uglify
                 };
@@ -51,12 +51,12 @@ exports.init = function (grunt) {
                 configuration.uglify.minimize = {
                     files: fileList
                 };
-            }else{
+            } else {
                 configuration.copy = configuration.copy || {};
                 configuration.copy.libs = configuration.copy.libs || {};
                 configuration.copy.libs.files = configuration.copy.libs.files || [];
 
-                for(var libs in fileList){
+                for (var libs in fileList) {
                     configuration.copy.libs.files.push({
                         expand: true,
                         src: path.basename(fileList[libs]),
@@ -78,19 +78,19 @@ exports.init = function (grunt) {
                     );
                 }
 
-                if(typeof this.environment.uglify != "undefined"){
+                if (typeof this.environment.uglify != "undefined") {
                     configuration.uglify.libs = {
                         files: libs
                     };
-                }else{
-                    this.registerTask("mergeLibs", "Merge libs into 1 file", function(){
-                        for(var lib in libs){
+                } else {
+                    this.registerTask("mergeLibs", "Merge libs into 1 file", function () {
+                        for (var lib in libs) {
                             var output = "";
-                            if(grunt.util.kindOf(libs[lib]) == "array"){
-                                libs[lib].forEach(function(file){
+                            if (grunt.util.kindOf(libs[lib]) == "array") {
+                                libs[lib].forEach(function (file) {
                                     output += grunt.file.read(file)
                                 });
-                            }else{
+                            } else {
                                 output += grunt.file.read(libs[lib]);
                             }
                             grunt.file.write(lib, output);
@@ -118,10 +118,24 @@ exports.init = function (grunt) {
                         dest: path.resolve(process.cwd(), configuration.target)
                     });
                 });
+
+                // Add process function if is set and match pattern
+                if (configuration.fileCopyHandler && typeof configuration.fileCopyHandler.process == "function") {
+                    configuration.copy.resources.options = configuration.copy.resources.options || {};
+                    configuration.copy.resources.options.process = function (content, srcPath) {
+                        if (configuration.fileCopyHandler.pattern) {
+                            if(grunt.file.isMatch("**/" + configuration.fileCopyHandler.pattern, srcPath)){
+                                return configuration.fileCopyHandler.process(content);
+                            }
+                        } else {
+                            return configuration.fileCopyHandler.process(content);
+                        }
+                    }
+                }
             }
 
             var task;
-            if(configuration.copy && Object.keys(configuration.copy).length > 0){
+            if (configuration.copy && Object.keys(configuration.copy).length > 0) {
                 // Run Task
                 this.loadPlugin("grunt-contrib-copy");
                 task = this.runTask("copy", configuration.copy, ["resources", "libs"]);
@@ -132,7 +146,7 @@ exports.init = function (grunt) {
             // Run uglify
             this.loadPlugin("grunt-contrib-uglify");
 
-            if(typeof this.environment.uglify != "undefined") {
+            if (typeof this.environment.uglify != "undefined") {
                 return this.runTask("uglify", configuration.uglify, ["minimize", "libs"]);
             }
             return task;
@@ -177,6 +191,10 @@ exports.init = function (grunt) {
 
             if (configuration.hasOwnProperty("target")) {
                 parsed.target = path.resolve(process.cwd(), configuration.target);
+            }
+
+            if (configuration.hasOwnProperty("fileCopyHandler")){
+                parsed.fileCopyHandler = configuration.fileCopyHandler;
             }
 
             // Fix for RequireJS

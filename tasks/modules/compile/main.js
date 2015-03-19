@@ -147,16 +147,18 @@ exports.init = function (grunt) {
                                         deps.push(pkg.requireName ? pkg.requireName : packageName);
                                     }
 
-                                    allPackages.push({
-                                        name: packageName,
-                                        package: packageName + "/main",
-                                        library: libraryName,
-                                        sourcePath: path.resolve(process.cwd(), srcPath, packageName),
-                                        compiledPath: path.resolve(process.cwd(), pathRel, packageName)
-                                    });
-
                                     if (pkg.config) {
-                                        packageConfig[packageName + "/main"] = pkg.config;
+                                        for(var conf in pkg.config){
+                                            allPackages.push({
+                                                name: packageName,
+                                                config: packageName + "/" + conf,
+                                                pkg: packageName + "/main",
+                                                library: libraryName,
+                                                sourcePath: path.resolve(process.cwd(), srcPath, packageName),
+                                                compiledPath: path.resolve(process.cwd(), pathRel, packageName)
+                                            });
+                                            packageConfig[packageName + "/" + conf] = pkg.config[conf];
+                                        }
                                     }
                                 }
                             }
@@ -177,15 +179,17 @@ exports.init = function (grunt) {
                         if (pkg) {
                             packages.push(packageName);
 
-                            allPackages.push({
-                                name: packageName,
-                                package: packageName + "/main",
-                                sourcePath: path.resolve(process.cwd(), srcPath, packageName),
-                                compiledPath: path.resolve(process.cwd(), pathRel, packageName)
-                            });
-
                             if (pkg.config) {
-                                packageConfig[packageName + "/main"] = pkg.config;
+                                for(var conf in pkg.config){
+                                    allPackages.push({
+                                        name: packageName,
+                                        config: packageName + "/" + conf,
+                                        pkg: packageName + "/main",
+                                        sourcePath: path.resolve(process.cwd(), srcPath, packageName),
+                                        compiledPath: path.resolve(process.cwd(), pathRel, packageName)
+                                    });
+                                    packageConfig[packageName + "/" + conf] = pkg.config[conf];
+                                }
                             }
                         }
                     }
@@ -199,10 +203,10 @@ exports.init = function (grunt) {
                     allPackages.forEach(function (pkg) {
                         var ret = baseConfig(pkg, allPackages);
                         if (ret) {
-                            if (packageConfig[pkg.name + "/main"]) {
-                                object.smartMerge(ret, packageConfig[pkg.name + "/main"]);
+                            if (packageConfig[pkg.config]) {
+                                object.smartMerge(ret, packageConfig[pkg.config]);
                             }
-                            packageConfig[pkg.name + "/main"] = ret;
+                            packageConfig[pkg.config] = ret;
                         }
                     });
                 }

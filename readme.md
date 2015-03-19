@@ -1,6 +1,6 @@
-#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png)Kelper 0.2.0
+#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png)Kelper 0.2.19
 
-Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatical checks for Unit test and UI test mistakes in webpages that are using by project.
+Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatically checks for Unit test and UI test mistakes in webpages that are using by project.
 
 ##Features
 
@@ -30,14 +30,14 @@ If you haven't used Grunt before, be sure to check out the [Getting Started](htt
 Kelper can be installed with these methods:
 
 ```
-npm install git+https://git.ctco.lv/r/~alexander.domotenko/training/builder.git --save
+npm install poc-kelper --save
 ```
 
 or add as dependency to package.json file.
 
 ```
 "dependencies": {
-    "kelper": "git+https://git.ctco.lv/r/~alexander.domotenko/training/builder.git",
+    "poc-kelper": "^0.2.19",
     "grunt": "^0.4.5"
 }
 ```
@@ -49,6 +49,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('kelper');
 };
 ```
+
+Kelper after installation will parse all npm modules and if module has in **"package.json"** file configuration parameter **"moduleType"** with value **"AMD"** then plugin's inner content will be copied to project and it's files will be added to **".gitignore"** file.
 
 ##Configuration
 
@@ -105,6 +107,7 @@ There are 3 main parameters:
 * **version** - compiled javascript standard
 * **baseConfig** - is callback function that is used for each package, returned information will be merged or overwritten by environment config.
 * **unitTestPattern** - pattern of unit test files (Default - **"*.unit.html"**)
+* **jsMapping** - used to set specific file path to sources (Not to compiled version)
 
 ##### baseConfig
 ------------
@@ -119,8 +122,9 @@ This function is used as callback function for each package. Returned informatio
 Function will receive object that have these parameters:
 
 * **name** *(string)* - Package name *(ex. "common")*
-* **package** *(string)* - Package full name *(ex. "common/main")*
-* **library** *(string)* - Library name *(ex. "application")*
+* **config** *(string)* - Package configuration name *(ex. "common/API")*
+* **pkg** *(string)* - Package full name *(ex. "common/main")*
+* **library** *(string, optional can be empty if not a library)* - Library name *(ex. "application")*
 * **sourcePath** *(string)* - Full path of sources *(ex. "C:\work\Example\src\common")*
 * **compiledPath** *(string)* - Full path of compile directory *(ex. "C:\work\Example\target\compiled\common")*
 
@@ -133,8 +137,8 @@ module.exports = function(grunt){
         target: 'target/compiled',
         version: 'es5',
         baseConfig: function(pkg){
-            switch (pkg.package) {
-                case "common/main":
+            switch (pkg.name) {
+                case "common":
                     return {
                         "libraryMetadata": [
                             grunt.file.readJSON(path.resolve(pkg.sourcePath, 'module.json'))
@@ -146,6 +150,22 @@ module.exports = function(grunt){
         }
     };
 };
+```
+
+##### jsMapping
+-----------------
+
+jsMapping is used to set specific path from sources. It is used to work with native javascript files that are not compiled. Later it will be used in optimization process.
+
+*Example of usage:*
+
+```
+jsMapping: {
+	files: [
+		"core/template/Compiler.js",
+		"core/template/Parser.js"
+	]
+}
 ```
 
 #### Optimization
@@ -213,6 +233,7 @@ There can be these configuration parameters:
 
 * **uglify** - is used in finalization process to minimize files
 * **base** - is used in optimization and finalization process to define static libraries like jQuery, Backbone and others.
+* **shim** - is used in compile and optimization process to define static libraries export data and dependencies.
 * **libraries** - is used in optimization and finalization process to define libraries that should be exported.
 * **packages** - is used in optimization and finalization process to define RequireJS static packages.
 * **hash** - is used in finalization process to define hash method.
@@ -246,6 +267,26 @@ RequireJS is not needed here, it will be automatically downloaded and loaded as 
 ```
   base:
     jquery: "lib/jquery/jquery"
+```
+
+#### Shim configuration parameter
+---------------------------------
+
+Shim is used in compile and optimization process to define static libraries export data and dependencies.
+
+*Example of usage:*
+
+```
+  shim:
+	jquery:
+		exports: "$"
+    underscore:
+	    exports: "_"
+	backbone
+		deps:
+			- "underscore"
+			- "jquery"
+		exports: "Backbone"
 ```
 
 #### Libraries configuration parameter
@@ -291,6 +332,7 @@ Packages can be used in libraries and separate configuration. Packages configura
 
 Each package contain 1 mandatory field **"name"** *(string)* and 3 optional fields:
 
+* **"requireName"** *(string)* - is used to replace module require parameter *(example "async!common?1")*
 * **"config"** *(object)* - is used to setup requireJS configuration
 * **"replace"** *(object)* - is used to replace one module with another in production (For UI tests this replacements will be ignored)
 * **"dependencies"** *(object)* - is used to add dependencies with ***glob*** functions. There are include and exclude functions available.
@@ -302,6 +344,7 @@ Configuration of package will be transferred like in libraries to bootstrap.js f
 ```
   packages:
     common:
+      requireName: "async!common?1"
       replace:
         common/Component: "common/ComponentProd"
       dependencies:

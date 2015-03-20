@@ -164,6 +164,7 @@ exports.init = function (grunt) {
                                                 moduleName: packageName + "/" + conf,
                                                 packageName: packageName,
                                                 libraryName: libraryName,
+                                                config: pkg.config[conf],
                                                 sourcePath: path.resolve(process.cwd(), srcPath, packageName),
                                                 compiledPath: path.resolve(process.cwd(), pathRel, packageName)
                                             });
@@ -200,6 +201,7 @@ exports.init = function (grunt) {
                                     moduleList.push({
                                         moduleName: packageName + "/" + conf,
                                         packageName: packageName,
+                                        config: pkg.config[conf],
                                         sourcePath: path.resolve(process.cwd(), srcPath, packageName),
                                         compiledPath: path.resolve(process.cwd(), pathRel, packageName)
                                     });

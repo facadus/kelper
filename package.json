@@ -1,13 +1,10 @@
 {
-  "name": "poc-kelper",
+  "name": "kelper",
   "version": "0.2.23",
-  "description": "Kelper is a project builder/compiler",
-  "publishConfig": {
-    "registry": "http://artifactory.ctco.lv/artifactory/api/npm/npm-local"
-  },
+  "description": "Build tool for Large-Scale JavaScript Application in TypeScript",
   "repository": {
     "type": "git",
-    "url": "git://git.ctco.lv/r/~alexander.domotenko/training/builder.git"
+    "url": "https://github.com/facadus/kelper.git"
   },
   "bin": {
     "install": "./bin/install.js"

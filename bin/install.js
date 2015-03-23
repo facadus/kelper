@@ -92,7 +92,7 @@ var config = readPackageJson();
 if (config && config.dependencies) {
     var copiedFF = [];
     for (var deps in config.dependencies) {
-        if (deps !== "poc-kelper") {
+        if (deps !== "kelper") { // TODO: get from package.json
             var dependencyPackage = readPackageJson(deps);
             if (dependencyPackage && dependencyPackage.moduleType && dependencyPackage.moduleType.toUpperCase() == "AMD") {
                 var directory = path.resolve(process.cwd(), "node_modules", deps);

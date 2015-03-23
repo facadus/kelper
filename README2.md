@@ -1,4 +1,4 @@
-#![Kelper](http://git.ctco.lv/raw/~alexander.domotenko/training/builder.git/master/resources/icon.png)Kelper 0.2.19
+#![Kelper](https://raw.githubusercontent.com/facadus/kelper/master/resources/icon.png)Kelper 0.2.19
 
 Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatically checks for Unit test and UI test mistakes in webpages that are using by project.
 
@@ -9,18 +9,6 @@ Kelper is a tool that is based on Grunt and is used for simplifying the process 
 * Autocompile, optimize and finalize project
 * Make required tests
 
-##Support
-
-If you are having issues or ideas, please let me know throught email **[pavel.kotov@ctco.lv](mailto://pavel.kotov@ctco.lv)** or add this issue as comment to **[Confluence](https://confluence.ctco.lv/confluence/display/UICM/Training)**.
-
-Source code: **[here](http://git.ctco.lv/tree/?r=~alexander.domotenko/training/builder.git)**
-
-##Sample project
-
-You can see sample project that is build with Kelper here:
-
-Source code: **[here](http://git.ctco.lv/tree/?r=~alexander.domotenko/training/sample.git)**
-
 ##Installation
 
 This plugin requires Grunt `0.4.5 or newer`.
@@ -30,14 +18,14 @@ If you haven't used Grunt before, be sure to check out the [Getting Started](htt
 Kelper can be installed with these methods:
 
 ```
-npm install poc-kelper --save
+npm install kelper --save
 ```
 
 or add as dependency to package.json file.
 
 ```
 "dependencies": {
-    "poc-kelper": "^0.2.19",
+    "kelper": "^0.2.19",
     "grunt": "^0.4.5"
 }
 ```

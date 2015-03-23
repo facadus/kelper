@@ -1,4 +1,4 @@
-#![Kelper](https://raw.githubusercontent.com/facadus/kelper/master/resources/icon.png)Kelper 0.2.19
+#![Kelper](https://raw.githubusercontent.com/facadus/kelper/master/resources/icon.png)Kelper
 
 Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatically checks for Unit test and UI test mistakes in webpages that are using by project.
 
@@ -25,7 +25,7 @@ or add as dependency to package.json file.
 
 ```
 "dependencies": {
-    "kelper": "^0.2.19",
+    "kelper": "latest",
     "grunt": "^0.4.5"
 }
 ```

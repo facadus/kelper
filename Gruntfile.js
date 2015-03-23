@@ -14,8 +14,8 @@ module.exports = function (grunt) {
                 commit: true,
                 commitMessage: 'Release v%VERSION%',
                 commitFiles: ['package.json'],
-                createTag: false,
-                push: false,
+                createTag: true,
+                push: true,
                 pushTo: 'origin',
                 gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
             }

@@ -14,7 +14,13 @@ exports.init = function (grunt) {
         if (grunt.util.kindOf(module.configuration.unitFiles) == "array" && module.configuration.unitFiles.length > 0) {
             module.loadPlugin("grunt-mocha-phantomjs");
             module.runTask("mocha_phantomjs", {
-                all: module.configuration.unitFiles
+                all: {
+                    options: {
+                        urls: module.configuration.unitFiles.map(function (item) {
+                            return "file:///" + item;
+                        })
+                    }
+                }
             });
         }
 

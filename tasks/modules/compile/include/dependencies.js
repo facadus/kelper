@@ -21,6 +21,12 @@ exports.init = function (grunt) {
                                 if (pkg) {
                                     if (pkg.dependencies) {
                                         dependencies[packageName] = pkg.dependencies;
+                                        if (pkg.replace) {
+                                            for (var repl in pkg.replace) {
+                                                var replPackage = path.relative(packageName, pkg.replace[repl]).replace(/\\/g, "/");
+                                                dependencies[packageName].push("!" + replPackage + ".js");
+                                            }
+                                        }
                                     }
                                 }
                             }

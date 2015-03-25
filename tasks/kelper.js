@@ -103,6 +103,7 @@ module.exports = function (grunt) {
             var oldConfig = {};
             if (!grunt.hasOwnProperty("test") || !grunt.test) {
                 var modules = plugin.configuration.phase(op);
+                var defConfiguration = grunt.util._.clone(grunt.config.get(), true);
                 modules.forEach(function (moduleName) {
                     var module = require(plugin.configuration.modulePath + path.sep + moduleName + path.sep + "main").init(grunt);
                     module.modulePath = path.dirname(plugin.configuration.builderPath);
@@ -111,6 +112,10 @@ module.exports = function (grunt) {
                     module.run();
                     oldConfig[moduleName] = module.configuration;
                 });
+                grunt.registerTask("kelper:returnConfiguration", function(){
+                    grunt.config.init(defConfiguration);
+                });
+                grunt.task.run("kelper:returnConfiguration");
             }
         });
     });

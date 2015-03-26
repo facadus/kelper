@@ -16,6 +16,7 @@ exports.init = function (grunt) {
             module.runTask("mocha_phantomjs", {
                 all: {
                     options: {
+                        timeout: 30000,
                         urls: module.configuration.unitFiles.map(function (item) {
                             return "file:///" + item;
                         })

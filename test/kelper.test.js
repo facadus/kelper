@@ -11,7 +11,7 @@ var should = require('chai').should();
 
 describe("Kelper", function () {
 
-    var lastPhase = "finalization";
+    var lastPhase = "build";
     var oldConfig = {};
 
     // Setting up Test options

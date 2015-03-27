@@ -116,6 +116,49 @@ exports.init = function (grunt) {
         },
         isNotEmptyObject: function (obj) {
             return grunt.util.kindOf(obj) == "object" && Object.keys(obj).length > 0;
+        },
+        copyFiles: function (files) {
+            if (grunt.util.kindOf(files) == "object") {
+
+                var copyFilesDep = function (fileDep) {
+                    if (grunt.util.kindOf(fileDep.files) == "array") {
+                        fileDep.options = fileDep.options || {};
+                        fileDep.files.forEach(function (file) {
+                            var foundFiles = grunt.file.expand({
+                                cwd: file.cwd
+                            }, file.src);
+                            if (foundFiles.length) {
+                                foundFiles.forEach(function (foundFile) {
+                                    if (fileDep.options.pattern && grunt.file.isMatch(fileDep.options.pattern, foundFile)) {
+                                        grunt.file.copy(
+                                            path.resolve(file.cwd, foundFile),
+                                            path.resolve(file.dest, foundFile),
+                                            {
+                                                process: fileDep.options.process
+                                            }
+                                        );
+                                    } else {
+                                        grunt.file.copy(
+                                            path.resolve(file.cwd, foundFile),
+                                            path.resolve(file.dest, foundFile)
+                                        );
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+
+                if (grunt.util.kindOf(files.files) == "array") {
+                    copyFilesDep(files);
+                } else {
+                    for (var file in files) {
+                        copyFilesDep(files[file]);
+                    }
+                }
+            }
+
+            return true;
         }
     }
 };

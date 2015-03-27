@@ -58,7 +58,6 @@ exports.init = function (grunt) {
 
                 for (var libs in fileList) {
                     configuration.copy.libs.files.push({
-                        expand: true,
                         src: path.basename(fileList[libs]),
                         cwd: path.dirname(fileList[libs]),
                         dest: path.dirname(libs)
@@ -112,7 +111,6 @@ exports.init = function (grunt) {
                 // Adding files if needed
                 this.environment.resources.forEach(function (resource) {
                     configuration.copy.resources.files.push({
-                        expand: true,
                         cwd: path.resolve(process.cwd(), configuration.resourcePath, resource) + path.sep,
                         src: ["*.*", "**/*.*"],
                         dest: path.resolve(process.cwd(), configuration.target)
@@ -122,23 +120,18 @@ exports.init = function (grunt) {
                 // Add process function if is set and match pattern
                 if (configuration.fileCopyHandler && typeof configuration.fileCopyHandler.process == "function") {
                     configuration.copy.resources.options = configuration.copy.resources.options || {};
-                    configuration.copy.resources.options.process = function (content, srcPath) {
-                        if (configuration.fileCopyHandler.pattern) {
-                            if(grunt.file.isMatch("**/" + configuration.fileCopyHandler.pattern, srcPath)){
-                                return configuration.fileCopyHandler.process(content);
-                            }
-                        } else {
-                            return configuration.fileCopyHandler.process(content);
-                        }
-                    }
+                    configuration.copy.resources.options.process = configuration.fileCopyHandler.process;
+                    configuration.copy.resources.options.pattern = configuration.fileCopyHandler.pattern;
                 }
             }
 
             var task;
             if (configuration.copy && Object.keys(configuration.copy).length > 0) {
                 // Run Task
-                this.loadPlugin("grunt-contrib-copy");
-                task = this.runTask("copy", configuration.copy, ["resources", "libs"]);
+                this.registerTask("kelper:copy_finalization", function(){
+                    module.copyFiles(configuration.copy);
+                });
+                task = this.runTask("kelper:copy_finalization");
             }
 
             this.configuration = configuration;

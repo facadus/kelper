@@ -1,4 +1,4 @@
-#![Kelper](https://raw.githubusercontent.com/facadus/kelper/master/resources/icon.png)Kelper
+# Kelper [![Build Status](https://travis-ci.org/facadus/kelper.svg?branch=master)](https://travis-ci.org/facadus/kelper)
 
 Kelper is a tool that is based on Grunt and is used for simplifying the process of building projects from source. It is used to compile project with automatically checks for Unit test and UI test mistakes in webpages that are using by project.
 

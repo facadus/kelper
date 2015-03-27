@@ -19,7 +19,8 @@ exports.init = function (grunt) {
             }
         }
 
-        if (module.generateAppNoCache()) {
+        module.configuration.libraries = module.generateAppNoCache();
+        if (module.configuration.libraries) {
             grunt.log.ok("Files are hashed");
         }
     });
@@ -48,6 +49,9 @@ exports.init = function (grunt) {
             }
 
             return configuration;
+        },
+        setConfiguration: function (conf) {
+            configuration = conf;
         },
         makeLibraries: function () {
             var libraries = {};
@@ -102,9 +106,14 @@ exports.init = function (grunt) {
             }
             return null;
         },
-        generateAppNoCache: function () {
-            var libraries = this.makeLibraries();
-            var libs = this.makeLibs();
+        generateAppNoCache: function (cdn) {
+            if(cdn) {
+                var libraries = cdn.libraries;
+                var libs = cdn.libs;
+            }else{
+                var libraries = this.makeLibraries();
+                var libs = this.makeLibs();
+            }
 
             // Gettings path
             var filePath = path.resolve(process.cwd(), configuration.target, "app.nocache.js");
@@ -115,8 +124,8 @@ exports.init = function (grunt) {
             var packageConfig = this.lastConfigurations.compile.packageConfig;
             var deps = [];
 
-            if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0) {
-                fileText += 'window.baseUrl = "' + this.environment.cdnUrl + '";\n';
+            if (cdn) {
+                fileText += 'window.baseUrl = "' + cdn.url + '";\n';
             }
 
             // Parse Libraries
@@ -194,8 +203,8 @@ exports.init = function (grunt) {
 
             fileText += "function __bootstrap(){\n";
             if (libs) {
-                if (grunt.util.kindOf(this.environment.cdnUrl) == "string" && this.environment.cdnUrl.length > 0) {
-                    fileText += "   document.write(\"<script src='" + this.environment.cdnUrl + "base/" + libs + ".js' defer='defer'></script>\");\n";
+                if (cdn) {
+                    fileText += "   document.write(\"<script src='" + cdn.url + "base/" + libs + ".js' defer='defer'></script>\");\n";
                 } else {
                     fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
                 }
@@ -211,11 +220,14 @@ exports.init = function (grunt) {
             // Write to file
             grunt.file.write(filePath, fileText);
 
-            if(typeof this.environment.uglify != "undefined") {
+            if (typeof this.environment.uglify != "undefined") {
                 this.minimize(filePath);
             }
 
-            return true;
+            return {
+                libraries: libraries,
+                libs: libs
+            };
         },
         minimize: function (file) {
             var options = this.mergeObjects({
@@ -243,7 +255,7 @@ exports.init = function (grunt) {
                     options
                 );
                 grunt.file.write(file, minified.min);
-            }catch (ex){
+            } catch (ex) {
                 console.log("Failed to minimize " + file, ex);
                 return false;
             }

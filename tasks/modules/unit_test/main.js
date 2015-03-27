@@ -36,8 +36,9 @@ exports.init = function (grunt) {
             }
 
             this.getConfiguration();
+            var compileConfig = require("../compile/main").init(grunt).getConfiguration();
 
-            var pathToSource = path.normalize(this.lastConfigurations.compile.default.src).replace(path.normalize("**/*.ts"), "");
+            var pathToSource = path.normalize(compileConfig.default.src).replace(path.normalize("**/*.ts"), "");
             var packages = [];
 
             // Parse libraries
@@ -99,11 +100,27 @@ exports.init = function (grunt) {
                 }
             }
 
-            if (this.lastConfigurations.compile.unitTestPattern) {
-                configuration.pattern = this.lastConfigurations.compile.unitTestPattern;
+            // Load user created configuration
+            var userFile = path.resolve(process.cwd(), "config/build/test.js");
+            if (grunt.file.exists(userFile)) {
+                var config = require(userFile)(grunt);
+
+                //Parsing configuration
+                configuration = this.mergeObjects(configuration, this.parse(config));
+            } else {
+                grunt.log.debug(this.name + " user configuration not found, continue");
             }
 
             return configuration;
+        },
+        parse: function(configuration){
+            var parsed = {};
+
+            if (configuration.hasOwnProperty("source")) {
+                parsed.patter = configuration.unitTestPattern;
+            }
+
+            return parsed;
         }
     });
 

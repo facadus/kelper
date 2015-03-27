@@ -9,30 +9,35 @@ module.exports = function (grunt) {
         modulePath: path.normalize(__dirname) + path.sep + "modules",
         operations: [
             "compile",
-            "optimization",
-            "finalization"
+            "test",
+            "build"
         ],
         phase: function (operation) {
             var $operations = [];
-            var operation = (operation != true) ? operation : "finalization";
+            var operation = (operation != true) ? operation : "build";
 
             switch (operation) {
-                case "f":
-                case "finalization":
+                case "b":
+                case "build":
                     $operations.push(
+                        "cdn",
                         "ui_test",
                         "hashconstruction",
-                        "finalization"
+                        "finalization",
+                        "optimization",
+                        "unit_test",
+                        "compile"
                     );
-                case "o":
-                case "optimization":
+                    break;
+                case "t":
+                case "test":
                     $operations.push(
-                        "optimization"
+                        "unit_test"
                     );
+                    break;
                 case "c":
                 case "compile":
                     $operations.push(
-                        "unit_test",
                         "compile"
                     );
                     break;
@@ -117,14 +122,6 @@ module.exports = function (grunt) {
                 });
                 grunt.task.run("kelper:returnConfiguration");
             }
-        });
-    });
-
-    grunt.registerTask("kelper:test", "Build task test", function () {
-        var done = this.async();
-        require('child_process').exec("mocha " + path.resolve(__dirname + "/../test/kelper.test.js"), function (err, stdout) {
-            grunt.log.write(stdout);
-            done(err);
         });
     });
 

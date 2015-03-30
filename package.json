@@ -13,15 +13,16 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "chai": "^2.1.1",
-    "grunt-contrib-requirejs": "^0.4.4",
-    "grunt-contrib-uglify": "^0.8.0",
-    "grunt-mocha-phantomjs": "^0.6.1",
-    "grunt-run-task": "^0.1.2",
-    "grunt-typescript": "^0.6.1",
-    "mocha": "^2.2.1",
+    "chai": "2.2.0",
+    "requirejs": "2.1.16",
+    "grunt-contrib-requirejs": "0.4.4",
+    "grunt-contrib-uglify": "0.8.0",
+    "grunt-mocha-phantomjs": "0.6.1",
+    "grunt-run-task": "0.1.2",
+    "grunt-typescript": "0.6.1",
+    "mocha": "2.2.1",
     "rjs-build-analysis": "0.0.3",
-    "typescript": "^1.4.1"
+    "typescript": "1.4.1"
   },
   "devDependencies": {
     "grunt": "latest",

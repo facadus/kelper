@@ -71,12 +71,12 @@ module.exports = function (grunt) {
         if (!plugin.environment.base.hasOwnProperty("require")) {
             // Prepend RequireJS
             plugin.environment.base = grunt.util._.extend({
-                require: path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
+                require: require.resolve("requirejs").substr(0, require.resolve("requirejs").lastIndexOf("requirejs") + "requirejs".length) + path.sep + "require"
             }, plugin.environment.base);
         }
     } else {
         plugin.environment.base = {
-            "require": path.resolve(__dirname, "../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require")
+            "require": require.resolve("requirejs").substr(0, require.resolve("requirejs").lastIndexOf("requirejs") + "requirejs".length) + path.sep + "require"
         }
     }
 

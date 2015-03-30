@@ -377,6 +377,14 @@ exports.init = function (grunt) {
             compFile = compFile.replace(/\{path_kelper_module}/g, path.relative(process.cwd(), this.modulePath + "/node_modules") + path.sep);
             compFile = compFile.replace(/\{path_kelper_include}/g, path.relative(process.cwd(), this.modulePath + "/include") + path.sep);
 
+            var reqJSpath = path.relative(process.cwd(), require.resolve("requirejs").substr(0, require.resolve("requirejs").lastIndexOf("requirejs") + "requirejs".length));
+            var chaiJSpath = path.relative(process.cwd(), require.resolve("chai").substr(0, require.resolve("chai").lastIndexOf("chai") + "chai".length));
+            var mochaJSpath = path.relative(process.cwd(), require.resolve("mocha").substr(0, require.resolve("mocha").lastIndexOf("mocha") + "mocha".length));
+
+            compFile = compFile.replace(/\{path_requirejs}/g, reqJSpath + path.sep);
+            compFile = compFile.replace(/\{path_chai}/g, chaiJSpath + path.sep);
+            compFile = compFile.replace(/\{path_mocha}/g, mochaJSpath + path.sep);
+
             compFile = compFile.replace(/\{path_compiled}/g, path.relative(process.cwd(), destPath) + path.sep);
 
             var optimization = require("../optimization/main").init(grunt).getConfiguration();

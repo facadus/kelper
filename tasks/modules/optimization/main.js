@@ -47,6 +47,7 @@ exports.init = function (grunt) {
             // Make bundles
             configuration.default.options.done = function (done, output) {
                 var bundles = require('rjs-build-analysis').parse(output);
+
                 var output = {};
                 if (bundles.hasOwnProperty("bundles") && grunt.util.kindOf(bundles.bundles) == "array") {
                     bundles.bundles.forEach(function (bundle) {
@@ -85,6 +86,8 @@ exports.init = function (grunt) {
                         out: path.resolve(newConfig[optModule.name].options.dir, optModule.name, "main.js"),
                         create: true
                     });
+
+                    this.parseConfigs(newConfig[optModule.name]);
 
                     grunt.file.mkdir(
                         path.resolve(newConfig[optModule.name].options.dir, optModule.name)
@@ -270,6 +273,31 @@ exports.init = function (grunt) {
             return {
                 shim: shims
             }
+        },
+        parseConfigs: function (config) {
+            var paths = config.options.paths || {};
+            var excludePaths = [];
+
+            // Filter excluded paths
+            for (var path in paths) {
+                if (paths[path] == "empty:") {
+                    excludePaths.push(path);
+                }
+            }
+
+            // Get paths to remove
+            for (var path in paths) {
+                if (paths[path] !== "empty:") {
+                    excludePaths.forEach(function (exclPath) {
+                        var regEx = new RegExp("^" + exclPath, "i");
+                        if (regEx.test(path)) {
+                            delete paths[path];
+                        }
+                    });
+                }
+            }
+
+            return paths;
         }
     });
 

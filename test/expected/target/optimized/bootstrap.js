@@ -11,7 +11,7 @@ var rootDir = Array(document.location.href.replace(document.location.hash,'').sp
 		window.require.packages = (window.require.packages || []).concat(["application"]);
 
         window.__bootstrap = function () {
-            document.write('<script src="' + rootDir + '../node_modules/grunt-contrib-requirejs/node_modules/requirejs/require.js" defer="defer"></script>');
+            document.write('<script src="' + rootDir + '../node_modules/requirejs/require.js" defer="defer"></script>');
         };
         document.write('<script src="' + rootDir + 'target/compiled/app.nocache.js"></script>');
     };

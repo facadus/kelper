@@ -40,6 +40,13 @@ var rootDir = Array(document.location.href.replace(document.location.hash,'').sp
                 mocha.run();
             }
         };
+
+        if (window.__setupTest) {
+            window.require.callback = function () {
+                window.__setupTest(window.__runTest);
+            };
+        }
+
     } else {
         defaultConfig(window);
     }

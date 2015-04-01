@@ -18,15 +18,6 @@
         document.write('<script src="' + rootDir + '{path_chai}chai.js"></script>');
         document.write('<script src="' + rootDir + '{path_kelper_include}mochaRun.js"></script>');
 
-        if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
-            {replaces}
-            document.write('<base href="' + rootDir + '{path_finalized}">');
-            document.write('<script src="app.nocache.js"></script>');
-        } else {
-            defaultConfig(window);
-        }
-
-        // Setup RunTest function
         window.__runTest = function () {
             if (window.mochaPhantomJS) {
                 mochaPhantomJS.run();
@@ -36,11 +27,19 @@
         };
 
         if (window.__setupTest) {
+            window.require = window.require || {};
             window.require.callback = function () {
                 window.__setupTest(window.__runTest);
             };
         }
 
+        if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
+            {replaces}
+            document.write('<base href="' + rootDir + '{path_finalized}">');
+            document.write('<script src="app.nocache.js"></script>');
+        } else {
+            defaultConfig(window);
+        }
     } else {
         defaultConfig(window);
     }

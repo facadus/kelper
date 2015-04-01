@@ -24,15 +24,6 @@ var rootDir = Array(document.location.href.replace(document.location.hash,'').sp
         document.write('<script src="' + rootDir + '../node_modules/chai/chai.js"></script>');
         document.write('<script src="' + rootDir + '../include/mochaRun.js"></script>');
 
-        if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
-            
-            document.write('<base href="' + rootDir + 'target/finalized/">');
-            document.write('<script src="app.nocache.js"></script>');
-        } else {
-            defaultConfig(window);
-        }
-
-        // Setup RunTest function
         window.__runTest = function () {
             if (window.mochaPhantomJS) {
                 mochaPhantomJS.run();
@@ -42,11 +33,19 @@ var rootDir = Array(document.location.href.replace(document.location.hash,'').sp
         };
 
         if (window.__setupTest) {
+            window.require = window.require || {};
             window.require.callback = function () {
                 window.__setupTest(window.__runTest);
             };
         }
 
+        if (window.mochaPhantomJS && script.getAttribute("test").toLocaleUpperCase() == "UI") {
+            
+            document.write('<base href="' + rootDir + 'target/finalized/">');
+            document.write('<script src="app.nocache.js"></script>');
+        } else {
+            defaultConfig(window);
+        }
     } else {
         defaultConfig(window);
     }

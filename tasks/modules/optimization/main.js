@@ -9,10 +9,21 @@ exports.init = function (grunt) {
     var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
     var configuration = {};
 
+    module.registerTask("addDependencies", "Adding dependencies to files", function () {
+        // Load library
+        var deps = require("./include/dependencies").init(grunt);
+        var depsPath = path.resolve(process.cwd(), configuration.default.options.baseUrl);
+        // Get Modules with dependencies
+        deps.findDependencies(module.environment);
+        deps.addFoundDependenciesToFiles(depsPath);
+    });
+
     util._extend(module, {
         name: path.basename(__dirname),
         run: function () {
             this.getConfiguration();
+
+            this.runTask("addDependencies", {default: {}}, []);
 
             if (this.isNotEmptyObject(this.environment.libraries)) {
                 configuration.default.options = this.mergeObjects(configuration.default.options, this.parseLibraries(this.environment.libraries));

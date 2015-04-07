@@ -20,7 +20,7 @@ exports.init = function (grunt) {
         }
 
         module.configuration.libraries = module.generateAppNoCache();
-        if (module.configuration.libraries) {
+        if (module.configuration.libraries && !grunt.test) {
             grunt.log.ok("Files are hashed");
         }
     });

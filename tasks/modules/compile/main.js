@@ -12,15 +12,6 @@ exports.init = function (grunt) {
     var baseConfig = null;
     var kindOf = grunt.util.kindOf;
 
-    module.registerTask("addDependencies", "Adding dependencies to files", function () {
-        // Load library
-        var deps = require("./include/dependencies").init(grunt);
-        var depsPath = path.resolve(process.cwd(), configuration.default.dest);
-        // Get Modules with dependencies
-        deps.findDependencies(module.environment);
-        deps.addFoundDependenciesToFiles(depsPath);
-    });
-
     util._extend(module, {
         name: path.basename(__dirname),
         run: function () {
@@ -41,11 +32,10 @@ exports.init = function (grunt) {
             // Setting configuration
             this.loadPlugin("grunt-typescript");
             this.configuration = configuration;
-            var task = this.runTask("typescript", {
+
+            return this.runTask("typescript", {
                 default: configuration.default
             });
-            this.runTask("addDependencies", {default: {}}, []);
-            return task;
         },
         getConfiguration: function () {
             // Load default configuration

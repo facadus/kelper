@@ -2,6 +2,7 @@
 
 var path = require("path");
 var fs = require("fs");
+var EoL = require('os').EOL;
 
 var copyPath = path.resolve(process.cwd(), process.argv[2] || "src");
 var BUF_LENGTH = 64 * 1024;
@@ -156,8 +157,8 @@ if (config && config.dependencies) {
                 toAppend.push(rules);
             }
         });
-        fs.appendFileSync(pathToGitIgnore, "\n" + toAppend.join("\n"));
+        fs.appendFileSync(pathToGitIgnore, EoL + toAppend.join(EoL));
     } else {
-        fs.writeFileSync(pathToGitIgnore, "\n" + copiedFF.join("\n"));
+        fs.writeFileSync(pathToGitIgnore, EoL + copiedFF.join(EoL));
     }
 }

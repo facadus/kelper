@@ -1,6 +1,7 @@
 //External modules
 var path = require('path');
 var util = require("util");
+var EoL = require("os").EOL;
 
 // Module Compile
 exports.init = function (grunt) {
@@ -113,9 +114,9 @@ exports.init = function (grunt) {
             var pathToLib = Array(pathRel.split(/[\/\\\\]/).length + 1).join("../");
             var relSourcePath = path.relative(process.cwd(), srcPath);
 
-            var fileText = "window.require = window.require || {};\n";
-            fileText += "\t\twindow.require.baseUrl = rootDir + '" + pathRel + "';\n";
-            fileText += "\t\twindow.require.sourceDir = rootDir + '" + relSourcePath + "/';\n";
+            var fileText = "window.require = window.require || {};" + EoL;
+            fileText += "\t\twindow.require.baseUrl = rootDir + '" + pathRel + "';" + EoL;
+            fileText += "\t\twindow.require.sourceDir = rootDir + '" + relSourcePath + "/';" + EoL;
 
             var deps = [];
             var packages = [];
@@ -168,7 +169,7 @@ exports.init = function (grunt) {
                 }
 
                 if (deps.length > 0) {
-                    fileText += '\t\twindow.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
+                    fileText += '\t\twindow.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);' + EoL;
                 }
             }
 
@@ -220,23 +221,23 @@ exports.init = function (grunt) {
             }
 
             if (deps.concat(packages).length > 0) {
-                fileText += '\t\twindow.require.packages = (window.require.packages || []).concat(["' + deps.concat(packages).join('","') + '"]);\n';
+                fileText += '\t\twindow.require.packages = (window.require.packages || []).concat(["' + deps.concat(packages).join('","') + '"]);' + EoL;
             }
 
             if (this.isNotEmptyObject(packageConfig)) {
-                fileText += '\t\twindow.require.config = window.require.config || {};\n';
+                fileText += '\t\twindow.require.config = window.require.config || {};' + EoL;
                 for (var index in packageConfig) {
-                    fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";\n";
+                    fileText += '\t\twindow.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ";" + EoL;
                 }
             }
 
             if ((this.isNotEmptyObject(this.environment.base) && Object.keys(this.environment.base).length > 1) || this.isNotEmptyObject(this.environment.reqModules) || this.isNotEmptyObject(configuration.default.jsMapping)) {
-                fileText += "\t\twindow.require.paths = window.require.paths || {};\n";
+                fileText += "\t\twindow.require.paths = window.require.paths || {};" + EoL;
 
                 if (kindOf(this.environment.base) == "object") {
                     for (var lib in this.environment.base) {
                         if (lib != "require") {
-                            fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + this.environment.base[lib]).replace(/\\/g, "/") + '";\n';
+                            fileText += '\t\twindow.require.paths["' + lib + '"] = "' + path.normalize(pathToLib + this.environment.base[lib]).replace(/\\/g, "/") + '";' + EoL;
                         }
                     }
                 }
@@ -257,7 +258,7 @@ exports.init = function (grunt) {
                                 process.cwd()
                             ))
                             .replace(/\\/g, "/");
-                        fileText += '\t\twindow.require.paths["' + lib + '"] = "' + reqModulePath + '";\n';
+                        fileText += '\t\twindow.require.paths["' + lib + '"] = "' + reqModulePath + '";' + EoL;
                     }
                 }
 
@@ -273,7 +274,7 @@ exports.init = function (grunt) {
                                     path.resolve(process.cwd(), srcPath),
                                     file.replace(/\.js$/i, "")
                                 ).replace(/\\/g, "/");
-                                fileText += '\t\twindow.require.paths["' + fileMap + '"] = "' + path.join(pathToLib, pathRelToSource, fileMap).replace(/\\/g, "/") + '";\n';
+                                fileText += '\t\twindow.require.paths["' + fileMap + '"] = "' + path.join(pathToLib, pathRelToSource, fileMap).replace(/\\/g, "/") + '";' + EoL;
                             });
                         });
                     }
@@ -282,9 +283,9 @@ exports.init = function (grunt) {
 
             // Copy shims if they exists
             if (this.isNotEmptyObject(this.environment.shim)) {
-                fileText += "\t\twindow.require.shim = window.require.shim || {};\n";
+                fileText += "\t\twindow.require.shim = window.require.shim || {};" + EoL;
                 for (var shim in this.environment.shim) {
-                    fileText += '\t\twindow.require.shim["' + shim + '"] = ' + JSON.stringify(this.environment.shim[shim]) + ';\n';
+                    fileText += '\t\twindow.require.shim["' + shim + '"] = ' + JSON.stringify(this.environment.shim[shim]) + ';' + EoL;
                 }
             }
 
@@ -332,16 +333,16 @@ exports.init = function (grunt) {
             }
 
             if (Object.keys(replaces).length > 0) {
-                var fileText = 'window.require = window.require || {};\n';
-                fileText += '\t\t\twindow.require.map = window.require.map || {};\n';
-                fileText += '\t\t\twindow.require.map["*"] = window.require.map["*"] || {};\n';
+                var fileText = 'window.require = window.require || {};' + EoL;
+                fileText += '\t\t\twindow.require.map = window.require.map || {};' + EoL;
+                fileText += '\t\t\twindow.require.map["*"] = window.require.map["*"] || {};' + EoL;
 
                 for (var key in replaces) {
                     var pathToCompiled = path.relative(
                         process.cwd(),
                         path.resolve(process.cwd(), pathToLib, configuration.default.dest, key)
                     );
-                    fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "' + pathToCompiled + '";\n';
+                    fileText += '\t\t\twindow.require.map["*"]["' + key + '"] = "' + pathToCompiled + '";' + EoL;
                 }
 
                 return fileText;
@@ -358,8 +359,8 @@ exports.init = function (grunt) {
             var bootstrap = path.resolve(destPath, "bootstrap.js");
             var defBootstrap = path.resolve(__dirname, "config/bootstrap.js");
 
-            var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];\n";
-            fileText += "var rootDir = Array(document.location.href.replace(document.location.hash,'').split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');\n";
+            var fileText = "var script = ('currentScript' in document) ? document.currentScript : document.getElementsByTagName('script')[document.getElementsByTagName('script').length - 1];" + EoL;
+            fileText += "var rootDir = Array(document.location.href.replace(document.location.hash,'').split(/[\/\\\\]/).filter(function(e, i){return script.src.split(/[\/\\\\]/)[i] !== e;}).length).join('../');" + EoL;
 
             var compFile = grunt.file.read(defBootstrap);
             compFile = compFile.replace(/\{compiled}/g, this.generateConfigFile(srcPath));

@@ -1,8 +1,7 @@
 //External modules
 var path = require('path');
 var util = require("util");
-var crypt = require("crypto");
-var fs = require('fs');
+var EoL = require('os').EOL;
 
 // Module Compile
 exports.init = function (grunt) {
@@ -60,7 +59,7 @@ exports.init = function (grunt) {
             var cdnFile = path.resolve(process.cwd(), this.lastConfigurations.finalization.target, configuration.cdnFile);
             var output = "";
             for(var file in files){
-                output += file + path.sep + files[file] + ".js\n";
+                output += file + path.sep + files[file] + ".js" + EoL;
             }
             grunt.file.write(cdnFile, output);
             return true;

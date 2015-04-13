@@ -3,6 +3,7 @@ var path = require('path');
 var util = require("util");
 var crypt = require("crypto");
 var fs = require('fs');
+var EoL = require("os").EOL;
 
 // Module Compile
 exports.init = function (grunt) {
@@ -117,7 +118,7 @@ exports.init = function (grunt) {
 
             // Gettings path
             var filePath = path.resolve(process.cwd(), configuration.target, "app.nocache.js");
-            var fileText = "window.require = window.require || {};\n";
+            var fileText = "window.require = window.require || {};" + EoL;
 
             var libPackages = [];
             var staticPackages = [];
@@ -125,7 +126,7 @@ exports.init = function (grunt) {
             var deps = [];
 
             if (cdn) {
-                fileText += 'window.baseUrl = "' + cdn.url + '";\n';
+                fileText += 'window.baseUrl = "' + cdn.url + '";' + EoL;
             }
 
             // Parse Libraries
@@ -168,48 +169,48 @@ exports.init = function (grunt) {
 
             // Deps
             if (deps.length > 0) {
-                fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);\n';
+                fileText += 'window.require.deps = (window.require.deps || []).concat(["' + deps.join('","') + '"]);' + EoL;
             }
 
             var packages = libPackages.concat(staticPackages);
             if (packages.length > 0) {
-                fileText += 'window.require.packages = (window.require.packages || []).concat(' + JSON.stringify(packages) + ');\n';
+                fileText += 'window.require.packages = (window.require.packages || []).concat(' + JSON.stringify(packages) + ');' + EoL;
             }
 
             // Bundles
             if (this.lastConfigurations.optimization.hasOwnProperty("bundles")) {
-                fileText += "window.require.bundles = window.require.bundles || {};\n";
+                fileText += "window.require.bundles = window.require.bundles || {};" + EoL;
                 for (var bundle in this.lastConfigurations.optimization.bundles) {
                     if (deps.indexOf(bundle) == -1) {
-                        fileText += 'window.require.bundles["' + bundle + '"] = ' + JSON.stringify(this.lastConfigurations.optimization.bundles[bundle]) + ';\n';
+                        fileText += 'window.require.bundles["' + bundle + '"] = ' + JSON.stringify(this.lastConfigurations.optimization.bundles[bundle]) + ';' + EoL;
                     }
                 }
             }
 
             if (Object.keys(packageConfig).length > 0) {
-                fileText += "window.require.config = window.require.config || {};\n";
+                fileText += "window.require.config = window.require.config || {};" + EoL;
                 for (var index in packageConfig) {
-                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ';\n';
+                    fileText += 'window.require.config["' + index + '"] = ' + JSON.stringify(packageConfig[index]) + ';' + EoL;
                 }
             }
 
             // Copy shims if they exists
             if (this.isNotEmptyObject(this.environment.shim)) {
-                fileText += "window.require.shim = window.require.shim || {};\n";
+                fileText += "window.require.shim = window.require.shim || {};" + EoL;
                 for (var shim in this.environment.shim) {
-                    fileText += 'window.require.shim["' + shim + '"] = ' + JSON.stringify(this.environment.shim[shim]) + ';\n';
+                    fileText += 'window.require.shim["' + shim + '"] = ' + JSON.stringify(this.environment.shim[shim]) + ';' + EoL;
                 }
             }
 
-            fileText += "function __bootstrap(){\n";
+            fileText += "function __bootstrap(){" + EoL;
             if (libs) {
                 if (cdn) {
-                    fileText += "   document.write(\"<script src='" + cdn.url + "base/" + libs + ".js' defer='defer'></script>\");\n";
+                    fileText += "   document.write(\"<script src='" + cdn.url + "base/" + libs + ".js' defer='defer'></script>\");" + EoL;
                 } else {
-                    fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");\n";
+                    fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");" + EoL;
                 }
             }
-            fileText += "}\n";
+            fileText += "}" + EoL;
             fileText += grunt.file.read(
                 path.resolve(process.cwd(), configuration.source, "app.nocache.js")
             );

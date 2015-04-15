@@ -157,7 +157,10 @@ if (config && config.dependencies) {
                 toAppend.push(rules);
             }
         });
-        fs.appendFileSync(pathToGitIgnore, EoL + toAppend.join(EoL));
+
+        if (toAppend.length > 0) {
+            fs.appendFileSync(pathToGitIgnore, EoL + toAppend.join(EoL));
+        }
     } else {
         fs.writeFileSync(pathToGitIgnore, EoL + copiedFF.join(EoL));
     }

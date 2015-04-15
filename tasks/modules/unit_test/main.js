@@ -101,10 +101,9 @@ exports.init = function (grunt) {
             }
 
             // Load user created configuration
-            var userFile = path.resolve(process.cwd(), "config/build/test.js");
-            if (grunt.file.exists(userFile)) {
-                var config = require(userFile)(grunt);
-
+            var userFile = grunt.config.get("kelper");
+            if (userFile && userFile["test"] && typeof userFile["test"] == "function") {
+                var config = (userFile[this.name])();
                 //Parsing configuration
                 configuration = this.mergeObjects(configuration, this.parse(config));
             } else {

@@ -53,7 +53,7 @@ module.exports = function (grunt) {
     // Loading Environment file
     var env_file = grunt.option('target') || grunt.option('t') || 'local';
     try {
-        var env_path = path.resolve(process.cwd(), "config/target", env_file);
+        var env_path = path.resolve(process.cwd(), "config", env_file);
         if (grunt.file.exists(env_path + ".json")) {
             plugin.environment = grunt.file.readJSON(env_path + ".json");
         } else if (grunt.file.exists(env_path + ".yml")) {
@@ -92,9 +92,9 @@ module.exports = function (grunt) {
     //    plugin.environment.reqModules[name] = "{path.fromKelper}/" + path.relative(path.dirname(__dirname), requireModule);
     //});
 
-    var userFile = path.resolve(process.cwd(), "config/build/compile.js");
-    if (grunt.file.exists(userFile)) {
-        var config = require(userFile)(grunt);
+    var userFile = grunt.config.get("kelper");
+    if (userFile && userFile['compile'] && typeof userFile['compile'] == "function") {
+        var config = userFile['compile']();
         if (config.hasOwnProperty("plugins")) {
             config.plugins.forEach(function (reqPlugin) {
                 plugin.environment.reqModules[path.basename(reqPlugin)] = "{path.fromRoot}/" + reqPlugin;

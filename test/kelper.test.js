@@ -9,17 +9,41 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 var should = require('chai').should();
 
+// Setting up Test options
+grunt.file.setBase(__dirname);
+if (grunt.file.exists("target")) {
+    grunt.file.delete("target", {force: true});
+}
+grunt.test = true;
+
+grunt.initConfig({
+    kelper: {
+        compile: function (defaults) {
+            return {
+                source: "src",
+                target: "target/compiled"
+            }
+        },
+        optimization: function () {
+            return {
+                source: "target/compiled",
+                target: "target/optimized"
+            }
+        },
+        finalization: function () {
+            return {
+                resourcePath: "resources",
+                source: "target/optimized",
+                target: "target/finalized"
+            }
+        }
+    }
+});
+
 describe("Kelper", function () {
 
     var lastPhase = "build";
     var oldConfig = {};
-
-    // Setting up Test options
-    grunt.file.setBase(__dirname);
-    if(grunt.file.exists("target")) {
-        grunt.file.delete("target", {force: true});
-    }
-    grunt.test = true;
 
     beforeEach(function () {
         grunt.file.setBase(__dirname);

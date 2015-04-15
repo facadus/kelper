@@ -52,14 +52,12 @@ exports.init = function (grunt) {
             }
 
             // Load user created configuration
-            var userFile = path.resolve(process.cwd(), "config/build", this.name + ".js");
-            if (grunt.file.exists(userFile)) {
-                var config = require(userFile)(grunt, {
+            var userFile = grunt.config.get("kelper");
+            if (userFile && userFile[this.name] && typeof userFile[this.name] == "function") {
+                var config = (userFile[this.name])({
                     source: path.resolve(process.cwd(), configuration.default.sourcePath),
                     target: path.resolve(process.cwd(), configuration.default.dest)
                 });
-
-                //Parsing configuration
                 configuration = this.mergeObjects(configuration, this.parse(config));
             } else {
                 grunt.log.debug(this.name + " user configuration not found, continue");
@@ -150,7 +148,7 @@ exports.init = function (grunt) {
                                     });
 
                                     if (pkg.config) {
-                                        for(var conf in pkg.config){
+                                        for (var conf in pkg.config) {
                                             moduleList.push({
                                                 moduleName: packageName + "/" + conf,
                                                 packageName: packageName,
@@ -188,7 +186,7 @@ exports.init = function (grunt) {
                             });
 
                             if (pkg.config) {
-                                for(var conf in pkg.config){
+                                for (var conf in pkg.config) {
                                     moduleList.push({
                                         moduleName: packageName + "/" + conf,
                                         packageName: packageName,

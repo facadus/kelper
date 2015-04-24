@@ -1,6 +1,6 @@
 /// <reference path="../require.d.ts" />
 
-export class Application{
+class Common{
     greeting: string;
     constructor(message: string) {
         this.greeting = message;
@@ -9,3 +9,5 @@ export class Application{
         return "Hello, " + this.greeting;
     }
 }
+
+export = Common;

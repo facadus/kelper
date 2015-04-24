@@ -1,14 +1,14 @@
 /// <reference path="../require.d.ts" />
 define(["require", "exports"], function (require, exports) {
-    var Application = (function () {
-        function Application(message) {
+    var Common = (function () {
+        function Common(message) {
             this.greeting = message;
         }
-        Application.prototype.greet = function () {
+        Common.prototype.greet = function () {
             return "Hello, " + this.greeting;
         };
-        return Application;
+        return Common;
     })();
-    exports.Application = Application;
+    return Common;
 });
 //# sourceMappingURL=main.js.map

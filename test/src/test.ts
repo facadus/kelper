@@ -1,5 +1,5 @@
-import app = require("application/main");
+import Common = require("common/main");
 
 export
-var greeter = new app.Application("world");
+var greeter = new Common("world");
 greeter.greet();

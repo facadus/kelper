@@ -8,7 +8,8 @@ var rootDir = Array(document.location.href.replace(document.location.hash,'').sp
         window.require = window.require || {};
 		window.require.baseUrl = rootDir + 'target/compiled';
 		window.require.sourceDir = rootDir + 'src/';
-		window.require.packages = (window.require.packages || []).concat(["application"]);
+		window.require.deps = (window.require.deps || []).concat(["common"]);
+		window.require.packages = (window.require.packages || []).concat(["common","common"]);
 
         window.__bootstrap = function () {
             document.write('<script src="' + rootDir + '../node_modules/requirejs/require.js" defer="defer"></script>');

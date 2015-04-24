@@ -1,5 +1,5 @@
 /// <reference path="../require.d.ts" />
-define('common/main',["require", "exports"], function (require, exports) {
+define(["require", "exports"], function (require, exports) {
     var Common = (function () {
         function Common(message) {
             this.greeting = message;
@@ -11,8 +11,4 @@ define('common/main',["require", "exports"], function (require, exports) {
     })();
     return Common;
 });
-//# sourceMappingURL=main.js.map;
-define('common', ['common/main'], function (main) { return main; });
-
-
-define("application", function(){});
+//# sourceMappingURL=main.js.map

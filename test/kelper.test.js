@@ -123,13 +123,16 @@ describe("Kelper", function () {
                     if (err) {
                         done(err);
                     } else {
-                        var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/optimized/**/*.js"));
-                        files.forEach(function (file) {
-                            var fromFile = grunt.file.read(file);
-                            var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimized/", path.relative(__dirname + "/expected/target/optimized", file)));
-                            should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
-                        });
-                        done();
+                        // Fixing - Async tasks - 0.5 seconds
+                        setTimeout(function () {
+                            var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/optimized/**/*.js"));
+                            files.forEach(function (file) {
+                                var fromFile = grunt.file.read(file);
+                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimized/", path.relative(__dirname + "/expected/target/optimized", file)));
+                                should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
+                            });
+                            done();
+                        }, 500);
                     }
                 });
             });
@@ -165,24 +168,22 @@ describe("Kelper", function () {
                 module.environment = plugin.environment;
                 module.lastConfigurations = oldConfig;
 
-                // Fixing - Async - 0 seconds
-                setTimeout(function () {
-                    var task = module.run();
-                    oldConfig["hashconstruction"] = module.configuration;
-                    task.run(function (err) {
-                        if (err) {
-                            done(err);
-                        } else {
-                            var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"));
-                            files.forEach(function (file) {
-                                var fromFile = grunt.file.read(file);
-                                var toFile = grunt.file.read(path.resolve(__dirname + "/target/optimization/", path.relative(__dirname + "/expected/target/optimization", file)));
-                                should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
-                            });
-                            done();
-                        }
-                    });
-                }, 0);
+                var task = module.run();
+                oldConfig["hashconstruction"] = module.configuration;
+                task.run(function (err) {
+                    if (err) {
+                        done(err);
+                    } else {
+                        // Fixing - Async - 0 seconds
+                        var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/hashconstruction/**/*.js"));
+                        files.forEach(function (file) {
+                            var fromFile = grunt.file.read(file);
+                            var toFile = grunt.file.read(path.resolve(__dirname + "/target/finalized/", path.relative(__dirname + "/expected/target/finalized", file)));
+                            should.equal(fromFile.replace(/(\r\n|\n|\r)/gm, ""), toFile.replace(/(\r\n|\n|\r)/gm, ""), "Files are not same (target and expected)");
+                        });
+                        done();
+                    }
+                });
             });
         });
     });

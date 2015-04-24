@@ -11,11 +11,19 @@ exports.init = function (grunt) {
 
     module.registerTask("addDependencies", "Adding dependencies to files", function () {
         // Load library
-        var deps = require("./include/dependencies").init(grunt);
+        var deps = require("./include/depsAdder").init(grunt);
         var depsPath = path.resolve(process.cwd(), configuration.default.options.baseUrl);
         // Get Modules with dependencies
         deps.findDependencies(module.environment);
         deps.addFoundDependenciesToFiles(depsPath);
+    });
+
+    module.registerTask("replaceDependencies", "Replacing dependencies to files", function () {
+        // Load library
+        var deps = require("./include/depsReplacer").init(grunt);
+        var depsPath = path.resolve(process.cwd(), configuration.default.options.baseUrl);
+        // Get Modules with dependencies
+        deps.replaceDependencies();
     });
 
     util._extend(module, {
@@ -93,8 +101,8 @@ exports.init = function (grunt) {
                         name: optModule.name,
                         include: optModule.include,
                         exclude: excludes,
-                        insertRequire: optModule.insertRequire,
                         out: path.resolve(newConfig[optModule.name].options.dir, optModule.name, "main.js"),
+                        requireDeps: optModule.insertRequire,
                         create: true
                     });
 
@@ -116,7 +124,9 @@ exports.init = function (grunt) {
             this.loadPlugin("grunt-contrib-requirejs");
 
             if (Object.keys(newConfig).length > 1) {
-                return this.runTask("requirejs", newConfig, Object.keys(newConfig));
+                var tasks = this.runTask("requirejs", newConfig, Object.keys(newConfig));
+                this.runTask("replaceDependencies", newConfig, Object.keys(newConfig));
+                return tasks;
             }
 
             return this.runTask("requirejs", newConfig);
@@ -308,6 +318,10 @@ exports.init = function (grunt) {
             }
 
             return paths;
+        },
+        createModule: function(fileName, dest, modules){
+            var fileText = 'define("' + dest + '", ["' + modules.join('","') + '"], function(){});';
+            grunt.file.write(fileName, fileText);
         }
     });
 

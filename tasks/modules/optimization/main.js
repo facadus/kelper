@@ -70,12 +70,19 @@ exports.init = function (grunt) {
                 var output = {};
                 if (bundles.hasOwnProperty("bundles") && grunt.util.kindOf(bundles.bundles) == "array") {
                     bundles.bundles.forEach(function (bundle) {
-                        var parent = path.relative(process.cwd() + path.sep + configuration.default.options.dir, bundle.parent.substr(0, bundle.parent.lastIndexOf('/main')) || bundle.parent);
+                        var parent = path.relative(
+                            path.resolve(process.cwd(), configuration.default.options.dir),
+                            bundle.parent.substr(0, bundle.parent.lastIndexOf('/main')) || bundle.parent
+                        );
+                        
                         output[parent] = bundle.children.map(function (bnd) {
                             if (/^[\w]+!/.test(bnd)) {
                                 return bnd;
                             } else {
-                                return path.relative(process.cwd() + path.sep + configuration.default.options.baseUrl, bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/");
+                                return path.relative(
+                                    path.resolve(process.cwd(), configuration.default.options.baseUrl),
+                                    (bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/")
+                                );
                             }
                         });
                     });

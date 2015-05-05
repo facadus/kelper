@@ -18,6 +18,7 @@ exports.init = function (grunt) {
                 all: {
                     options: {
                         reporter: reporter,
+                        'ignore-resource-errors': true,
                         urls: module.configuration.uiTests.map(function (item) {
                             return "file:///" + item;
                         })

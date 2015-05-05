@@ -12,10 +12,12 @@ exports.init = function (grunt) {
     module.registerTask('UITests', 'Build task', function () {
 
         if (grunt.util.kindOf(module.configuration.uiTests) == "array" && module.configuration.uiTests.length > 0) {
+            var reporter = module.getMochaReporter();
             module.loadPlugin("grunt-mocha-phantomjs");
             module.runTask("mocha_phantomjs", {
                 all: {
                     options: {
+                        reporter: reporter,
                         urls: module.configuration.uiTests.map(function (item) {
                             return "file:///" + item;
                         })

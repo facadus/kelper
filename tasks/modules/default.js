@@ -159,6 +159,15 @@ exports.init = function (grunt) {
             }
 
             return true;
+        },
+        getMochaReporter: function(){
+            var oldReporter = path.resolve(this.modulePath, "include/kelper-reporter.js");
+            var newReporter = path.resolve(
+                require.resolve("mocha").substr(0, require.resolve("mocha").lastIndexOf("mocha") + "mocha".length),
+                "lib/reporters/kelper-reporters"
+            );
+            grunt.file.copy(oldReporter, newReporter + ".js");
+            return newReporter;
         }
     }
 };

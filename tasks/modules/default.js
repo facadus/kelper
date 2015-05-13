@@ -160,14 +160,19 @@ exports.init = function (grunt) {
 
             return true;
         },
-        getMochaReporter: function(){
-            var oldReporter = path.resolve(this.modulePath, "include/kelper-reporter.js");
-            var newReporter = path.resolve(
-                require.resolve("mocha").substr(0, require.resolve("mocha").lastIndexOf("mocha") + "mocha".length),
-                "lib/reporters/kelper-reporters"
-            );
-            grunt.file.copy(oldReporter, newReporter + ".js");
-            return newReporter;
+        getMochaReporter: function () {
+            var reporter = (grunt.config('kelper') || grunt.config('kelper').options) ? grunt.config('kelper').options.testReporter : undefined;
+            if (reporter) {
+                var oldReporter = path.resolve(process.cwd(), reporter);
+                var newReporter = path.resolve(
+                    require.resolve("mocha").substr(0, require.resolve("mocha").lastIndexOf("mocha") + "mocha".length),
+                    "lib/reporters/",
+                    "kelper-" + path.basename(reporter, ".js")
+                );
+                grunt.file.copy(oldReporter, newReporter + ".js");
+                return newReporter;
+            }
+            return "spec";
         }
     }
 };

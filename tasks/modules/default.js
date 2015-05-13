@@ -163,10 +163,18 @@ exports.init = function (grunt) {
         getMochaReporter: function () {
             var reporter = (grunt.config('kelper') || grunt.config('kelper').options) ? grunt.config('kelper').options.testReporter : undefined;
             if (reporter) {
+                var mochaReporterDir = path.resolve(
+                    require.resolve("mocha").substr(0, require.resolve("mocha").lastIndexOf("mocha") + "mocha".length),
+                    "lib/reporters/"
+                );
+
+                if (grunt.file.exists(mochaReporterDir + path.sep + reporter + ".js")) {
+                    return reporter;
+                }
+
                 var oldReporter = path.resolve(process.cwd(), reporter);
                 var newReporter = path.resolve(
-                    require.resolve("mocha").substr(0, require.resolve("mocha").lastIndexOf("mocha") + "mocha".length),
-                    "lib/reporters/",
+                    mochaReporterDir,
                     "kelper-" + path.basename(reporter, ".js")
                 );
                 grunt.file.copy(oldReporter, newReporter + ".js");

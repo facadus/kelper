@@ -82,7 +82,7 @@ exports.init = function (grunt) {
                                 return path.relative(
                                     path.resolve(process.cwd(), configuration.default.options.baseUrl),
                                     (bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/")
-                                );
+                                ).replace(/\\/g, "/");
                             }
                         });
                     });

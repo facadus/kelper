@@ -161,7 +161,7 @@ exports.init = function (grunt) {
             return true;
         },
         getMochaReporter: function () {
-            var reporter = (grunt.config('kelper') || grunt.config('kelper').options) ? grunt.config('kelper').options.testReporter : undefined;
+            var reporter = (grunt.config('kelper') && grunt.config('kelper').options) ? grunt.config('kelper').options.testReporter : undefined;
             if (reporter) {
                 var mochaReporterDir = path.resolve(
                     require.resolve("mocha").substr(0, require.resolve("mocha").lastIndexOf("mocha") + "mocha".length),

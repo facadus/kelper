@@ -69,16 +69,28 @@ exports.init = function (grunt) {
 
                 var output = {};
                 if (bundles.hasOwnProperty("bundles") && grunt.util.kindOf(bundles.bundles) == "array") {
+
+                    var reqModules = [];
+                    for (var reqMod in module.environment.reqModules) {
+                        reqModules.push(
+                            module.environment.reqModules[reqMod].replace("{path.fromRoot}", process.cwd().replace(/\\/g, "/"))
+                        );
+                    }
+
                     bundles.bundles.forEach(function (bundle) {
                         var parent = path.relative(
                             path.resolve(process.cwd(), configuration.default.options.dir),
                             bundle.parent.substr(0, bundle.parent.lastIndexOf('/main')) || bundle.parent
                         );
-                        
+
                         output[parent] = bundle.children.map(function (bnd) {
                             if (/^[\w]+!/.test(bnd)) {
                                 return bnd;
                             } else {
+                                if (reqModules.indexOf((bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/")) > -1) {
+                                    return false;
+                                }
+
                                 return path.relative(
                                     path.resolve(process.cwd(), configuration.default.options.baseUrl),
                                     (bnd.substr(0, bnd.lastIndexOf('.')) || bnd).replace(/\\/g, "/")
@@ -326,7 +338,7 @@ exports.init = function (grunt) {
 
             return paths;
         },
-        createModule: function(fileName, dest, modules){
+        createModule: function (fileName, dest, modules) {
             var fileText = 'define("' + dest + '", ["' + modules.join('","') + '"], function(){});';
             grunt.file.write(fileName, fileText);
         }

@@ -46,6 +46,11 @@ module.exports = function (grunt) {
             }
 
             $operations.reverse();
+
+            if (grunt.option('skipTests')) {
+                $operations = grunt.util._.without($operations, 'unit_test', 'ui_test');
+            }
+
             return $operations;
         }
     };
@@ -117,7 +122,7 @@ module.exports = function (grunt) {
                     module.run();
                     oldConfig[moduleName] = module.configuration;
                 });
-                grunt.registerTask("kelper:returnConfiguration", function(){
+                grunt.registerTask("kelper:returnConfiguration", function () {
                     grunt.config.init(defConfiguration);
                 });
                 grunt.task.run("kelper:returnConfiguration");

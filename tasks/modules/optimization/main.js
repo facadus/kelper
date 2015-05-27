@@ -7,14 +7,14 @@ exports.init = function (grunt) {
     'use strict';
 
     var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
+    var deps = require("./include/depsAdder").init(grunt);
+
     var configuration = {};
+    var moduleIncludes = {};
 
     module.registerTask("addDependencies", "Adding dependencies to files", function () {
-        // Load library
-        var deps = require("./include/depsAdder").init(grunt);
         var depsPath = path.resolve(process.cwd(), configuration.default.options.baseUrl);
         // Get Modules with dependencies
-        deps.findDependencies(module.environment);
         deps.addFoundDependenciesToFiles(depsPath);
     });
 
@@ -30,6 +30,10 @@ exports.init = function (grunt) {
         name: path.basename(__dirname),
         run: function () {
             this.getConfiguration();
+
+            // Load library
+            deps.findDependencies(module.environment);
+            moduleIncludes = deps.getIncludes(this.lastConfigurations.compile.default.sourcePath);
 
             this.runTask("addDependencies", {default: {}}, []);
 
@@ -114,6 +118,12 @@ exports.init = function (grunt) {
                         optModule.exclude.forEach(function (mdl) {
                             newConfig[optModule.name].options.paths[mdl] = "empty:";
                         });
+                    }
+
+                    for(var mInc in moduleIncludes){
+                        if(optModule.include.indexOf(mInc) > -1){
+                            optModule.include = optModule.include.concat(moduleIncludes[mInc]);
+                        }
                     }
 
                     this.smartMerge(newConfig[optModule.name].options, {

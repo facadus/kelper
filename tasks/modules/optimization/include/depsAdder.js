@@ -3,7 +3,8 @@ var path = require("path");
 exports.init = function (grunt) {
     'use strict';
 
-    var dependencies = [];
+    var dependencies = {};
+    var includes = {};
 
     return {
         findDependencies: function (environment) {
@@ -47,7 +48,7 @@ exports.init = function (grunt) {
                 }
             }
 
-            return dependencies;
+            return this.parseDependencies(dependencies);
         },
         addFoundDependenciesToFiles: function (filePath) {
             for (var deps in dependencies) {
@@ -103,6 +104,43 @@ exports.init = function (grunt) {
                     grunt.file.write(file, openFile);
                 }
             }
+        },
+        parseDependencies: function (deps) {
+            for (var dep in deps) {
+                var tempDep = [];
+                deps[dep].forEach(function (value, index) {
+                    if (value.charAt(0) == '~') {
+                        includes[dep] = (includes[dep] || []).concat(deps[dep][index]);
+                    } else {
+                        tempDep.push(deps[dep][index]);
+                    }
+                });
+                deps[dep] = tempDep;
+
+                if (deps[dep].length == 0) {
+                    delete deps[dep];
+                }
+            }
+
+            return deps;
+        },
+        getIncludes: function (sourceDir) {
+            for (var incl in includes) {
+                includes[incl].forEach(function(value, index){
+                    includes[incl][index] = value.substring(1);
+                });
+
+                var files = [];
+                grunt.file.expand({
+                    cwd: path.resolve(process.cwd(), sourceDir, incl)
+                }, includes[incl]).forEach(function(value){
+                    var file = path.join(incl, value.substr(0, value.lastIndexOf('.')) || value).replace(/\\/g, "/");
+                    files.push(file);
+                });
+
+                includes[incl] = files;
+            }
+            return includes;
         }
     }
 };

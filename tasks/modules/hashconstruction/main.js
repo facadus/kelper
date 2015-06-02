@@ -126,7 +126,7 @@ exports.init = function (grunt) {
             var deps = [];
 
             if (cdn) {
-                fileText += 'window.baseUrl = "' + cdn.url + '";' + EoL;
+                fileText += 'window.require.baseUrl = "' + cdn.url + '";' + EoL;
             }
 
             // Parse Libraries

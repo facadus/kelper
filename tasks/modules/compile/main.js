@@ -74,10 +74,10 @@ exports.init = function (grunt) {
                 parsed.sourcePath = path.resolve(process.cwd(), configuration.source);
                 parsed.src = path.resolve(parsed.sourcePath, "**/*.ts");
                 if (parsed.hasOwnProperty("options")) {
-                    parsed.options.basePath = path.normalize(configuration.source);
+                    parsed.options.rootDir = path.normalize(configuration.source);
                 } else {
                     parsed.options = {
-                        basePath: path.normalize(configuration.source)
+                        rootDir: path.normalize(configuration.source)
                     }
                 }
             }

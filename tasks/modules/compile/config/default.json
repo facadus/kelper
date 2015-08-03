@@ -6,7 +6,7 @@
     "options": {
       "module": "amd",
       "sourceMap": true,
-      "basePath": "src",
+      "rootDir": "src",
       "target": "es5"
     }
   }

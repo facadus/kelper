@@ -82,6 +82,12 @@ exports.init = function (grunt) {
                 }
             }
 
+            if (configuration.hasOwnProperty("typescript")) {
+                for (var prop in configuration.typescript) {
+                    parsed.options[prop] = configuration.typescript[prop];
+                }
+            }
+
             if (configuration.hasOwnProperty("target")) {
                 parsed.dest = path.resolve(process.cwd(), configuration.target);
             }

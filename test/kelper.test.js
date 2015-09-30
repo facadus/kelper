@@ -21,7 +21,10 @@ grunt.initConfig({
         compile: function (defaults) {
             return {
                 source: "src",
-                target: "target/compiled"
+                target: "target/compiled",
+                typescript: {
+                    declaration: true
+                }
             }
         },
         optimization: function () {
@@ -98,7 +101,10 @@ describe("Kelper", function () {
                     if (err) {
                         done(err);
                     } else {
-                        var files = grunt.file.expand(path.normalize(__dirname + "/expected/target/compiled/**/*.js"));
+                        var files = grunt.file.expand([
+                            path.normalize(__dirname + "/expected/target/compiled/**/*.d.ts"),
+                            path.normalize(__dirname + "/expected/target/compiled/**/*.js")
+                        ]);
                         files.forEach(function (file) {
                             var fromFile = grunt.file.read(file);
                             var toFile = grunt.file.read(path.resolve(__dirname + "/target/compiled/", path.relative(__dirname + "/expected/target/compiled", file)));

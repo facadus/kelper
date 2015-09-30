@@ -83,6 +83,9 @@ exports.init = function (grunt) {
             }
 
             if (configuration.hasOwnProperty("typescript")) {
+                if (!parsed.hasOwnProperty("options")) {
+                    parsed.options = {};
+                }
                 for (var prop in configuration.typescript) {
                     parsed.options[prop] = configuration.typescript[prop];
                 }

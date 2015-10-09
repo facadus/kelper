@@ -211,6 +211,7 @@ exports.init = function (grunt) {
                 paths: {}
             };
 
+            var skipPaths = {};
             for (var libraryName in source) {
                 var library = source[libraryName];
 
@@ -228,11 +229,16 @@ exports.init = function (grunt) {
                             if (typeof pkg == "boolean") {
                                 excludes.push(packageName);
                             } else {
+                                if (pkg.skip) {
+                                    skipPaths[packageName] = 'empty:';
+                                }
                                 includes.push(packageName);
 
-                                includeRequire.push(
-                                    pkg.requireName ? pkg.requireName : packageName
-                                );
+                                if (!pkg.skipRequire) {
+                                    includeRequire.push(
+                                        pkg.requireName ? pkg.requireName : packageName
+                                    );
+                                }
 
                                 if (pkg.replace) {
                                     parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);

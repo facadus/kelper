@@ -261,6 +261,8 @@ exports.init = function (grunt) {
                 parsed.packages = parsed.packages.concat(includes);
             }
 
+            parsed.paths = this.mergeObjects(parsed.paths, skipPaths);
+
             return parsed;
         },
         parseBaseLibs: function (libs) {

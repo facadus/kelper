@@ -4,11 +4,23 @@ var runTask = require("grunt-run-task");
 exports.init = function (grunt) {
     'use strict';
 
+    function resovePath(initDir, module) {
+        var currentDir = initDir;
+        while (!grunt.file.exists(currentDir, "node_modules", module, "package.json")) {
+            var parentDir = path.dirname(currentDir);
+            if (!parentDir || parentDir === currentDir) {
+                throw new Error("Module " + module + " is not found. Is it installed?");
+            }
+            currentDir = parentDir;
+        }
+        return currentDir;
+    }
+
     return {
         loadPlugin: function (pluginName) {
             var cwd = process.cwd();
             try {
-                process.chdir(this.modulePath);
+                process.chdir(resovePath(this.modulePath, pluginName));
                 if (grunt.hasOwnProperty("test") && grunt.test) {
                     runTask.loadNpmTasks(pluginName);
                 } else {

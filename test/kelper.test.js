@@ -88,6 +88,7 @@ describe("Kelper", function () {
     // Run modules and watch for results
     describe("Run modules and watch for results", function () {
         describe("Compile module", function () {
+            this.timeout(5000);
             it("Run and check compiled files", function (done) {
                 var module = require(plugin.configuration.modulePath + path.sep + "compile" + path.sep + "main").init(grunt);
                 module.modulePath = path.dirname(plugin.configuration.builderPath);

@@ -9,6 +9,18 @@ var EoL = require("os").EOL;
 exports.init = function (grunt) {
     'use strict';
 
+    function resovePath(initDir, module) {
+        var currentDir = initDir;
+        while (!grunt.file.exists(currentDir, "node_modules", module, "package.json")) {
+            var parentDir = path.dirname(currentDir);
+            if (!parentDir || parentDir === currentDir) {
+                throw new Error("Module " + module + " is not found. Is it installed?");
+            }
+            currentDir = parentDir;
+        }
+        return currentDir;
+    }
+
     var module = require(path.join(path.dirname(__dirname), "default")).init(grunt);
     var configuration = {};
 
@@ -246,7 +258,7 @@ exports.init = function (grunt) {
             }, this.lastConfigurations.finalization.uglify.options);
 
             var uglify = require(
-                path.resolve(this.modulePath, "node_modules/grunt-contrib-uglify/tasks/lib/uglify")
+                path.join(resovePath(this.modulePath, 'grunt-contrib-uglify'), 'node_modules', 'grunt-contrib-uglify', 'tasks', 'lib', 'uglify')
             ).init(grunt);
 
             try {

@@ -40,7 +40,7 @@ exports.init = function (grunt) {
             this.getConfiguration();
             var compileConfig = require("../compile/main").init(grunt).getConfiguration();
 
-            var pathToSource = path.normalize(compileConfig.default.src).replace(path.normalize("**/*.ts"), "");
+            var pathToSource = path.normalize(compileConfig.default.src).replace(path.normalize("**/*.ts*"), "");
             var packages = [];
 
             // Parse libraries

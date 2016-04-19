@@ -217,9 +217,9 @@ exports.init = function (grunt) {
             fileText += "function __bootstrap(){" + EoL;
             if (libs) {
                 if (cdn) {
-                    fileText += "   document.write(\"<script src='" + cdn.url + "base/" + libs + ".js' defer='defer'></script>\");" + EoL;
+                    fileText += 'var e=document.createElement("script");e.setAttribute("src","' + cdn.url + 'base/' + libs + '.js"),e.setAttribute("defer","defer"),e.onerror=function(){throw Error("Couldn\'t complete loading")},document.head.appendChild(e)' + EoL;
                 } else {
-                    fileText += "   document.write(\"<script src='base/" + libs + ".js' defer='defer'></script>\");" + EoL;
+                    fileText += 'var e=document.createElement("script");e.setAttribute("src","base/' + libs + '.js"),e.setAttribute("defer","defer"),e.onerror=function(){throw Error("Couldn\'t complete loading")},document.head.appendChild(e)' + EoL;
                 }
             }
             fileText += "}" + EoL;

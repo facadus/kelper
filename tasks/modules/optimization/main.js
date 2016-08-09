@@ -113,6 +113,10 @@ exports.init = function (grunt) {
                     var optModule = grunt.util._.clone(configuration.default.options.modules[i], true);
                     newConfig[optModule.name] = grunt.util._.clone(configuration.default, true);
 
+                    if (this.isNotEmptyObject(this.lastConfigurations.compile.packageConfig)) {
+                        newConfig[optModule.name].options.config = this.lastConfigurations.compile.packageConfig;
+                    }
+                    
                     var excludes = [];
                     if (optModule.exclude && optModule.exclude.length > 0) {
                         optModule.exclude.forEach(function (mdl) {

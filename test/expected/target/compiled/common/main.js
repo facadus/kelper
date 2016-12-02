@@ -1,5 +1,6 @@
 /// <reference path="../require.d.ts" />
 define(["require", "exports"], function (require, exports) {
+    "use strict";
     var Common = (function () {
         function Common(message) {
             this.greeting = message;
@@ -8,7 +9,7 @@ define(["require", "exports"], function (require, exports) {
             return "Hello, " + this.greeting;
         };
         return Common;
-    })();
+    }());
     return Common;
 });
 //# sourceMappingURL=main.js.map

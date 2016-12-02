@@ -18,11 +18,11 @@
     "grunt-contrib-uglify": "0.8.0",
     "grunt-mocha-phantomjs": "0.6.1",
     "grunt-run-task": "0.1.2",
-    "grunt-typescript": "git://github.com/facadus/grunt-typescript#9fec2ef",
+    "grunt-typescript": "facadus/grunt-typescript#9fec2ef",
     "mocha": "2.2.1",
     "requirejs": "2.1.16",
     "rjs-build-analysis": "0.0.3",
-    "typescript": "1.7.5"
+    "typescript": "^2.0.10"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

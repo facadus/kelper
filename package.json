@@ -1,6 +1,6 @@
 {
   "name": "kelper",
-  "version": "0.2.58",
+  "version": "0.2.59",
   "description": "Build tool for Large-Scale JavaScript Application in TypeScript",
   "repository": {
     "type": "git",

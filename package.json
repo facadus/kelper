@@ -22,7 +22,7 @@
     "mocha": "2.2.1",
     "requirejs": "2.1.16",
     "rjs-build-analysis": "0.0.3",
-    "typescript": "^2.0.10"
+    "typescript": "2.0.10"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

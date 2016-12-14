@@ -137,7 +137,8 @@ exports.init = function (grunt) {
                         fileDep.options = fileDep.options || {};
                         fileDep.files.forEach(function (file) {
                             var foundFiles = grunt.file.expand({
-                                cwd: file.cwd
+                                cwd: file.cwd,
+                                filter: 'isFile'
                             }, file.src);
                             if (foundFiles.length) {
                                 foundFiles.forEach(function (foundFile) {

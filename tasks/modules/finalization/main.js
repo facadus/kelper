@@ -112,7 +112,7 @@ exports.init = function (grunt) {
                 this.environment.resources.forEach(function (resource) {
                     configuration.copy.resources.files.push({
                         cwd: path.resolve(process.cwd(), configuration.resourcePath, resource) + path.sep,
-                        src: ["*.*", "**/*.*"],
+                        src: ["**/*"],
                         dest: path.resolve(process.cwd(), configuration.target)
                     });
                 });

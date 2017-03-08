@@ -55,17 +55,83 @@ module.exports = function (grunt) {
         }
     };
 
-    // Loading Environment file
-    var env_file = grunt.option('target') || grunt.option('t') || 'local';
-    try {
+    function typeOf(x) {
+        var res = typeof(x);
+        if (res === "object") {
+            if (!x) return "null";
+            if (Array.isArray(x)) return "array";
+        } 
+        return res;
+    }
+
+    function reportTypeMismatch(parent, child, path, contentType, overrideType) {
+        grunt.log.writeln(
+            [contentType,'property',path,'from',parent,'is overwritten with',overrideType,'in',child].join(' ')
+        );
+    }
+
+    function recursiveMerge(parent, child, path, content, override) {
+        var contentType = typeOf(content);
+        var overrideType = typeOf(override);
+        switch(contentType) {
+            case "undefined": return override;
+            case "object": 
+                switch(overrideType) {
+                    case "object":
+                        Object.keys(override).forEach(function(key){
+                            content[key] = recursiveMerge(
+                                parent,
+                                child,
+                                path+'/'+key,
+                                content[key],
+                                override[key]
+                            )
+                        });
+                        return content;
+                    case "undefined":
+                        return content;
+                    default:
+                        reportTypeMismatch(parent, child, path, contentType, overrideType);
+                        return override;
+                }
+            default:
+                if (overrideType === "undefined") {
+                    return content;
+                } else {
+                    if (overrideType != contentType) {
+                        if (overrideType === "object"
+                            && contentType === "array"
+                            && typeOf(override.concat) === "array") {
+                            return content.concat(override.concat())
+                        } else {
+                            reportTypeMismatch(parent, child, path, contentType, overrideType);
+                        }
+                    }
+                    return override;
+                }
+        }
+    }
+
+    function loadFile(env_file) {
         var env_path = path.resolve(process.cwd(), "config", env_file);
+        var content = {};
         if (grunt.file.exists(env_path + ".json")) {
-            plugin.environment = grunt.file.readJSON(env_path + ".json");
+            content = grunt.file.readJSON(env_path + ".json");
         } else if (grunt.file.exists(env_path + ".yml")) {
-            plugin.environment = grunt.file.readYAML(env_path + ".yml");
+            content = grunt.file.readYAML(env_path + ".yml");
         } else {
             throw new Error("[ERROR] There is no '" + env_file + "' environment file!")
         }
+        if (content.extends) {
+            content = recursiveMerge(env_file, content.extends, '', content, loadFile(content.extends));
+        }
+        return content;
+    }
+
+    // Loading Environment file
+    var env_file = grunt.option('target') || grunt.option('t') || 'local';
+    try {
+        plugin.environment = loadFile(env_file);
     } catch (ex) {
         grunt.log.error(ex);
         return 1;

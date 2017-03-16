@@ -123,7 +123,7 @@ module.exports = function (grunt) {
             throw new Error("[ERROR] There is no '" + env_file + "' environment file!")
         }
         if (content.extends) {
-            content = recursiveMerge(env_file, content.extends, '', content, loadFile(content.extends));
+            content = recursiveMerge(env_file, content.extends, '', loadFile(content.extends), content);
         }
         return content;
     }

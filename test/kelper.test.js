@@ -168,6 +168,32 @@ describe("Kelper", function () {
 
         });
 
+        it('Should replace string value', function () {
+
+            var ms = new Ms({
+                test: {
+                    'extends': 'base',
+                    c: {
+                        text: 'abc'
+                    }
+                },
+                base: {
+                    c: {
+                        text: '123'
+                    }
+                }
+            });
+
+            var r = {
+                c: {
+                    text: 'abc'
+                }
+            };
+
+            expect(ms.read('test')).to.deep.equal(r);
+
+        });
+
     });
 
     // Run modules and watch for results

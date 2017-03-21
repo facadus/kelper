@@ -64,6 +64,10 @@ module.exports = function (grunt) {
         if (_.isObject(objValue) && _.isArray(srcValue) && _.isArray(objValue.concat)) {
             return objValue.concat.concat(srcValue);
         }
+
+        if (_.isString(objValue)) {
+            return objValue;
+        }
     }
 
     plugin.merge = function (content, base) {

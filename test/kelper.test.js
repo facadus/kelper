@@ -93,9 +93,12 @@ describe("Kelper", function () {
     Ms.prototype.read = function (name) {
         var content = this.data[name] || {};
 
+        var self = this;
         return plugin.merge(
             content,
-            (name) => this.read(name)
+            function (name) {
+                return self.read(name);
+            }
         );
     };
 

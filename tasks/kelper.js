@@ -103,7 +103,9 @@ module.exports = function (grunt) {
 
         return plugin.merge(
             content,
-            (name) => loadFile(name)
+            function (name) {
+                return loadFile(name);
+            }
         );
     }
 

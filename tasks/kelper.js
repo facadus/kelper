@@ -70,13 +70,29 @@ module.exports = function (grunt) {
         }
     }
 
-    plugin.merge = function (content, base) {
-        return _.mergeWith({}, content, base, customMerge);
+    plugin.merge = function (content, loader) {
+        var result = content;
+
+        if (content.extends) {
+            var base = [].concat(content.extends).map(loader);
+
+            var args = [{}, content]
+                .concat(base)
+                .concat(customMerge);
+
+            result = _.mergeWith.apply(_, args);
+
+            delete result.extends;
+        }
+
+        return result;
     };
 
     function loadFile(env_file) {
         var env_path = path.resolve(process.cwd(), "config", env_file);
+
         var content = {};
+
         if (grunt.file.exists(env_path + ".json")) {
             content = grunt.file.readJSON(env_path + ".json");
         } else if (grunt.file.exists(env_path + ".yml")) {
@@ -84,10 +100,11 @@ module.exports = function (grunt) {
         } else {
             throw new Error("[ERROR] There is no '" + env_file + "' environment file!")
         }
-        if (content.extends) {
-            content = plugin.merge(content, loadFile(content.extends));
-        }
-        return content;
+
+        return plugin.merge(
+            content,
+            (name) => loadFile(name)
+        );
     }
 
     // Loading Environment file

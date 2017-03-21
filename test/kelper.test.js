@@ -93,13 +93,10 @@ describe("Kelper", function () {
     Ms.prototype.read = function (name) {
         var content = this.data[name] || {};
 
-        if (content.extends) {
-            content = plugin.merge(content, this.read(content.extends));
-        }
-
-        delete content.extends;
-
-        return content;
+        return plugin.merge(
+            content,
+            (name) => this.read(name)
+        );
     };
 
     describe("Recursive Merge", function () {
@@ -188,6 +185,32 @@ describe("Kelper", function () {
                 c: {
                     text: 'abc'
                 }
+            };
+
+            expect(ms.read('test')).to.deep.equal(r);
+
+        });
+
+        it('Should extends list of configs', function () {
+
+            var ms = new Ms({
+                test: {
+                    'extends': ['feature1', 'feature2']
+                },
+                feature1: {
+                    a: 1,
+                    c: 3
+                },
+                feature2: {
+                    b: 2,
+                    c: 4
+                }
+            });
+
+            var r = {
+                a: 1,
+                b: 2,
+                c: 4
             };
 
             expect(ms.read('test')).to.deep.equal(r);

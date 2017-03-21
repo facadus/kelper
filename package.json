@@ -15,10 +15,11 @@
   "dependencies": {
     "chai": "2.2.0",
     "grunt-contrib-requirejs": "0.4.4",
+    "grunt-contrib-uglify": "facadus/grunt-contrib-uglify#a01a07d",
     "grunt-mocha-phantomjs": "0.6.1",
     "grunt-run-task": "0.1.2",
-    "grunt-contrib-uglify": "facadus/grunt-contrib-uglify#a01a07d",
     "grunt-typescript": "facadus/grunt-typescript#9fec2ef",
+    "lodash": "4.17.4",
     "mocha": "2.2.1",
     "requirejs": "2.1.16",
     "rjs-build-analysis": "0.0.3",

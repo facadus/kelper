@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
     'use strict';
 
+    var _ = require('lodash');
     var path = require('path');
 
     var plugin = {};
@@ -55,62 +56,19 @@ module.exports = function (grunt) {
         }
     };
 
-    function typeOf(x) {
-        var res = typeof(x);
-        if (res === "object") {
-            if (!x) return "null";
-            if (Array.isArray(x)) return "array";
-        } 
-        return res;
-    }
+    function customMerge(objValue, srcValue, key, object, source, stack) {
+        if (_.isArray(objValue) && _.isArray(srcValue)) {
+            return objValue;
+        }
 
-    function reportTypeMismatch(parent, child, path, contentType, overrideType) {
-        grunt.log.writeln(
-            [contentType,'property',path,'from',parent,'is overwritten with',overrideType,'in',child].join(' ')
-        );
-    }
-
-    function recursiveMerge(parent, child, path, content, override) {
-        var contentType = typeOf(content);
-        var overrideType = typeOf(override);
-        switch(contentType) {
-            case "undefined": return override;
-            case "object": 
-                switch(overrideType) {
-                    case "object":
-                        Object.keys(override).forEach(function(key){
-                            content[key] = recursiveMerge(
-                                parent,
-                                child,
-                                path+'/'+key,
-                                content[key],
-                                override[key]
-                            )
-                        });
-                        return content;
-                    case "undefined":
-                        return content;
-                    default:
-                        reportTypeMismatch(parent, child, path, contentType, overrideType);
-                        return override;
-                }
-            default:
-                if (overrideType === "undefined") {
-                    return content;
-                } else {
-                    if (overrideType != contentType) {
-                        if (overrideType === "object"
-                            && contentType === "array"
-                            && typeOf(override.concat) === "array") {
-                            return content.concat(override.concat())
-                        } else {
-                            reportTypeMismatch(parent, child, path, contentType, overrideType);
-                        }
-                    }
-                    return override;
-                }
+        if (_.isObject(objValue) && _.isArray(srcValue) && _.isArray(objValue.concat)) {
+            return objValue.concat.concat(srcValue);
         }
     }
+
+    plugin.merge = function (content, base) {
+        return _.mergeWith({}, content, base, customMerge);
+    };
 
     function loadFile(env_file) {
         var env_path = path.resolve(process.cwd(), "config", env_file);
@@ -123,7 +81,7 @@ module.exports = function (grunt) {
             throw new Error("[ERROR] There is no '" + env_file + "' environment file!")
         }
         if (content.extends) {
-            content = recursiveMerge(env_file, content.extends, '', loadFile(content.extends), content);
+            content = plugin.merge(content, loadFile(content.extends));
         }
         return content;
     }

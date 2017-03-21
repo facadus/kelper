@@ -8,6 +8,7 @@ var kelper = require(path.resolve(__dirname, "../tasks/kelper"));
 var assert = require('chai').assert;
 var expect = require('chai').expect;
 var should = require('chai').should();
+var _ = require('lodash');
 
 // Setting up Test options
 grunt.file.setBase(__dirname);
@@ -83,6 +84,90 @@ describe("Kelper", function () {
                 assert.ok(module, "Works fine");
             });
         });
+    });
+
+    function Ms(data) {
+        this.data = data;
+    }
+
+    Ms.prototype.read = function (name) {
+        var content = this.data[name] || {};
+
+        if (content.extends) {
+            content = plugin.merge(content, this.read(content.extends));
+        }
+
+        delete content.extends;
+
+        return content;
+    };
+
+    describe("Recursive Merge", function () {
+        it('Should extends deep objects', function () {
+
+            var ms = new Ms({
+                test: {
+                    'extends': 'middle',
+                    b: 2,
+                    c: {
+                        c2: 2
+                    }
+                },
+                middle: {
+                    'extends': 'base',
+                    d: 3
+                },
+                base: {
+                    a: 1,
+                    c: {
+                        c1: 1
+                    }
+                }
+            });
+
+            var r = {
+                a: 1,
+                b: 2,
+                c: {
+                    c1: 1,
+                    c2: 2
+                },
+                d: 3
+            };
+
+            expect(ms.read('test')).to.deep.equal(r);
+
+        });
+
+        it('Should merge arrays objects', function () {
+
+            var ms = new Ms({
+                test: {
+                    'extends': 'base',
+                    a1: [1],
+                    b: [1, 2],
+                    c: {
+                        concat: [1, 2]
+                    }
+                },
+                base: {
+                    a2: [2],
+                    b: [3],
+                    c: [3]
+                }
+            });
+
+            var r = {
+                a1: [1],
+                a2: [2],
+                b: [1, 2],
+                c: [1, 2, 3]
+            };
+
+            expect(ms.read('test')).to.deep.equal(r);
+
+        });
+
     });
 
     // Run modules and watch for results

@@ -111,6 +111,10 @@ describe("Kelper", function () {
                     b: 2,
                     c: {
                         c2: 2
+                    },
+                    e: {
+                        e1: true,
+                        e2: 2
                     }
                 },
                 middle: {
@@ -121,6 +125,10 @@ describe("Kelper", function () {
                     a: 1,
                     c: {
                         c1: 1
+                    },
+                    e: {
+                        e1: false,
+                        e2: 1
                     }
                 }
             });
@@ -132,7 +140,11 @@ describe("Kelper", function () {
                     c1: 1,
                     c2: 2
                 },
-                d: 3
+                d: 3,
+                e: {
+                    e1: true,
+                    e2: 2
+                }
             };
 
             expect(ms.read('test')).to.deep.equal(r);
@@ -174,19 +186,19 @@ describe("Kelper", function () {
                 test: {
                     'extends': 'base',
                     c: {
-                        text: 'abc'
+                        b1: 'true'
                     }
                 },
                 base: {
                     c: {
-                        text: '123'
+                        b1: 'false'
                     }
                 }
             });
 
             var r = {
                 c: {
-                    text: 'abc'
+                    b1: 'true'
                 }
             };
 
@@ -198,22 +210,43 @@ describe("Kelper", function () {
 
             var ms = new Ms({
                 test: {
-                    'extends': ['feature1', 'feature2']
+                    'extends': ['feature1', 'feature2', 'feature3'],
+                    d: {
+                        c1: 'null'
+                    }
                 },
                 feature1: {
                     a: 1,
-                    c: 3
+                    c: 3,
+                    d: {
+                        a1: true,
+                        b1: 'false',
+                        c1: 'false'
+                    }
                 },
                 feature2: {
                     b: 2,
-                    c: 4
+                    c: 4,
+                    d: {
+                        a1: false,
+                        b1: 'true',
+                        c1: 'true'
+                    }
+                },
+                feature3: {
+                    c: 5
                 }
             });
 
             var r = {
                 a: 1,
                 b: 2,
-                c: 4
+                c: 5,
+                d: {
+                    a1: false,
+                    b1: 'true',
+                    c1: 'null'
+                }
             };
 
             expect(ms.read('test')).to.deep.equal(r);

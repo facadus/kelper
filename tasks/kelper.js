@@ -57,16 +57,8 @@ module.exports = function (grunt) {
     };
 
     function customMerge(objValue, srcValue, key, object, source, stack) {
-        if (_.isArray(objValue) && _.isArray(srcValue)) {
-            return objValue;
-        }
-
-        if (_.isObject(objValue) && _.isArray(srcValue) && _.isArray(objValue.concat)) {
-            return objValue.concat.concat(srcValue);
-        }
-
-        if (_.isString(objValue)) {
-            return objValue;
+        if (_.isObject(srcValue) && _.isArray(objValue) && _.isArray(srcValue.concat)) {
+            return srcValue.concat.concat(objValue);
         }
     }
 
@@ -76,8 +68,9 @@ module.exports = function (grunt) {
         if (content.extends) {
             var base = [].concat(content.extends).map(loader);
 
-            var args = [{}, content]
+            var args = [{}]
                 .concat(base)
+                .concat(content)
                 .concat(customMerge);
 
             result = _.mergeWith.apply(_, args);

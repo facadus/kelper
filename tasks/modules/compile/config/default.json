@@ -1,6 +1,6 @@
 {
   "default": {
-    "src": "src/**/*.ts",
+    "src": "src/**/*.ts*",
     "sourcePath": "src",
     "dest": "target/compiled",
     "options": {

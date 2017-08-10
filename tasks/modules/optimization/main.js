@@ -230,22 +230,24 @@ exports.init = function (grunt) {
                         for (var packageName in library.packages) {
                             var pkg = library.packages[packageName];
 
-                            if (typeof pkg == "boolean") {
-                                excludes.push(packageName);
-                            } else {
-                                if (pkg.skip) {
-                                    skipPaths[packageName] = 'empty:';
-                                }
-                                includes.push(packageName);
+                            if (pkg != null) {
+                                if (typeof pkg == "boolean") {
+                                    excludes.push(packageName);
+                                } else {
+                                    if (pkg.skip) {
+                                        skipPaths[packageName] = 'empty:';
+                                    }
+                                    includes.push(packageName);
 
-                                if (!pkg.skipRequire) {
-                                    includeRequire.push(
-                                        pkg.requireName ? pkg.requireName : packageName
-                                    );
-                                }
+                                    if (!pkg.skipRequire) {
+                                        includeRequire.push(
+                                            pkg.requireName ? pkg.requireName : packageName
+                                        );
+                                    }
 
-                                if (pkg.replace) {
-                                    parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);
+                                    if (pkg.replace) {
+                                        parsed.paths = this.mergeObjects(parsed.paths, pkg.replace);
+                                    }
                                 }
                             }
                         }

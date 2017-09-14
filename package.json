@@ -18,7 +18,7 @@
     "grunt-contrib-uglify": "facadus/grunt-contrib-uglify#a01a07d",
     "grunt-mocha-phantomjs": "0.6.1",
     "grunt-run-task": "0.1.2",
-    "grunt-typescript": "facadus/grunt-typescript#9fec2ef",
+    "grunt-typescript": "facadus/grunt-typescript#ea01df4",
     "lodash": "4.17.4",
     "mocha": "2.2.1",
     "requirejs": "2.1.16",

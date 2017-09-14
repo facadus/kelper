@@ -11,15 +11,15 @@ module.exports = function (grunt) {
         operations: [
             "compile",
             "test",
-            "build",
-            "all"
+            "build"
         ],
         phase: function (operation) {
             var $operations = [];
-            var operation = (operation != true) ? operation : "all";
+            var operation = (operation != true) ? operation : "build";
 
             switch (operation) {
-                case "all":
+                case "b":
+                case "build":
                     $operations.push(
                         "cdn",
                         "ui_test",
@@ -28,14 +28,6 @@ module.exports = function (grunt) {
                         "optimization",
                         "unit_test",
                         "compile"
-                    );
-                    break;
-                case "b":
-                case "build":
-                    $operations.push(
-                        "hashconstruction",
-                        "finalization",
-                        "optimization"
                     );
                     break;
                 case "t":

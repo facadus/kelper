@@ -152,6 +152,10 @@ module.exports = function (grunt) {
         grunt.registerTask('kelper:' + op, "Kelper's " + op + " module", function () {
             var oldConfig = {};
             if (!grunt.hasOwnProperty("test") || !grunt.test) {
+                delete global.window;
+                delete global.document;
+                delete global.navigator;
+
                 var modules = plugin.configuration.phase(op);
                 var defConfiguration = grunt.util._.clone(grunt.config.get(), true);
                 modules.forEach(function (moduleName) {
